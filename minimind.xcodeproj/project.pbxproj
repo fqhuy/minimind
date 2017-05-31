@@ -19,6 +19,8 @@
 		367E89351C965A3600C96392 /* base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E89341C965A3600C96392 /* base.swift */; };
 		367E89BB1C96BB4400C96392 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BA1C96BB4400C96392 /* Surge.framework */; };
 		367E89BD1C96BB4B00C96392 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BC1C96BB4B00C96392 /* Accelerate.framework */; };
+		36C3CEFB1EDE019700CE1E42 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C3CEFA1EDE019700CE1E42 /* main.swift */; };
+		36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C3CEFC1EDECCA600CE1E42 /* random.swift */; };
 		36DFA3EA1D3FC336005CBBC0 /* base_estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */; };
 		36DFA3EC1D3FC570005CBBC0 /* gaussian_process.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DFA3EB1D3FC570005CBBC0 /* gaussian_process.swift */; };
 /* End PBXBuildFile section */
@@ -50,6 +52,8 @@
 		367E89631C96AF3C00C96392 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		367E89BA1C96BB4400C96392 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = "../lib/Surge/build/Debug-iphoneos/Surge.framework"; sourceTree = "<group>"; };
 		367E89BC1C96BB4B00C96392 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		36C3CEFA1EDE019700CE1E42 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		36C3CEFC1EDECCA600CE1E42 /* random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = random.swift; path = ../random.swift; sourceTree = "<group>"; };
 		36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = base_estimator.swift; sourceTree = "<group>"; };
 		36DFA3EB1D3FC570005CBBC0 /* gaussian_process.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = gaussian_process.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -109,6 +113,7 @@
 				367E89151C963D2600C96392 /* Info.plist */,
 				367E89341C965A3600C96392 /* base.swift */,
 				367E89631C96AF3C00C96392 /* MyPlayground.playground */,
+				36C3CEFA1EDE019700CE1E42 /* main.swift */,
 			);
 			path = minimind;
 			sourceTree = "<group>";
@@ -186,6 +191,7 @@
 		36DFA3E81D3FC30F005CBBC0 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				36C3CEFC1EDECCA600CE1E42 /* random.swift */,
 				36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */,
 				3617FA021EDB225F0087C682 /* scg.swift */,
 				3617FA041EDB226E0087C682 /* optimization.swift */,
@@ -313,6 +319,8 @@
 				36DFA3EA1D3FC336005CBBC0 /* base_estimator.swift in Sources */,
 				3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */,
 				3617FA031EDB225F0087C682 /* scg.swift in Sources */,
+				36C3CEFB1EDE019700CE1E42 /* main.swift in Sources */,
+				36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */,
 				36DFA3EC1D3FC570005CBBC0 /* gaussian_process.swift in Sources */,
 				3617FA0B1EDD973C0087C682 /* array.swift in Sources */,
 				367E89351C965A3600C96392 /* base.swift in Sources */,
