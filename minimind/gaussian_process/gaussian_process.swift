@@ -20,7 +20,7 @@ public protocol GaussianProcess: BaseEstimator, RegressorMixin {
     
     func score(X: MatrixT, y: MatrixT) -> ScalarT
     
-    func predict(X: MatrixT) -> MatrixT
+    func predict(X: MatrixT) -> (MatrixT, MatrixT) 
 }
 
 public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: ExpressibleByFloatLiteral & FloatingPoint, K.MatrixT == Matrix<T>, K.ScalarT == T {
@@ -44,7 +44,7 @@ public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: E
         self.alpha = alpha
     }
     
-    public func predict(X: MatrixT) -> MatrixT {
+    public func predict(X: MatrixT) -> (MatrixT, MatrixT)  {
         fatalError("unimplemented")
     }
 
@@ -58,9 +58,13 @@ public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: E
 }
 
 public extension GaussianProcessRegressor where T == Float {
-    public func predict(_ X: MatrixT) -> MatrixT {
+    public func predict(_ X: MatrixT) -> (MatrixT, MatrixT) {
         let Kxz = kernel.K(X, Xtrain)
-        return Kxz * inv(Kxx + noise) * ytrain
+        let Kzz = kernel.K(X, X)
+        let Sigma = Kzz - Kxz * inv(Kxx + noise) * transpose(Kxz)
+        let Mu = Kxz * inv(Kxx + noise) * ytrain
+        
+        return (Mu, Sigma)
     }
     
     public func fit(_ X: MatrixT, _ y: MatrixT) {

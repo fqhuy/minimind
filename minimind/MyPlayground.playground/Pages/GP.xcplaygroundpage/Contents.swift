@@ -15,4 +15,6 @@ let y: Matrix<Float> = randMatrix(rows: 10, columns: 1)
 gpr.fit(X, y)
 
 let Xstar: Matrix<Float> = randMatrix(rows: 2, columns: 5)
-gpr.predict(Xstar)
+let (Mu, Sigma) = gpr.predict(Xstar)
+print(Mu)
+print(Sigma)
