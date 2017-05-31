@@ -9,9 +9,9 @@
 import Foundation
 import Surge
 
-class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
-    typealias ScalarT = Float
-    typealias MatrixT = Matrix<ScalarT>
+public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
+    public typealias ScalarT = Float
+//    typealias MatrixT = Matrix<ScalarT>
     
     typealias T = ScalarT
     var objective: F
@@ -38,7 +38,7 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
         var gradnew: MatrixT = self.objective.gradient(self.init_x)
         function_eval += 1
         
-        var current_grad = (gradnew * gradnew)[0, 0]
+        var current_grad = (gradnew * gradnew.t)[0, 0]
         
         // NEED TO COPY !
         var gradold: MatrixT = gradnew
@@ -46,8 +46,8 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
         var success = true
         var nsuccess = 0
         
-        let betamin: T = 1.0e-15
-        let betamax: T = 1.0e-15
+        let betamin: T = 1.0e-10
+        let betamax: T = 1.0e10
         var status = "Not Converged"
         
         var flog = [Float]()
@@ -65,19 +65,19 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
         var fnew: T = 0.0
         while iteration < self.maxiters {
             if success {
-                var mu = (d * gradnew)[0, 0]
+                mu = (d * gradnew.t)[0, 0]
                 if mu >= 0 {
                     d = -gradnew
-                    mu = (d * gradnew)[0, 0]
+                    mu = (d * gradnew.t)[0, 0]
                 }
-                kappa = (d * d)[0, 0]
+                kappa = (d * d.t)[0, 0]
                 sigma = sigma0 / sqrt(kappa)
                 
                 // FROM HERE
                 let xplus = x + sigma * d
                 let gplus = self.objective.gradient(xplus)
                 function_eval += 1
-                theta = (d * (gplus - gradnew) / sigma)[0, 0]
+                theta = (d * (gplus - gradnew).t / sigma)[0, 0]
             }
             
             delta = theta + beta * kappa
@@ -110,8 +110,9 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
             flog.append(fnow)
             
             iteration += 1
-            if self.verbose {
+            if verbose {
                 // show current values
+                print("iter: ", iteration, fnow)
             }
             
             if success {
@@ -125,7 +126,7 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
                     gradold = gradnew
                     gradnew = self.objective.gradient(x)
                     function_eval  += 1
-                    current_grad = (gradnew * gradnew)[0, 0]
+                    current_grad = (gradnew * gradnew.t)[0, 0]
                     fold = fnew
                     
                     if current_grad <= gtol {
@@ -148,7 +149,7 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
                 beta = 1.0
                 nsuccess = 0
             } else if success {
-                Gamma = ((gradold - gradnew) * gradnew)[0, 0] / mu
+                Gamma = ((gradold - gradnew) * gradnew.t)[0, 0] / mu
                 d = Gamma * d - gradnew
             }
         }
@@ -156,7 +157,8 @@ class SCG<F: AnyObjectiveFunction<Float> >: Optimizer {
         status = "maxiter exceeded"
         
         if verbose {
-            
+            print("iter: ", iteration, fnow)
+            print(status)
         }
         
         return (x, flog, function_eval)

@@ -10,29 +10,18 @@ import Foundation
 import Surge
 
 public protocol ObjectiveFunction {
-    associatedtype ScalarT
-    associatedtype MatrixT
-    func compute(_ x: MatrixT) -> ScalarT
-    func gradient(_ x: MatrixT) -> MatrixT
-}
-
-class AnyObjectiveFunction<S>: ObjectiveFunction where S: ExpressibleByFloatLiteral & FloatingPoint {
-    typealias ScalarT = S
-    typealias MatrixT = Matrix<S>
+    associatedtype ScalarT: FloatType
+    typealias MatrixT = Matrix<ScalarT>
     
-    func compute(_ x: MatrixT) -> ScalarT {
-        return 0.0
-    }
-    
-    func gradient(_ x: MatrixT) -> MatrixT {
-        return MatrixT([[]])
-    }
+     func compute(_ x: MatrixT) -> ScalarT
+     func gradient(_ x: MatrixT) -> MatrixT
 }
 
 
 public protocol Optimizer {
-    associatedtype ScalarT
-    associatedtype MatrixT
-    func optimize(verbose: Bool) -> (MatrixT, [Float], Int)
-    func get_cost() -> Double
+    associatedtype ScalarT: FloatType
+    typealias MatrixT = Matrix<ScalarT>
+    
+     func optimize(verbose: Bool) -> (MatrixT, [Float], Int)
+     func get_cost() -> Double
 }

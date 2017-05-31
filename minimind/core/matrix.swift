@@ -21,15 +21,26 @@ public extension Matrix {
         self.grid = data
     }
     
-//    public var t: Matrix {
-//        get {
-//            let newmat = self
-//            return transpose(newmat)
-//        }
-//    }
-    
     func copy(with zone: NSZone? = nil) -> Any {
         return Matrix(rows: 0, columns: 0, repeatedValue: 0.0)
+    }
+}
+
+public extension Matrix where T == Float {
+        public var t: Matrix {
+            get {
+                let newmat = self
+                return transpose(newmat)
+            }
+        }
+}
+
+public extension Matrix where T == Double {
+    public var t: Matrix {
+        get {
+            let newmat = self
+            return transpose(newmat)
+        }
     }
 }
 
@@ -218,6 +229,6 @@ public func eye<T: FloatingPoint & ExpressibleByFloatLiteral>(_ D: Int) -> Matri
 //    mat.grid = arc4random_uniform(10)
 //}
 
-public func randMatrix<T: FloatType>(rows: Int, columns: Int) -> Matrix<T> {
+public func randMatrix<T: FloatType>(_ rows: Int,_ columns: Int) -> Matrix<T> {
     return Matrix<T>(rows: rows, columns: columns, data: randArray(n: rows * columns))
 }

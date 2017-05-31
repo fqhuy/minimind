@@ -4,5 +4,6 @@
         <page name='TestExtension'/>
         <page name='OperatorOverloading'/>
         <page name='GP'/>
+        <page name='Optimization'/>
     </pages>
 </playground>
