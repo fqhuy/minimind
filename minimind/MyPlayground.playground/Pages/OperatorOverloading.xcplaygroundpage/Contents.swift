@@ -9,8 +9,12 @@ import Surge
 var m = Matrix<Float>([[1.0, 2.0],[1.0, 1.0]])
 let v = m
 //let v1 = -1.0 * m
+//
+func / <T:ExpressibleByFloatLiteral & FloatingPoint>(lhs: T, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs / rhs
+}
 
-func * <T:ExpressibleByFloatLiteral & FloatingPoint>(lhs: T, rhs: Matrix<T>) -> Matrix<T> {
+func * <T:ExpressibleByFloatLiteral & FloatingPoint>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
     return lhs * rhs
 }
 
@@ -32,9 +36,29 @@ func -<T: SignedNumber>(lhs: [T], rhs: [T]) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] - rhs[$0] }
 }
 
+
 let s = [1.0, 2.0]
 s - [1.0, 1.0]
+10.0 * m
 
+//
+//
+//let x: Int = 10
+//let y = x
+//pow(5.0, 10.0)
+//
+//public class C {
+//    public init(){
+//        
+//    }
+//    public subscript(index idx: Int) -> Int {
+//    get {
+//        return idx
+//    }
+//    
+//    }
+//}
+//
+//let a = Array([1,2,3])
+//a[0]
 
-let x: Int? = 10
-let y = x

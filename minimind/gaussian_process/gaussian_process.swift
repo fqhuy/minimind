@@ -23,39 +23,51 @@ public protocol GaussianProcess: BaseEstimator, RegressorMixin {
     func predict(X: MatrixT) -> MatrixT
 }
 
-class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: ExpressibleByFloatLiteral & FloatingPoint, K.MatrixT == Matrix<T>, K.ScalarT == T {
-    var kernel: K
-    var Kxx: MatrixT
-    var noiseModel: String
-    var X: MatrixT
+public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: ExpressibleByFloatLiteral & FloatingPoint, K.MatrixT == Matrix<T>, K.ScalarT == T {
+    public var kernel: K
+    public var Kxx: MatrixT
+    public var alpha: T
+    public var Xtrain: MatrixT
     var noise: MatrixT
-    var y: MatrixT
+    public var ytrain: MatrixT
     
-    typealias KernelT = K
-    typealias ScalarT = T
-    typealias MatrixT = Matrix<T>
+    public typealias KernelT = K
+    public typealias ScalarT = T
+    public typealias MatrixT = Matrix<T>
     
-    public init(noiseModel: String = "Spherical") {
-        kernel = KernelT()
+    public init( kernel: KernelT, alpha: T = 1e-5) {
+        self.kernel = kernel
         Kxx = MatrixT()
-        X = MatrixT()
+        Xtrain = MatrixT()
         noise = MatrixT()
-        y = MatrixT()
-        self.noiseModel = noiseModel
+        ytrain = MatrixT()
+        self.alpha = alpha
     }
     
-    func predict(X: MatrixT) -> MatrixT {
-        let Kxz = kernel.K(self.X, X)!
-        return Kxz * (Kxx + noise) * y
+    public func predict(X: MatrixT) -> MatrixT {
+        fatalError("unimplemented")
     }
 
-    func score(X: MatrixT, y: MatrixT) -> ScalarT {
-        return 0.0
+    public func score(X: MatrixT, y: MatrixT) -> ScalarT {
+        fatalError("unimplemented")
     }
 
-    func fit(X: MatrixT, y: MatrixT) {
-        Kxx = self.kernel.K(X, X)!
+    public func fit(X: MatrixT, y: MatrixT) {
+        fatalError("unimplemented")
     }
+}
 
-
+public extension GaussianProcessRegressor where T == Float {
+    public func predict(_ X: MatrixT) -> MatrixT {
+        let Kxz = kernel.K(X, Xtrain)
+        return Kxz * inv(Kxx + noise) * ytrain
+    }
+    
+    public func fit(_ X: MatrixT, _ y: MatrixT) {
+        Kxx = kernel.K(X, X)
+        Xtrain = X
+        let e: Matrix<T> = eye(X.rows)
+        noise = e * (alpha * alpha)
+        ytrain = y
+    }
 }
