@@ -17,15 +17,17 @@ public protocol Kernel {
     
     func K(_ X: MatrixT, _ Y: MatrixT) -> MatrixT
     
-    // return the gradient of K w.r.t all parameters
+    /// comute the gradient of K w.r.t all parameters
+    /// - Parameter X, Y: data points
+    /// - Parameter dLdK: gradient of an objective function w.r.t this kernel
+    /// - Returns: gradient of the parameters
     func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT
+    
+    /// each kernel should know how to set it parameters, all combined in a single 1xP vector
+    func set_params(_ params: MatrixT)
+    
+    /// return a vector of concatenated parameters
+    func get_params() -> MatrixT
 }
-
-//extension Kernel where ScalarT: ExpressibleByFloatLiteral & FloatingPoint {
-//    
-//    func K(_ X: Matrix<ScalarT>, _ Y: Matrix<ScalarT>) -> Matrix<ScalarT> {
-//        return Surge.Matrix(rows: 1, columns: 1, repeatedValue: 0.0)
-//    }
-//}
 
 
