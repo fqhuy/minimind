@@ -22,17 +22,26 @@ class minimindTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
+    func testGaussianProcessRegressor() {
+        let N = 8
+        let P = 2
+        let kern = RBF(alpha: 1.1, gamma: 1.0)
+        let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.01)
         
-        let kern = RBF(alpha: 0.1, gamma: 2.0)
-        let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 0.01)
+        var X: Matrix<Float> = randMatrix(N, P + 1) * 10.0
+        X[column: 0] = [Float](repeating: 1.0, count: N)
+        var XX: Matrix<Float> = zeros(N, P)
+        for i in 1..<P+1 {
+            XX[column: i - 1] = X[column: i]
+        }
         
-        let X: Matrix<Float> = randMatrix(10, 5)
-        let y: Matrix<Float> = randMatrix(1, 10)
+        let A: Matrix<Float> = randMatrix(P + 1, 1)
+        let y: Matrix<Float> = X * A + 0.01 * randMatrix(N, 1)
         
-        gpr.fit(X, y)
-        let Xstar: Matrix<Float> = randMatrix(2, 5)
-        gpr.predict(Xstar)
+        gpr.fit(XX, y)
+        
+        let Xstar: Matrix<Float> = randMatrix(5, P)
+        let (Mu, Sigma) = gpr.predict(Xstar)
         
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -65,6 +74,25 @@ class minimindTests: XCTestCase {
         var scg = SCG(objective: Quad(2.0, -3.0, 5.0), learning_rate: 0.01, init_x: Matrix<Float>([[5.0]]), maxiters: 200)
         scg.optimize(verbose: true)
 
+    }
+    
+    func testMatrixOps() {
+        let X: Matrix<Float> = randMatrix(8, 2)
+        let y: Matrix<Float> = randMatrix(8, 1)
+        let kern = RBF(alpha: 1.1, gamma: 1.0)
+        
+        let C = kern.K(X, X) + eye(8) * (1.1 * 1.1)
+        let N = Float(X.rows)
+        let D = Float(X.columns)
+        
+        let L = cholesky(C, "L")
+        let alpha = solve_triangular(L,y, "L")
+        
+        let ytCy = 0.5 * reduce_sum(alpha • alpha)![0, 0]
+        let logdetC = 0.5 * D * logdet(C)
+        
+        let llh = ytCy + logdetC + N * D / 2.0 * log(2.0 * Float.pi)
+        
     }
     
     func testMath() {

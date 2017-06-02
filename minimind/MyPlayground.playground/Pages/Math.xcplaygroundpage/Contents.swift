@@ -19,5 +19,9 @@ print(symmat)
 let b: Matrix<Float> = Matrix<Float>([[0.1], [0.2], [0.3]])
 
 let x = solve_triangular(L, b, "U")
+let iL = inv(L, "L")
+let iLL = inv(L)
 
 print(x)
+print(iL)
+print(iLL)

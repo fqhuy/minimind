@@ -42,6 +42,7 @@ public func * <T: FloatingPoint>(lhs: T, rhs: [T]) -> [T] {
 }
 
 public func * <T: FloatingPoint>(lhs: [T], rhs: [T]) -> [T] {
+    precondition(lhs.count == rhs.count, "rhs.count must == lhs.count")
     return (0..<lhs.count).map{ lhs[$0] * rhs[$0] }
 }
 

@@ -62,3 +62,8 @@ s - [1.0, 1.0]
 //let a = Array([1,2,3])
 //a[0]
 
+print(m)
+m[column: 0] = [9.0, 9.0]
+print(m)
+
+

@@ -6,15 +6,24 @@ import minimind
 
 //: [Next](@next)
 
-let kern = RBF(alpha: 0.1, gamma: 2.0)
-let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 0.01)
+let N = 8
+let P = 2
+let kern = RBF(alpha: 1.1, gamma: 1.0)
+let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.01)
 
-let X: Matrix<Float> = randMatrix(10, 5)
-let y: Matrix<Float> = randMatrix(10, 1)
+var X: Matrix<Float> = randMatrix(N, P + 1) * 5.0
+X[column: 0] = [Float](repeating: 1.0, count: N)
+var XX: Matrix<Float> = zeros(N, P)
+for i in 1..<P+1 {
+    XX[column: i - 1] = X[column: i]
+}
 
-gpr.fit(X, y)
+let A: Matrix<Float> = randMatrix(P + 1, 1)
+let y: Matrix<Float> = X * A + 0.01 * randMatrix(N, 1)
 
-let Xstar: Matrix<Float> = randMatrix(2, 5)
+gpr.fit(XX, y)
+
+let Xstar: Matrix<Float> = randMatrix(5, P)
 let (Mu, Sigma) = gpr.predict(Xstar)
+
 print(Mu)
-print(Sigma)

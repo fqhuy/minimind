@@ -35,7 +35,7 @@ public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: E
     public typealias ScalarT = T
     public typealias MatrixT = Matrix<T>
     
-    public init( kernel: KernelT, alpha: T = 1e-5) {
+    public init( kernel: KernelT, alpha: T = 1.0) {
         self.kernel = kernel
         Kxx = MatrixT()
         Xtrain = MatrixT()
@@ -58,7 +58,7 @@ public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: E
 }
 
 public extension GaussianProcessRegressor where T == Float {
-    public var likelihood: GPLikelihood<T, KernelT> {
+    public var likelihood: GPLikelihood<KernelT> {
         get {
             return GPLikelihood(kernel, noise, Xtrain, ytrain)
         }
@@ -85,7 +85,10 @@ public extension GaussianProcessRegressor where T == Float {
         let e: Matrix<T> = eye(X.rows)
         noise = e * (alpha * alpha)
         
-        var scg = SCG(objective: likelihood, learning_rate: 0.01, init_x: Matrix<Float>([[1.0, 1.0]]), maxiters: maxiters)
+        var llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
+        
+        var scg = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.init_params(), maxiters: maxiters)
+        
         let (x, flog, _) = scg.optimize(verbose: verbose)
         
         kernel.set_params(x)
@@ -93,8 +96,8 @@ public extension GaussianProcessRegressor where T == Float {
 }
 
 
-public class GPLikelihood<T: FloatType, K: Kernel>: ObjectiveFunction where K.MatrixT == Matrix<T>, K.ScalarT == T  {
-    public typealias ScalarT = T
+public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matrix<Float>, K.ScalarT == Float  {
+    public typealias ScalarT = Float
     public typealias MatrixT = Matrix<ScalarT>
     public typealias KernelT = K
     
@@ -111,17 +114,17 @@ public class GPLikelihood<T: FloatType, K: Kernel>: ObjectiveFunction where K.Ma
         ytrain = y
     }
     
-    public func compute(_ x: MatrixT) -> ScalarT {
-        fatalError("unimplemented")
-    }
-    
-    public func gradient(_ x: MatrixT) -> MatrixT {
-        fatalError("unimplemented")
-    }
-}
-
-
-extension GPLikelihood where T == Float {
+//    public func compute(_ x: MatrixT) -> ScalarT {
+//        fatalError("unimplemented")
+//    }
+//    
+//    public func gradient(_ x: MatrixT) -> MatrixT {
+//        fatalError("unimplemented")
+//    }
+//}
+//
+//
+//extension GPLikelihood where T == Float {
     public func compute(_ x: MatrixT) -> ScalarT {
         kernel.set_params(x)
         
@@ -130,7 +133,7 @@ extension GPLikelihood where T == Float {
         let D = Float(Xtrain.columns)
         
         let L = cholesky(C, "L")
-        let alpha = solve_triangular(L, Xtrain, "L")
+        let alpha = solve_triangular(L, ytrain, "L")
         
         // same as 0.5 * tr(alpha.t * alpha)
         let ytCy = 0.5 * reduce_sum(alpha • alpha)![0, 0]
@@ -138,7 +141,7 @@ extension GPLikelihood where T == Float {
         let logdetC = 0.5 * D * logdet(C)
         
         // Negative log likelihood
-        return ytCy + logdetC + N * D / 2.0 * log(2.0 * T.pi)
+        return ytCy + logdetC + N * D / 2.0 * log(2.0 * ScalarT.pi)
     }
     
     public func gradient(_ x: MatrixT) -> MatrixT {
@@ -154,11 +157,15 @@ extension GPLikelihood where T == Float {
         let L = cholesky(C, "L")
         let B = solve_triangular(L, solve_triangular(L.t, ytrain, "U"), "L")
         
-        let D = T(Xtrain.columns)
-        let iL = inv(L)
+        let D = ScalarT(Xtrain.columns)
+        
+        // WEIRD! BUT THIS IS HOW IT WORKS
+        let iL = inv(L, "U")
         
         // TODO: possibly wrong
-        let dLdK = -(B * B.t) + D * (iL * iL.t)
+        let t1 = -(B * transpose(B) )
+        let t2 = D * (iL * transpose(iL) )
+        let dLdK = t1 + t2 // -(B * B.t) + D * (iL * iL.t)
         
         return kernel.gradient(Xtrain, Xtrain, dLdK)
     }

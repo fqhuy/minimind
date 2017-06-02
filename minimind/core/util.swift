@@ -15,5 +15,15 @@ extension Character {
 }
 
 public func ascii(_ c: String) -> Int8 {
-    return Int8(c[c.startIndex].asciiValue!)
+    switch c {
+    case "U":
+        return 85
+    case "L":
+        return 76
+    case "N":
+        return 78
+    default:
+        return 0
+    }
+//    return Int8(c[c.startIndex].asciiValue!)
 }

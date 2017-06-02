@@ -79,7 +79,8 @@ public func div (mat: Matrix<Float>, scalar: Float) -> Matrix<Float> {
 
 public func •<T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     var newmat = lhs
-    newmat.grid = (0..<lhs.grid.count).map{ lhs.grid[$0] * rhs.grid[$0] }
+    newmat.grid = lhs.grid * rhs.grid
+//    newmat.grid = (0..<lhs.grid.count).map{ lhs.grid[$0] * rhs.grid[$0] }
     return newmat
 }
 
@@ -161,6 +162,24 @@ public func min<T: FloatingPoint & ExpressibleByFloatLiteral>(_ mat: Matrix<T>) 
     return mat.grid.min()!
 }
 
+public func inv(_ mat: Matrix<Float>, _ uplo: String) -> Matrix<Float> {
+    
+    if uplo == "N" {
+        return inv(mat)
+    } else if (uplo == "U" || uplo == "L")  {
+        var A = mat
+        var uplo: Int8 = ascii(uplo)
+        var dia: Int8 = ascii("N")
+        var n: __CLPK_integer = __CLPK_integer(A.rows)
+        var info: __CLPK_integer = __CLPK_integer(0)
+        
+        strtri_(&uplo, &dia, &n, &(A.grid), &n, &info)
+        return A
+    } else {
+        return mat
+    }
+}
+
 public func cross_add<T: FloatType>(_ lhs: Matrix<T>, _ rhs: Matrix<T>) -> Matrix<T> {
     precondition((lhs.columns == 1) && (rhs.columns == 1), "lhs and rhs must have shape (N, 1)")
     
@@ -181,7 +200,7 @@ public func cholesky(_ mat: Matrix<Float>, _ uplo: String = "U") -> Matrix<Float
     var info: __CLPK_integer = 0
     spotrf_(&_uplo, &n, &(L.grid), &n, &info )
     
-    assert(info == 0, "Cholesky failed")
+    assert(info == 0, "Cholesky failed: " + String(info) )
     switch uplo {
     case "L":
         return triu(L).t
@@ -200,7 +219,7 @@ public func cholesky(_ mat: Matrix<Double>, _ uplo: String = "U") -> Matrix<Doub
     var info: __CLPK_integer = 0
     dpotrf_(&_uplo, &n, &(L.grid), &n, &info )
     
-    assert(info == 0, "Cholesky failed")
+    assert(info == 0, "Cholesky failed" + String(info))
     switch uplo {
     case "L":
         return triu(L).t
@@ -223,11 +242,10 @@ public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: St
     var trans: Int8 = ascii("N")
     var dia: Int8 = ascii("N")
     var n: __CLPK_integer = __CLPK_integer(A.rows)
-    var nrhs: __CLPK_integer = __CLPK_integer(b.rows)
-    var info: __CLPK_integer = 0
+    var nrhs: __CLPK_integer = __CLPK_integer(b.columns)
+    var info: __CLPK_integer = __CLPK_integer(0)
     
-    strtrs_(&uplo, &trans, &dia, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &nrhs, &info)
-    
+    strtrs_(&uplo, &trans, &dia, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &n, &info)
     assert(info == 0, "solve triangular failed")
     
     return bb
@@ -240,10 +258,10 @@ public func solve_triangular(_ A: Matrix<Double>, _ b: Matrix<Double>, _ lower: 
     var trans: Int8 = ascii("N")
     var dia: Int8 = ascii("N")
     var n: __CLPK_integer = __CLPK_integer(A.rows)
-    var nrhs: __CLPK_integer = __CLPK_integer(b.rows)
+    var nrhs: __CLPK_integer = __CLPK_integer(b.columns)
     var info: __CLPK_integer = 0
     
-    dtrtrs_(&uplo, &trans, &dia, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &nrhs, &info)
+    dtrtrs_(&uplo, &trans, &dia, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &n, &info)
     
     assert(info == 0, "solve triangular failed")
     

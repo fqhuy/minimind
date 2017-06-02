@@ -35,8 +35,12 @@ public class RBF: Kernel {
         gamma = params[0, 1]
     }
     
-    public func get_params() -> Matrix<RBF.ScalarT> {
+    public func get_params() -> MatrixT {
         return MatrixT([[alpha, gamma]])
+    }
+    
+    public func init_params() -> MatrixT {
+        return MatrixT([[1.0, 1.0]])
     }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {

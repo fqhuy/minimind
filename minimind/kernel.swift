@@ -28,6 +28,9 @@ public protocol Kernel {
     
     /// return a vector of concatenated parameters
     func get_params() -> MatrixT
+    
+    /// return a reasonable initialisation for all parameters
+    func init_params() -> MatrixT
 }
 
 
