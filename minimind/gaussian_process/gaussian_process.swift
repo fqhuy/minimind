@@ -58,6 +58,13 @@ public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: E
 }
 
 public extension GaussianProcessRegressor where T == Float {
+    public var likelihood: GPLikelihood<T, KernelT> {
+        get {
+            return GPLikelihood(kernel, noise, Xtrain, ytrain)
+        }
+    }
+
+    
     public func predict(_ X: MatrixT) -> (MatrixT, MatrixT) {
         let Kxz = kernel.K(X, Xtrain)
         let Kzz = kernel.K(X, X)
@@ -73,5 +80,55 @@ public extension GaussianProcessRegressor where T == Float {
         let e: Matrix<T> = eye(X.rows)
         noise = e * (alpha * alpha)
         ytrain = y
+    }
+}
+
+
+public class GPLikelihood<T: FloatType, K: Kernel>: ObjectiveFunction where K.MatrixT == Matrix<T>, K.ScalarT == T  {
+    public typealias ScalarT = T
+    public typealias MatrixT = Matrix<ScalarT>
+    public typealias KernelT = K
+    
+
+    public var kernel: KernelT
+    public var noise: MatrixT
+    public var Xtrain: MatrixT
+    public var ytrain: MatrixT
+    
+    public init(_ kernel: KernelT, _ noise: MatrixT, _ X: MatrixT, _ y: MatrixT) {
+        self.kernel = kernel
+        self.noise = noise
+        Xtrain = X
+        ytrain = y
+    }
+    
+    public func compute(_ x: MatrixT) -> ScalarT {
+        fatalError("unimplemented")
+    }
+    
+    public func gradient(_ x: MatrixT) -> MatrixT {
+        fatalError("unimplemented")
+    }
+}
+
+
+extension GPLikelihood where T == Float {
+    public func compute(_ x: MatrixT) -> ScalarT {
+        let C = kernel.K(x, x) + noise
+        let N = Float(Xtrain.rows)
+        let ytCy = (0.5 * ytrain.t * inv(C) * ytrain)[0, 0]
+        let logdetC = 0.5 * logdet(C)
+        
+        // Negative log likelihood
+        return ytCy + logdetC + N / 2 * log(2 * T.pi)
+    }
+    
+    public func gradient(_ x: MatrixT) -> MatrixT {
+        let C = kernel.K(x, x) + noise
+        let Cinv = inv(C)
+        let D = T(Xtrain.columns)
+        let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
+        
+        return kernel.gradient(Xtrain, ytrain, dLdK)
     }
 }

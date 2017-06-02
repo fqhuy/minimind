@@ -27,11 +27,11 @@ class minimindTests: XCTestCase {
         let kern = RBF(alpha: 0.1, gamma: 2.0)
         let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 0.01)
         
-        let X: Matrix<Float> = randMatrix(rows: 10, columns: 5)
-        let y: Matrix<Float> = randMatrix(rows: 1, columns: 10)
+        let X: Matrix<Float> = randMatrix(10, 5)
+        let y: Matrix<Float> = randMatrix(1, 10)
         
         gpr.fit(X, y)
-        let Xstar: Matrix<Float> = randMatrix(rows: 2, columns: 5)
+        let Xstar: Matrix<Float> = randMatrix(2, 5)
         gpr.predict(Xstar)
         
         // This is an example of a functional test case.
@@ -65,6 +65,13 @@ class minimindTests: XCTestCase {
         var scg = SCG(objective: Quad(2.0, -3.0, 5.0), learning_rate: 0.01, init_x: Matrix<Float>([[5.0]]), maxiters: 200)
         scg.optimize(verbose: true)
 
+    }
+    
+    func testMath() {
+        let m: Matrix<Float>  = randMatrix(4, 3)
+        let mat = m * m.t
+        
+        let L = cholesky(mat)
     }
     
     func testPerformanceExample() {
