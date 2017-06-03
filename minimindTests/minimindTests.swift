@@ -77,22 +77,14 @@ class minimindTests: XCTestCase {
     }
     
     func testMatrixOps() {
-        let X: Matrix<Float> = randMatrix(8, 2)
-        let y: Matrix<Float> = randMatrix(8, 1)
-        let kern = RBF(alpha: 1.1, gamma: 1.0)
+        let mat: Matrix<Float> = Matrix<Float>([[0.1, 0.4, 0.3],[0.2, 0.1, 0.1]]).t
+        let A = mat * mat.t + eye(3)
+        let v = Matrix<Float>([[0.0, 0.0, 0.0]])
         
-        let C = kern.K(X, X) + eye(8) * (1.1 * 1.1)
-        let N = Float(X.rows)
-        let D = Float(X.columns)
+        let gauss = MultivariateNormal(v, A)
         
-        let L = cholesky(C, "L")
-        let alpha = solve_triangular(L,y, "L")
-        
-        let ytCy = 0.5 * reduce_sum(alpha • alpha)![0, 0]
-        let logdetC = 0.5 * D * logdet(C)
-        
-        let llh = ytCy + logdetC + N * D / 2.0 * log(2.0 * Float.pi)
-        
+        print(gauss.rvs(3))
+        gauss.pdf(randMatrix(5, 3))
     }
     
     func testMath() {

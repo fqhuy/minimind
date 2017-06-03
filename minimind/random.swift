@@ -5,7 +5,7 @@
 //  Copyright (c) 2015 Furkan Yilmaz. All rights reserved.
 //
 
-import UIKit
+//import UIKit
 
 // each type has its own random
 
@@ -66,12 +66,12 @@ public extension Float {
     }
 }
 
-public extension CGFloat {
-    /// SwiftRandom extension
-    public static func random(_ lower: CGFloat = 0, _ upper: CGFloat = 1) -> CGFloat {
-        return CGFloat(Float(arc4random()) / Float(UINT32_MAX)) * (upper - lower) + lower
-    }
-}
+//public extension CGFloat {
+//    /// SwiftRandom extension
+//    public static func random(_ lower: CGFloat = 0, _ upper: CGFloat = 1) -> CGFloat {
+//        return CGFloat(Float(arc4random()) / Float(UINT32_MAX)) * (upper - lower) + lower
+//    }
+//}
 
 public extension Date {
     /// SwiftRandom extension
@@ -105,16 +105,16 @@ public extension Date {
 
 }
 
-public extension UIColor {
-    /// SwiftRandom extension
-    public static func random(_ randomAlpha: Bool = false) -> UIColor {
-        let randomRed = CGFloat.random()
-        let randomGreen = CGFloat.random()
-        let randomBlue = CGFloat.random()
-        let alpha = randomAlpha ? CGFloat.random() : 1.0
-        return UIColor(red: randomRed, green: randomGreen, blue: randomBlue, alpha: alpha)
-    }
-}
+//public extension UIColor {
+//    /// SwiftRandom extension
+//    public static func random(_ randomAlpha: Bool = false) -> UIColor {
+//        let randomRed = CGFloat.random()
+//        let randomGreen = CGFloat.random()
+//        let randomBlue = CGFloat.random()
+//        let alpha = randomAlpha ? CGFloat.random() : 1.0
+//        return UIColor(red: randomRed, green: randomGreen, blue: randomBlue, alpha: alpha)
+//    }
+//}
 
 public extension Array {
     /// SwiftRandom extension
@@ -192,9 +192,9 @@ public struct Randoms {
         return Float.random(lower, upper)
     }
 
-    public static func randomCGFloat(_ lower: CGFloat = 0, _ upper: CGFloat = 1) -> CGFloat {
-        return CGFloat.random(lower, upper)
-    }
+//    public static func randomCGFloat(_ lower: CGFloat = 0, _ upper: CGFloat = 1) -> CGFloat {
+//        return CGFloat.random(lower, upper)
+//    }
 
     public static func randomDateWithinDaysBeforeToday(_ days: Int) -> Date {
         return Date.randomWithinDaysBeforeToday(days)
@@ -204,9 +204,9 @@ public struct Randoms {
         return Date.random()
     }
 
-    public static func randomColor(_ randomAlpha: Bool = false) -> UIColor {
-        return UIColor.random(randomAlpha)
-    }
+//    public static func randomColor(_ randomAlpha: Bool = false) -> UIColor {
+//        return UIColor.random(randomAlpha)
+//    }
 
     public static func randomNSURL() -> URL {
         return URL.random()
@@ -275,28 +275,28 @@ public struct Randoms {
         static let allValues = [Standard, MM, Identicon, MonsterID, Wavatar, Retro]
     }
 
-    public static func createGravatar(_ style: Randoms.GravatarStyle = .Standard, size: Int = 80, completion: ((_ image: UIImage?, _ error: Error?) -> Void)?) {
-        var url = "https://secure.gravatar.com/avatar/thisimagewillnotbefound?s=\(size)"
-        if style != .Standard {
-            url += "&d=\(style.rawValue.lowercased())"
-        }
+//    public static func createGravatar(_ style: Randoms.GravatarStyle = .Standard, size: Int = 80, completion: ((_ image: UIImage?, _ error: Error?) -> Void)?) {
+//        var url = "https://secure.gravatar.com/avatar/thisimagewillnotbefound?s=\(size)"
+//        if style != .Standard {
+//            url += "&d=\(style.rawValue.lowercased())"
+//        }
+//
+//        let request = URLRequest(url: URL(string: url)! as URL, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 5.0)
+//        let session = URLSession.shared
+//
+//        session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
+//            DispatchQueue.main.async {
+//                if error == nil {
+//                    completion?(UIImage(data: data!), nil)
+//                } else {
+//                    completion?(nil, error)
+//                }
+//            }
+//                         }).resume()
+//    }
 
-        let request = URLRequest(url: URL(string: url)! as URL, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 5.0)
-        let session = URLSession.shared
-
-        session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
-            DispatchQueue.main.async {
-                if error == nil {
-                    completion?(UIImage(data: data!), nil)
-                } else {
-                    completion?(nil, error)
-                }
-            }
-                         }).resume()
-    }
-
-    public static func randomGravatar(_ size: Int = 80, completion: ((_ image: UIImage?, _ error: Error?) -> Void)?) {
-        let options = Randoms.GravatarStyle.allValues
-        Randoms.createGravatar(options.randomItem()!, size: size, completion: completion)
-    }
+//    public static func randomGravatar(_ size: Int = 80, completion: ((_ image: UIImage?, _ error: Error?) -> Void)?) {
+//        let options = Randoms.GravatarStyle.allValues
+//        Randoms.createGravatar(options.randomItem()!, size: size, completion: completion)
+//    }
 }

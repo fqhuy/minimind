@@ -50,17 +50,47 @@ public prefix func -(mat: Matrix<Float>) -> Matrix<Float> {
     return -1.0 * mat
 }
 
+public func +(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
+    var mat = lhs
+    mat.grid = mat.grid + rhs
+    return mat
+}
+
+public func -(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
+    var mat = lhs
+    mat.grid = mat.grid - rhs
+    return mat
+}
+
+public func +(lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
+    var mat = lhs
+    if lhs.shape == rhs.shape{
+        mat = add(lhs, y: rhs)
+    } else if (lhs.rows == rhs.rows) && (rhs.columns == 1) {
+        for col in 0..<lhs.columns {
+            mat[column: col] = lhs[column: col] + rhs[column: 0]
+        }
+    } else if (lhs.columns == rhs.columns) && (rhs.rows == 1) {
+        for row in 0..<lhs.rows {
+            mat[row] = lhs[row] + rhs[0]
+        }
+    } else {
+        fatalError("incompatible matrix shapes")
+    }
+    return mat
+}
+
 public func -(lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
-    return lhs + (-1.0 * rhs)
+    return lhs + (-rhs)
 }
 
-public prefix func -(mat: Matrix<Double>) -> Matrix<Double> {
-    return -1.0 * mat
-}
+//public prefix func -(mat: Matrix<Double>) -> Matrix<Double> {
+//    return -1.0 * mat
+//}
 
-public func -(lhs: Matrix<Double>, rhs: Matrix<Double>) -> Matrix<Double> {
-    return lhs + (-1.0 * rhs)
-}
+//public func -(lhs: Matrix<Double>, rhs: Matrix<Double>) -> Matrix<Double> {
+//    return lhs + (-1.0 * rhs)
+//}
 
 public func * <T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
     var newmat = lhs
@@ -84,67 +114,20 @@ public func •<T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return newmat
 }
 
-
-//public prefix func -<T: ExpressibleByFloatLiteral & FloatingPoint>(lhs: Matrix<T>) -> Matrix<T> {
-//    var newmat = lhs
-//    newmat.grid = -newmat.grid
-//    return newmat
-//}
-//
-//public func - <T: ExpressibleByFloatLiteral & FloatingPoint>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
-//    return lhs - rhs
-//}
-//
-//
-//public func +<T: ExpressibleByFloatLiteral & FloatingPoint>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
-//    return lhs + rhs // add(lhs, y: rhs)
-//}
-//
-//
-//public func *<T: ExpressibleByFloatLiteral & FloatingPoint>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
-//    return lhs * rhs
-//}
-//
-//public func -<T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-//    return lhs - rhs
-//}
-//
-//public func +<T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-//    return lhs + rhs
-//}
-//
-//public func *<T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-//    return lhs * rhs
-//}
-//
-//public func /<T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-//    return lhs / rhs
-//}
-//
-//public func - <T: FloatType>(lhs: T, rhs: Matrix<T>) -> Matrix<T> {
-//    return lhs - rhs
-//}
-//
-//public func +<T: FloatType>(lhs: T, rhs: Matrix<T>) -> Matrix<T> {
-//    return rhs + lhs
-//}
-//
-//public func *<T: FloatType>(lhs: T, rhs: Matrix<T>) -> Matrix<T> {
-//    return rhs * lhs
-//}
-//
-//public func /<T: FloatType>(lhs: T, rhs: Matrix<T>) -> Matrix<T> {
-//    return rhs / lhs
-//}
+infix operator **
+public func ** (_ mat: Matrix<Float>, _ e: Float) -> Matrix<Float> {
+    let newgrid: [Float] = mat.grid.map{ powf($0, e) }
+    return Matrix<Float>( mat.rows, mat.columns, newgrid)
+}
 
 // MATH FUNCTIONS
 
-public func log(_ mat: Matrix<Float>) -> Matrix<Float> {
-    return Matrix<Float>(mat.rows, mat.columns, log(mat.grid))
+public func sqrt<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
+    return Matrix<T>(mat.rows, mat.columns, sqrt(mat.grid))
 }
 
-public func log(_ mat: Matrix<Double>) -> Matrix<Double> {
-    return Matrix<Double>(mat.rows, mat.columns, log(mat.grid))
+public func log(_ mat: Matrix<Float>) -> Matrix<Float> {
+    return Matrix<Float>(mat.rows, mat.columns, log(mat.grid))
 }
 
 
@@ -211,28 +194,15 @@ public func cholesky(_ mat: Matrix<Float>, _ uplo: String = "U") -> Matrix<Float
     }
 }
 
-public func cholesky(_ mat: Matrix<Double>, _ uplo: String = "U") -> Matrix<Double> {
-    precondition(mat.rows == mat.columns, "Matrix must be square")
-    var L = mat
-    var _uplo: Int8 = ascii(uplo)
-    var n: __CLPK_integer = __CLPK_integer(mat.rows)
-    var info: __CLPK_integer = 0
-    dpotrf_(&_uplo, &n, &(L.grid), &n, &info )
-    
-    assert(info == 0, "Cholesky failed" + String(info))
-    switch uplo {
-    case "L":
-        return triu(L).t
-    case "U":
-        return tril(L).t
-    default:
-        return triu(L).t
-    }
-}
 
 public func logdet(_ mat: Matrix<Float>) -> Float {
     let L = cholesky(mat, "L")
     return (2.0 * reduce_sum(log(diag(L)))!)[0,0]
+}
+
+public func det(_ mat: Matrix<Float>) -> Float {
+    let L = cholesky(mat, "L")
+    return  powf(reduce_prod(diag(L))![0, 0], 2)
 }
 
 public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "U", _ trans: String = "N") -> Matrix<Float> {
@@ -251,26 +221,41 @@ public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: St
     return bb
 }
 
-public func solve_triangular(_ A: Matrix<Double>, _ b: Matrix<Double>, _ lower: Bool = false) -> Matrix<Double> {
-    var aa = A
-    var bb = b
-    var uplo: Int8 = lower ? ascii("L") : ascii("U")
-    var trans: Int8 = ascii("N")
-    var dia: Int8 = ascii("N")
-    var n: __CLPK_integer = __CLPK_integer(A.rows)
-    var nrhs: __CLPK_integer = __CLPK_integer(b.columns)
+public func eigh(_ mat: Matrix<Float>, _ uplo: String) -> (Matrix<Float>, Matrix<Float>) {
+    var A = mat
+    var uplo: Int8 = ascii(uplo)
+    var n = __CLPK_integer(A.rows)
+    var d = [CFloat](repeating: 0.0, count: A.rows)
+    var e = [CFloat](repeating: 0.0, count: A.rows - 1)
+    var tau = [CFloat](repeating: 0.0, count: A.rows - 1)
+    // CHECK THIS
+    var lwork = __CLPK_integer(mat.columns * mat.columns)
+    var work = [CFloat](repeating: 0.0, count: Int(lwork))
     var info: __CLPK_integer = 0
     
-    dtrtrs_(&uplo, &trans, &dia, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &n, &info)
+    ssytrd_(&uplo, &n, &(A.grid), &n, &d, &e, &tau, &work, &lwork, &info)
     
-    assert(info == 0, "solve triangular failed")
+    assert(info == 0, "QTQ failed")
     
-    return bb
+    sorgtr_(&uplo, &n, &(A.grid), &n, &tau, &work, &lwork, &info)
+    
+    assert(info == 0, "Q computation failed")
+    
+    var compz: Int8 = ascii("V")
+    ssteqr_(&compz, &n, &d, &e, &(A.grid), &n, &work, &info)
+    
+    assert(info == 0, "QR failed")
+    
+    return (Matrix<Float>(1, Int(n), d), A)
+}
+
+public func trace<T: FloatType>(_ mat: Matrix<T>) ->T {
+    return reduce_sum(diag(mat))![0,0]
 }
 
 // TRAVERSE
 
-public func reduce_sum<T: FloatingPoint & ExpressibleByFloatLiteral>(_ mat: Matrix<T>,_ axis: Int? = nil) -> Matrix<T>? {
+public func reduce_sum<T: FloatType>(_ mat: Matrix<T>,_ axis: Int? = nil) -> Matrix<T>? {
     if axis == nil {
         var newmat = Matrix<T>([[0.0]])
         newmat[0,0] = mat.grid.reduce(0.0, {x , y in x + y})
@@ -286,6 +271,29 @@ public func reduce_sum<T: FloatingPoint & ExpressibleByFloatLiteral>(_ mat: Matr
         var newmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: 0.0)
         for i in 0..<mat.columns {
             newmat.grid[i] = mat[column: i].reduce(0.0, {x,y in x+y})
+        }
+        return newmat
+    } else {
+        return nil
+    }
+}
+
+public func reduce_prod<T: FloatType>(_ mat: Matrix<T>,_ axis: Int? = nil) -> Matrix<T>? {
+    if axis == nil {
+        var newmat = Matrix<T>([[0.0]])
+        newmat[0,0] = mat.grid.reduce(1.0, {x , y in x * y})
+        return newmat
+    } else if axis! == 1 {
+        var newmat = Matrix<T>(rows: mat.rows, columns: 1, repeatedValue: 0.0)
+        for i in 0..<mat.rows {
+            newmat.grid[i] = mat[i].reduce(1.0, {x,y in x * y})
+        }
+        
+        return newmat
+    } else if axis! == 0 {
+        var newmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: 0.0)
+        for i in 0..<mat.columns {
+            newmat.grid[i] = mat[column: i].reduce(1.0, {x,y in x * y})
         }
         return newmat
     } else {
@@ -328,6 +336,12 @@ public func triu<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
 
 // TRANSFORMERS
 
+public func clip<T: FloatType>(_ mat: Matrix<T>, _ floor: T, _ ceil: T) -> Matrix<T> {
+    var newmat = mat
+    newmat.grid = clip(mat.grid, floor, ceil)
+    return newmat
+}
+
 public func tile<T: FloatType>(_ mat: Matrix<T>, _ shape: [Int]) -> Matrix<T> {
     var newmat: Matrix<T> = zeros(mat.rows * shape[0], mat.columns * shape[1])
     for row in 0..<shape[0] {
@@ -342,7 +356,17 @@ public func tile<T: FloatType>(_ mat: Matrix<T>, _ shape: [Int]) -> Matrix<T> {
     return newmat
 }
 
+
 // CREATORS
+public func diagonal<T: FloatType>(_ a: [T]) -> Matrix<T> {
+    var m: Matrix<T> = zeros(a.count, a.count)
+    for i in 0..<a.count {
+        m[i, i] = a[i]
+    }
+
+    return m
+}
+
 public func ones<T: FloatType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
     return Matrix<T>(rows: rows, columns: columns, repeatedValue: 1.0 as T)
 }

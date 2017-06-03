@@ -7,43 +7,46 @@ var str = "Hello, playground"
 
 //: [Next](@next)
 
+public func bar<T : FloatingPoint & ExpressibleByFloatLiteral>(_ t: T) {
+    print("foo")
+}
+
+public func bar( _ t: Float) {
+    print("foo Float")
+}
+
+public func bar( _ t: Double) {
+    print("foo Double")
+}
+
 public class A<T: FloatingPoint & ExpressibleByFloatLiteral> {
 //    var v: T
     
-    public init(){
-//        v = 0.0 as! T
+    public init() {
         
     }
     
-    public func foo() {
-        print("in A")
-    }
-    
-    public func bar(_ t: T) -> T {
-        let v: T = 5.0
-        return v * t
-    }
-    
-    public func mul(_ t: Matrix<T>) -> Matrix<T> {
-        return t * transpose(t)
+    public static func foo() {
+        let t:T = 10.0
+        bar(t)
     }
 }
 
-extension A where T == Float {
-    public func foo() {
-        print("when T == Float")
-    }
-    
-
-}
+//extension A where T == Float {
+//    public static func foo() {
+//        print("when T == Float")
+//    }
+//}
+//
+//extension A where T == Double {
+//    public static func foo() {
+//        print("when T == Double")
+//    }
+//}
 
 let a: A<Float> = A()
-a.foo()
-let x = a.bar(2000.0)
-x is Double
+A<Double>.foo()
 
-let m = Matrix<Float>([[0.0, 1.1]])
-a.mul(m)
 
 
 

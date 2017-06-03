@@ -6,7 +6,8 @@
 //  Copyright © 2016 Phan Quoc Huy. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+//#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for minimind.
 FOUNDATION_EXPORT double minimindVersionNumber;

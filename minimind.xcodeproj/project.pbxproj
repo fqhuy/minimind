@@ -19,10 +19,28 @@
 		367E89351C965A3600C96392 /* base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E89341C965A3600C96392 /* base.swift */; };
 		367E89BB1C96BB4400C96392 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BA1C96BB4400C96392 /* Surge.framework */; };
 		367E89BD1C96BB4B00C96392 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BC1C96BB4B00C96392 /* Accelerate.framework */; };
-		36C3CEFB1EDE019700CE1E42 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C3CEFA1EDE019700CE1E42 /* main.swift */; };
+		36B2CB161EE322C3001751D3 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B2CB0D1EE322C3001751D3 /* minimind.framework */; };
+		36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */; };
+		36B2CB1D1EE322C3001751D3 /* minimind mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B2CB0F1EE322C3001751D3 /* minimind mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		36B2CB241EE32361001751D3 /* base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E89341C965A3600C96392 /* base.swift */; };
+		36B2CB251EE323B0001751D3 /* random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C3CEFC1EDECCA600CE1E42 /* random.swift */; };
+		36B2CB261EE323B0001751D3 /* base_estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */; };
+		36B2CB271EE323B0001751D3 /* scg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA021EDB225F0087C682 /* scg.swift */; };
+		36B2CB281EE323B0001751D3 /* optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA041EDB226E0087C682 /* optimization.swift */; };
+		36B2CB291EE323B0001751D3 /* matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA061EDC23860087C682 /* matrix.swift */; };
+		36B2CB2A1EE323B0001751D3 /* array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA0A1EDD973C0087C682 /* array.swift */; };
+		36B2CB2B1EE323B0001751D3 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619881EE156FD00B12612 /* util.swift */; };
+		36B2CB2C1EE323B0001751D3 /* distributions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E368D91EE295C80026F5DB /* distributions.swift */; };
+		36B2CB2D1EE323BD001751D3 /* kernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA081EDC81FB0087C682 /* kernel.swift */; };
+		36B2CB2E1EE323BD001751D3 /* rbf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619861EDF5FFA00B12612 /* rbf.swift */; };
+		36B2CB2F1EE323C3001751D3 /* pairwise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA001EDB1FCC0087C682 /* pairwise.swift */; };
+		36B2CB301EE323CA001751D3 /* gaussian_process.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DFA3EB1D3FC570005CBBC0 /* gaussian_process.swift */; };
+		36B2CB321EE323F2001751D3 /* minimindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E891F1C963D2600C96392 /* minimindTests.swift */; };
+		36B2CB521EE32A18001751D3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B2CB511EE32A18001751D3 /* main.swift */; };
 		36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C3CEFC1EDECCA600CE1E42 /* random.swift */; };
 		36DFA3EA1D3FC336005CBBC0 /* base_estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */; };
 		36DFA3EC1D3FC570005CBBC0 /* gaussian_process.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DFA3EB1D3FC570005CBBC0 /* gaussian_process.swift */; };
+		36E368DA1EE295C80026F5DB /* distributions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E368D91EE295C80026F5DB /* distributions.swift */; };
 		36E619871EDF5FFA00B12612 /* rbf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619861EDF5FFA00B12612 /* rbf.swift */; };
 		36E619891EE156FD00B12612 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619881EE156FD00B12612 /* util.swift */; };
 /* End PBXBuildFile section */
@@ -35,7 +53,26 @@
 			remoteGlobalIDString = 367E890F1C963D2600C96392;
 			remoteInfo = minimind;
 		};
+		36B2CB171EE322C3001751D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 367E89071C963D2600C96392 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B2CB0C1EE322C3001751D3;
+			remoteInfo = "minimind mac";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		36B2CB4D1EE32A18001751D3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3617FA001EDB1FCC0087C682 /* pairwise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pairwise.swift; sourceTree = "<group>"; };
@@ -54,10 +91,19 @@
 		367E89631C96AF3C00C96392 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		367E89BA1C96BB4400C96392 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = "../lib/Surge/build/Debug-iphoneos/Surge.framework"; sourceTree = "<group>"; };
 		367E89BC1C96BB4B00C96392 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		36C3CEFA1EDE019700CE1E42 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		36B2CB0D1EE322C3001751D3 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B2CB0F1EE322C3001751D3 /* minimind mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "minimind mac.h"; sourceTree = "<group>"; };
+		36B2CB101EE322C3001751D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		36B2CB151EE322C3001751D3 /* minimind macTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "minimind macTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = minimind_macTests.swift; sourceTree = "<group>"; };
+		36B2CB1C1EE322C3001751D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		36B2CB4A1EE3270A001751D3 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
+		36B2CB4F1EE32A18001751D3 /* minimindx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = minimindx; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B2CB511EE32A18001751D3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		36C3CEFC1EDECCA600CE1E42 /* random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = random.swift; path = ../random.swift; sourceTree = "<group>"; };
 		36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = base_estimator.swift; sourceTree = "<group>"; };
 		36DFA3EB1D3FC570005CBBC0 /* gaussian_process.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = gaussian_process.swift; sourceTree = "<group>"; };
+		36E368D91EE295C80026F5DB /* distributions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = distributions.swift; sourceTree = "<group>"; };
 		36E619861EDF5FFA00B12612 /* rbf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = rbf.swift; path = covariance/rbf.swift; sourceTree = "<group>"; };
 		36E619881EE156FD00B12612 /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -80,12 +126,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36B2CB091EE322C3001751D3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB121EE322C3001751D3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B2CB161EE322C3001751D3 /* minimind.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB4C1EE32A18001751D3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		367E89061C963D2600C96392 = {
 			isa = PBXGroup;
 			children = (
+				36B2CB0E1EE322C3001751D3 /* minimind mac */,
+				36B2CB191EE322C3001751D3 /* minimind macTests */,
+				36B2CB501EE32A18001751D3 /* minimindx */,
 				367E89BE1C96BB5E00C96392 /* Frameworks */,
 				367E89121C963D2600C96392 /* minimind */,
 				367E891E1C963D2600C96392 /* minimindTests */,
@@ -98,6 +169,9 @@
 			children = (
 				367E89101C963D2600C96392 /* minimind.framework */,
 				367E891A1C963D2600C96392 /* minimindTests.xctest */,
+				36B2CB0D1EE322C3001751D3 /* minimind.framework */,
+				36B2CB151EE322C3001751D3 /* minimind macTests.xctest */,
+				36B2CB4F1EE32A18001751D3 /* minimindx */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,7 +191,6 @@
 				367E89151C963D2600C96392 /* Info.plist */,
 				367E89341C965A3600C96392 /* base.swift */,
 				367E89631C96AF3C00C96392 /* MyPlayground.playground */,
-				36C3CEFA1EDE019700CE1E42 /* main.swift */,
 			);
 			path = minimind;
 			sourceTree = "<group>";
@@ -193,6 +266,33 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		36B2CB0E1EE322C3001751D3 /* minimind mac */ = {
+			isa = PBXGroup;
+			children = (
+				36B2CB0F1EE322C3001751D3 /* minimind mac.h */,
+				36B2CB101EE322C3001751D3 /* Info.plist */,
+				36B2CB4A1EE3270A001751D3 /* MyPlayground.playground */,
+			);
+			path = "minimind mac";
+			sourceTree = "<group>";
+		};
+		36B2CB191EE322C3001751D3 /* minimind macTests */ = {
+			isa = PBXGroup;
+			children = (
+				36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */,
+				36B2CB1C1EE322C3001751D3 /* Info.plist */,
+			);
+			path = "minimind macTests";
+			sourceTree = "<group>";
+		};
+		36B2CB501EE32A18001751D3 /* minimindx */ = {
+			isa = PBXGroup;
+			children = (
+				36B2CB511EE32A18001751D3 /* main.swift */,
+			);
+			path = minimindx;
+			sourceTree = "<group>";
+		};
 		36DFA3E81D3FC30F005CBBC0 /* core */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,6 +303,7 @@
 				3617FA061EDC23860087C682 /* matrix.swift */,
 				3617FA0A1EDD973C0087C682 /* array.swift */,
 				36E619881EE156FD00B12612 /* util.swift */,
+				36E368D91EE295C80026F5DB /* distributions.swift */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -215,6 +316,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				367E89141C963D2600C96392 /* minimind.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB0A1EE322C3001751D3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B2CB1D1EE322C3001751D3 /* minimind mac.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,13 +366,66 @@
 			productReference = 367E891A1C963D2600C96392 /* minimindTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		36B2CB0C1EE322C3001751D3 /* minimind mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36B2CB1E1EE322C3001751D3 /* Build configuration list for PBXNativeTarget "minimind mac" */;
+			buildPhases = (
+				36B2CB081EE322C3001751D3 /* Sources */,
+				36B2CB091EE322C3001751D3 /* Frameworks */,
+				36B2CB0A1EE322C3001751D3 /* Headers */,
+				36B2CB0B1EE322C3001751D3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "minimind mac";
+			productName = "minimind mac";
+			productReference = 36B2CB0D1EE322C3001751D3 /* minimind.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		36B2CB141EE322C3001751D3 /* minimind macTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36B2CB211EE322C3001751D3 /* Build configuration list for PBXNativeTarget "minimind macTests" */;
+			buildPhases = (
+				36B2CB111EE322C3001751D3 /* Sources */,
+				36B2CB121EE322C3001751D3 /* Frameworks */,
+				36B2CB131EE322C3001751D3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				36B2CB181EE322C3001751D3 /* PBXTargetDependency */,
+			);
+			name = "minimind macTests";
+			productName = "minimind macTests";
+			productReference = 36B2CB151EE322C3001751D3 /* minimind macTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		36B2CB4E1EE32A18001751D3 /* minimindx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36B2CB531EE32A18001751D3 /* Build configuration list for PBXNativeTarget "minimindx" */;
+			buildPhases = (
+				36B2CB4B1EE32A18001751D3 /* Sources */,
+				36B2CB4C1EE32A18001751D3 /* Frameworks */,
+				36B2CB4D1EE32A18001751D3 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = minimindx;
+			productName = minimindx;
+			productReference = 36B2CB4F1EE32A18001751D3 /* minimindx */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		367E89071C963D2600C96392 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0720;
+				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Phan Quoc Huy";
 				TargetAttributes = {
@@ -276,6 +438,18 @@
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = SVU6H5C475;
 						LastSwiftMigration = 0810;
+					};
+					36B2CB0C1EE322C3001751D3 = {
+						CreatedOnToolsVersion = 8.3.2;
+						ProvisioningStyle = Automatic;
+					};
+					36B2CB141EE322C3001751D3 = {
+						CreatedOnToolsVersion = 8.3.2;
+						ProvisioningStyle = Automatic;
+					};
+					36B2CB4E1EE32A18001751D3 = {
+						CreatedOnToolsVersion = 8.3.2;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -293,6 +467,9 @@
 			targets = (
 				367E890F1C963D2600C96392 /* minimind */,
 				367E89191C963D2600C96392 /* minimindTests */,
+				36B2CB0C1EE322C3001751D3 /* minimind mac */,
+				36B2CB141EE322C3001751D3 /* minimind macTests */,
+				36B2CB4E1EE32A18001751D3 /* minimindx */,
 			);
 		};
 /* End PBXProject section */
@@ -306,6 +483,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		367E89181C963D2600C96392 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB0B1EE322C3001751D3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB131EE322C3001751D3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -326,10 +517,10 @@
 				36E619891EE156FD00B12612 /* util.swift in Sources */,
 				3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */,
 				3617FA031EDB225F0087C682 /* scg.swift in Sources */,
-				36C3CEFB1EDE019700CE1E42 /* main.swift in Sources */,
 				36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */,
 				36DFA3EC1D3FC570005CBBC0 /* gaussian_process.swift in Sources */,
 				3617FA0B1EDD973C0087C682 /* array.swift in Sources */,
+				36E368DA1EE295C80026F5DB /* distributions.swift in Sources */,
 				36E619871EDF5FFA00B12612 /* rbf.swift in Sources */,
 				367E89351C965A3600C96392 /* base.swift in Sources */,
 			);
@@ -343,6 +534,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36B2CB081EE322C3001751D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B2CB2D1EE323BD001751D3 /* kernel.swift in Sources */,
+				36B2CB301EE323CA001751D3 /* gaussian_process.swift in Sources */,
+				36B2CB2C1EE323B0001751D3 /* distributions.swift in Sources */,
+				36B2CB2A1EE323B0001751D3 /* array.swift in Sources */,
+				36B2CB291EE323B0001751D3 /* matrix.swift in Sources */,
+				36B2CB2E1EE323BD001751D3 /* rbf.swift in Sources */,
+				36B2CB261EE323B0001751D3 /* base_estimator.swift in Sources */,
+				36B2CB2B1EE323B0001751D3 /* util.swift in Sources */,
+				36B2CB271EE323B0001751D3 /* scg.swift in Sources */,
+				36B2CB281EE323B0001751D3 /* optimization.swift in Sources */,
+				36B2CB2F1EE323C3001751D3 /* pairwise.swift in Sources */,
+				36B2CB251EE323B0001751D3 /* random.swift in Sources */,
+				36B2CB241EE32361001751D3 /* base.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB111EE322C3001751D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B2CB321EE323F2001751D3 /* minimindTests.swift in Sources */,
+				36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B2CB4B1EE32A18001751D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B2CB521EE32A18001751D3 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -350,6 +578,11 @@
 			isa = PBXTargetDependency;
 			target = 367E890F1C963D2600C96392 /* minimind */;
 			targetProxy = 367E891C1C963D2600C96392 /* PBXContainerItemProxy */;
+		};
+		36B2CB181EE322C3001751D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B2CB0C1EE322C3001751D3 /* minimind mac */;
+			targetProxy = 36B2CB171EE322C3001751D3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -396,7 +629,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -439,7 +672,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -509,6 +742,122 @@
 			};
 			name = Release;
 		};
+		36B2CB1F1EE322C3001751D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "minimind mac/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = "me.phanquochuy.minimind-mac";
+				PRODUCT_NAME = minimind;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		36B2CB201EE322C3001751D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "minimind mac/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = "me.phanquochuy.minimind-mac";
+				PRODUCT_NAME = minimind;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		36B2CB221EE322C3001751D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "minimind macTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = "me.phanquochuy.minimind-macTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		36B2CB231EE322C3001751D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "minimind macTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = "me.phanquochuy.minimind-macTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		36B2CB541EE32A18001751D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		36B2CB551EE32A18001751D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -538,6 +887,30 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		36B2CB1E1EE322C3001751D3 /* Build configuration list for PBXNativeTarget "minimind mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36B2CB1F1EE322C3001751D3 /* Debug */,
+				36B2CB201EE322C3001751D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		36B2CB211EE322C3001751D3 /* Build configuration list for PBXNativeTarget "minimind macTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36B2CB221EE322C3001751D3 /* Debug */,
+				36B2CB231EE322C3001751D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		36B2CB531EE32A18001751D3 /* Build configuration list for PBXNativeTarget "minimindx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36B2CB541EE32A18001751D3 /* Debug */,
+				36B2CB551EE32A18001751D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

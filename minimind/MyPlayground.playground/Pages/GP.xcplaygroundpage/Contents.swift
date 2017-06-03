@@ -8,10 +8,10 @@ import minimind
 
 let N = 8
 let P = 2
-let kern = RBF(alpha: 1.1, gamma: 1.0)
+let kern = RBF(alpha: 10.1, gamma: 10.0)
 let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.01)
 
-var X: Matrix<Float> = randMatrix(N, P + 1) * 5.0
+var X: Matrix<Float> = randMatrix(N, P + 1) * 4.0
 X[column: 0] = [Float](repeating: 1.0, count: N)
 var XX: Matrix<Float> = zeros(N, P)
 for i in 1..<P+1 {
@@ -19,7 +19,7 @@ for i in 1..<P+1 {
 }
 
 let A: Matrix<Float> = randMatrix(P + 1, 1)
-let y: Matrix<Float> = X * A + 0.01 * randMatrix(N, 1)
+let y: Matrix<Float> = X * A + 0.1 * randMatrix(N, 1)
 
 gpr.fit(XX, y)
 

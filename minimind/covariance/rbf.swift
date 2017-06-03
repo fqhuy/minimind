@@ -40,7 +40,7 @@ public class RBF: Kernel {
     }
     
     public func init_params() -> MatrixT {
-        return MatrixT([[1.0, 1.0]])
+        return MatrixT([[alpha, gamma]])
     }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {

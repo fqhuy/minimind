@@ -62,8 +62,16 @@ public func / <T: FloatingPoint>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] / rhs }
 }
 
+public func sqrt<T: FloatingPoint>(_ arr: [T]) -> [T] {
+    return arr.map{ sqrt($0) }
+}
+
 public func abs<T: SignedNumber>(_ arr: [T]) -> [T] {
     return arr.map{ abs($0) }
+}
+
+public func clip<T: FloatingPoint>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
+    return arr.map{ $0 < floor ? floor : $0}.map{ $0 > ceil ? ceil : $0 }
 }
 
 public func randArray<T: FloatingPoint>(n: Int) -> [T] {

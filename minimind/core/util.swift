@@ -22,6 +22,10 @@ public func ascii(_ c: String) -> Int8 {
         return 76
     case "N":
         return 78
+    case "I":
+        return 73
+    case "V":
+        return 86
     default:
         return 0
     }
