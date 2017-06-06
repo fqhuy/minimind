@@ -8,6 +8,47 @@
 
 import Foundation
 
+public func **(lhs: [Float], rhs: Float) -> [Float] {
+    return lhs.map{ powf($0, 2.0) }
+}
+
+public func **(lhs: [Double], rhs: Double) -> [Double] {
+    return lhs.map{ pow($0, 2.0) }
+}
+
+
+public func +=<T: FloatingPoint>(lhs: inout [T], rhs: T) {
+    lhs = lhs + rhs
+}
+
+public func +=<T: FloatingPoint>(lhs: inout [T], rhs: [T]){
+    lhs = lhs + rhs
+}
+
+public func -=<T: FloatingPoint>(lhs: inout [T], rhs: T) {
+    lhs = lhs - rhs
+}
+
+public func -=<T: FloatingPoint>(lhs: inout [T], rhs: [T]) {
+    lhs = lhs - rhs
+}
+
+public func *=<T: FloatingPoint>(lhs: inout [T], rhs: T)  {
+    lhs = lhs * rhs
+}
+
+public func *=<T: FloatingPoint>(lhs: inout [T], rhs: [T])  {
+    lhs =  lhs * rhs
+}
+
+public func /=<T: FloatingPoint>(lhs: inout [T], rhs: T)  {
+    lhs = lhs / rhs
+}
+
+public func /=<T: FloatingPoint>(lhs: inout [T], rhs: [T])  {
+    lhs = lhs / rhs
+}
+
 public prefix func -<T: SignedNumber>(arr: [T]) -> [T] {
     return arr.map{x in -x}
 }
@@ -76,6 +117,48 @@ public func clip<T: FloatingPoint>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
 
 public func randArray<T: FloatingPoint>(n: Int) -> [T] {
     return (0..<n).map{x in Randoms.randomFloat(0.0, 1.0) as! T}
+}
+
+public func arange(_ minValue: Float, _ maxValue: Float, _ step: Float) -> [Float] {
+    let n: Int = Int(floorf((maxValue - minValue) / step))
+    return (0..<n).map{ Float($0) * step + minValue }
+}
+
+public func arange(_ minValue: Double, _ maxValue: Double, _ step: Double) -> [Double] {
+    let n: Int = Int(floor((maxValue - minValue) / step))
+    return (0..<n).map{ Double($0) * step + minValue }
+}
+
+public func std(_ arr: [Float]) {
+    
+}
+
+public extension Array where Element == Float {
+    public func std() -> Element {
+        let m = mean()
+        let v = mean(self.map{ powf(($0 - m), 2.0)})
+        return sqrtf(v)
+    }
+    
+    public func mean() -> Element {
+        return sum() / Element(count)
+    }
+    
+    public func mean(_ arr: [Element]) -> Element {
+        return sum(arr) / Element(arr.count)
+    }
+    
+    public func sum() -> Element {
+        return self.reduce(0.0, {x, y in x + y} )
+    }
+    
+    public func sum(_ arr: [Element]) -> Element {
+        return arr.reduce(0.0, {x, y in x + y} )
+    }
+    
+    public func norm() -> Element {
+        return sqrt((self ** 2).sum())
+    }
 }
 
 //public func log<T: FloatingPoint>(_ arr: [T]) -> [T] {

@@ -63,8 +63,15 @@ public func -(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
 }
 
 public func +(lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
+//public func + <T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     var mat = lhs
     if lhs.shape == rhs.shape{
+//        switch lhs {
+//        case is Matrix<Float>:
+//            add(lhs as Matrix<Float>, y: rhs)
+//        default:
+//            mat = lhs
+//        }
         mat = add(lhs, y: rhs)
     } else if (lhs.rows == rhs.rows) && (rhs.columns == 1) {
         for col in 0..<lhs.columns {
@@ -94,8 +101,9 @@ public func -(lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
 
 public func * <T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
     var newmat = lhs
-    newmat.grid = newmat.grid / rhs
-    return newmat}
+    newmat.grid = newmat.grid * rhs
+    return newmat
+}
 
 public func /<T: FloatType> (lhs: Matrix<T>, rhs: T) -> Matrix<T> {
     var newmat = lhs
@@ -192,6 +200,19 @@ public func cholesky(_ mat: Matrix<Float>, _ uplo: String = "U") -> Matrix<Float
     default:
         return triu(L).t
     }
+}
+
+public func ldlt(_ mat: Matrix<Float>, _ uplo: String = "L") -> Matrix<Float> {
+    var L = mat
+    var _uplo: Int8 = ascii(uplo)
+    var n: __CLPK_integer = __CLPK_integer(mat.rows)
+    var info: __CLPK_integer = 0
+    var lwork = __CLPK_integer(mat.columns * mat.columns)
+    var work = [CFloat](repeating: 0.0, count: Int(lwork))
+    var ipiv: [__CLPK_integer] = [__CLPK_integer](repeating: 0, count: Int(n))
+    ssytrf_(&_uplo, &n, &(L.grid), &n, &ipiv, &work, &lwork, &info)
+    
+    return L
 }
 
 

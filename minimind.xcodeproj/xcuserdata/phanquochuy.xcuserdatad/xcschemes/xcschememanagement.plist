@@ -14,6 +14,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>miniminds.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
 		<key>minimindx.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -22,6 +27,26 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>363DDC3A1EE3EF02003607B4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>363DDC521EE3EF02003607B4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>363DDC9A1EE4AF02003607B4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>363DDCB01EE4AF02003607B4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>367E890F1C963D2600C96392</key>
 		<dict>
 			<key>primary</key>

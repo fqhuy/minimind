@@ -76,22 +76,74 @@ class minimindTests: XCTestCase {
 
     }
     
+    func testDist(){
+        let N = 40
+        let Nf = 10
+        let w = Float(300.0)
+        
+        let x: [Float] = arange(0.0, w, w / Float(N))
+        
+        var s1 = sin(x)
+        var s2 = cos(x)
+        
+        s1 -= s1.mean(); s1 /= s1.std()
+        s2 -= s2.mean(); s2 /= s2.std()
+        
+        let kern = RBF(alpha: 10.0, gamma: 10000.0)
+        let A = kern.K(Matrix<Float>(N, 1, s1), Matrix<Float>(N, 1, s2))
+        
+//        let (m1, m2) = (Matrix<Float>(N, 1, s1), Matrix<Float>(N, 1, s2))
+//        let A = 10.0 * m1 * m2.t
+        let v: Matrix<Float> = zeros(1, N)
+        
+        let gauss = MultivariateNormal(v, A)
+        let X: Matrix<Float> = gauss.rvs(Nf) + 100.0
+        print(X[0])
+    }
+    
     func testMatrixOps() {
-        let mat: Matrix<Float> = Matrix<Float>([[0.1, 0.4, 0.3],[0.2, 0.1, 0.1]]).t
-        let A = mat * mat.t + eye(3)
+        let A = Matrix<Float>([[1.0, 0.1, 0.1],[0.01, 2.0, 0.3], [0.02, 0.2, 1.5]])
         let v = Matrix<Float>([[0.0, 0.0, 0.0]])
         
         let gauss = MultivariateNormal(v, A)
         
-        print(gauss.rvs(3))
+        let X = gauss.rvs(1000)
+        print(X[0].mean())
+        print(X[1].mean())
+        print(X[2].mean())
+        
         gauss.pdf(randMatrix(5, 3))
     }
     
-    func testMath() {
-        let m: Matrix<Float>  = randMatrix(4, 3)
-        let mat = m * m.t
+    func testArray() {
+        let a: [Float] = [1.0, 2.0, -2.0, -1.0]
+        XCTAssert(a.sum() == 0.0, "Array sum failed")
         
-        let L = cholesky(mat)
+        XCTAssert(a.mean() == 0.0, "Array mean failed")
+    
+//        print("std: ", a.std())
+        
+        let b: [Float] = randArray(n: 12)
+        print("mean ", b.mean())
+        print("std ", b.std())
+    }
+    
+    func testMath() {
+        let m: Matrix<Float>  = Matrix([[1.0, 0.1, 0.1],[0.01, 2.0, 0.3], [0.02, 0.2, 1.5]])
+        //        let mat = m * m.t + eye(3)
+        
+        let (eivals, eivecs) = eigh(m, "L")
+        
+        for i in 0..<3 {
+            print( eivecs[column: i].norm())
+        }
+        print(eivals)
+        
+        
+        let arr: [Float] = randArray(n: 1000)
+        print(arr.mean())
+        //        print(eivecs)
+        //        let L = cholesky(mat)
     }
     
     func testPerformanceExample() {
