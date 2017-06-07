@@ -44,9 +44,6 @@ public class RBF: Kernel {
     }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {
-//        let xx = 0.5 * self.gamma * reduce_sum(X • X, 1)!
-//        let yy = 0.5 * self.gamma * reduce_sum(Y • Y, 1)!
-//        let dist = cross_add(xx, yy) - self.gamma * (X * Y′)
         let dist = self.dist(X, Y)
         Kxx = alpha * exp(-dist)
         return Kxx

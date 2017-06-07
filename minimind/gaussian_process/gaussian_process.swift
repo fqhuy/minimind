@@ -114,17 +114,6 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matri
         ytrain = y
     }
     
-//    public func compute(_ x: MatrixT) -> ScalarT {
-//        fatalError("unimplemented")
-//    }
-//    
-//    public func gradient(_ x: MatrixT) -> MatrixT {
-//        fatalError("unimplemented")
-//    }
-//}
-//
-//
-//extension GPLikelihood where T == Float {
     public func compute(_ x: MatrixT) -> ScalarT {
         kernel.set_params(x)
         

@@ -112,6 +112,7 @@
 		363DDCBE1EE4AF47003607B4 /* GraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 		363DDCC71EE56B54003607B4 /* GraphModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphModel.swift; sourceTree = "<group>"; };
 		363DDCCB1EE58024003607B4 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
+		366141651EE7435400FD776F /* MathPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MathPlayground.playground; sourceTree = "<group>"; };
 		367E89101C963D2600C96392 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		367E89131C963D2600C96392 /* minimind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = minimind.h; sourceTree = "<group>"; };
 		367E89151C963D2600C96392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -266,6 +267,7 @@
 				367E89151C963D2600C96392 /* Info.plist */,
 				367E89341C965A3600C96392 /* base.swift */,
 				367E89631C96AF3C00C96392 /* MyPlayground.playground */,
+				366141651EE7435400FD776F /* MathPlayground.playground */,
 			);
 			path = minimind;
 			sourceTree = "<group>";
@@ -1120,6 +1122,7 @@
 				363DDCBA1EE4AF02003607B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		363DDCBB1EE4AF02003607B4 /* Build configuration list for PBXNativeTarget "minimindsUITests" */ = {
 			isa = XCConfigurationList;
@@ -1128,6 +1131,7 @@
 				363DDCBD1EE4AF02003607B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		367E890A1C963D2600C96392 /* Build configuration list for PBXProject "minimind" */ = {
 			isa = XCConfigurationList;

@@ -116,16 +116,14 @@ class minimindTests: XCTestCase {
     }
     
     func testArray() {
-        let a: [Float] = [1.0, 2.0, -2.0, -1.0]
-        XCTAssert(a.sum() == 0.0, "Array sum failed")
+        let mat: Matrix<Float> = randMatrix(5, 5)
+        var m1 = mat
+        m1[0, 0] = 100.0
+        print(m1 == mat)
         
-        XCTAssert(a.mean() == 0.0, "Array mean failed")
-    
-//        print("std: ", a.std())
+        let ids = 0..10
         
-        let b: [Float] = randArray(n: 12)
-        print("mean ", b.mean())
-        print("std ", b.std())
+//        let m1 = mat[0..2, 0..2]
     }
     
     func testMath() {

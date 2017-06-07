@@ -8,6 +8,8 @@
 
 import Foundation
 
+//MARK: Arithmetic
+
 public func **(lhs: [Float], rhs: Float) -> [Float] {
     return lhs.map{ powf($0, 2.0) }
 }
@@ -103,6 +105,8 @@ public func / <T: FloatingPoint>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] / rhs }
 }
 
+
+//MARK: Math
 public func sqrt<T: FloatingPoint>(_ arr: [T]) -> [T] {
     return arr.map{ sqrt($0) }
 }
@@ -115,8 +119,18 @@ public func clip<T: FloatingPoint>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
     return arr.map{ $0 < floor ? floor : $0}.map{ $0 > ceil ? ceil : $0 }
 }
 
-public func randArray<T: FloatingPoint>(n: Int) -> [T] {
-    return (0..<n).map{x in Randoms.randomFloat(0.0, 1.0) as! T}
+
+//MARK: Creators
+public func randArray(n: Int) -> [Float] {
+    return (0..<n).map{x in Randoms.randomFloat(0.0, 1.0)}
+}
+
+public func randArray(n: Int) -> [Double] {
+    return (0..<n).map{x in Randoms.randomDouble(0.0, 1.0)}
+}
+
+public func randArray(n: Int) -> [Int] {
+    return (0..<n).map{x in Randoms.randomInt(0, 100)}
 }
 
 public func arange(_ minValue: Float, _ maxValue: Float, _ step: Float) -> [Float] {
@@ -129,9 +143,18 @@ public func arange(_ minValue: Double, _ maxValue: Double, _ step: Double) -> [D
     return (0..<n).map{ Double($0) * step + minValue }
 }
 
-public func std(_ arr: [Float]) {
-    
+public func arange(_ minValue: Int, _ maxValue: Int, _ step: Int) -> [Int] {
+    let n: Int = Int((maxValue - minValue) / step)
+    return (0..<n).map{ $0 * step + minValue }
 }
+
+infix operator ..
+
+public func .. (from: Int, step: Int) -> ((Int) -> [Int]) {
+    return { x in arange(from, x, step) }
+}
+
+//MARK: Array extensions
 
 public extension Array where Element == Float {
     public func std() -> Element {

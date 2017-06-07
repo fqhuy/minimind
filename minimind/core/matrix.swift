@@ -9,6 +9,7 @@
 import Foundation
 import Surge
 
+typealias NumberType = Float
 public typealias FloatType = ExpressibleByFloatLiteral & FloatingPoint
 
 public extension Matrix {
@@ -17,22 +18,54 @@ public extension Matrix {
 
         self.rows = rows
         self.columns = columns
-        
         self.grid = data
     }
     
-    func copy(with zone: NSZone? = nil) -> Any {
-        return Matrix(rows: 0, columns: 0, repeatedValue: 0.0)
+    public subscript(_ rows: [Int], _ columns: [Int]) -> Matrix {
+        var arr: [Element] = []
+        for r in 0..<rows.count {
+            for c in 0..<columns.count {
+                arr.append(self[rows[r], columns[c]])
+            }
+        }
+        
+        return Matrix(rows.count, columns.count, arr)
     }
+    
+    public subscript(_ frow: (Int) -> [Int], _ fcol: ((Int) -> [Int])) -> Matrix {
+        let rows = frow(self.rows)
+        let cols = fcol(self.columns)
+        
+        return self[rows, cols]
+    }
+    
 }
 
 public extension Matrix where T == Float {
-        public var t: Matrix {
+    public var t: Matrix {
             get {
                 let newmat = self
                 return transpose(newmat)
-            }
         }
+    }
+    
+    public func mean(_ axis: Int) -> Matrix {
+        if axis == 0 {
+            var m: Matrix = zeros(1, columns)
+            for col in 0..<columns {
+                m[0, col] = Surge.mean(self[column: col])
+            }
+            return m
+        } else if axis == 1 {
+            var m: Matrix = zeros(rows, 1)
+            for row in 0..<rows {
+                m[row, 0] = Surge.mean(self[row])
+            }
+            return m
+        } else {
+            return Matrix([[Surge.mean(grid)]])
+        }
+    }
 }
 
 public extension Matrix where T == Double {
@@ -42,9 +75,38 @@ public extension Matrix where T == Double {
             return transpose(newmat)
         }
     }
+    
+    public func mean(_ axis: Int) -> Matrix {
+        if axis == 0 {
+            var m: Matrix = zeros(1, columns)
+            for col in 0..<columns {
+                m[0, col] = Surge.mean(self[column: col])
+            }
+            return m
+        } else if axis == 1 {
+            var m: Matrix = zeros(rows, 1)
+            for row in 0..<rows {
+                m[row, 0] = Surge.mean(self[row])
+            }
+            return m
+        } else {
+            return Matrix([[Surge.mean(grid)]])
+        }
+    }
 }
 
 // ARITHMETIC
+public func ==<T: Equatable>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<Bool> {
+    precondition(lhs.shape == rhs.shape, "Can't compare matrices with different shapes")
+    var mat =  Matrix<Bool>(rows: lhs.rows, columns: lhs.columns,repeatedValue: true)
+    for r in 0..<lhs.rows {
+        for c in 0..<lhs.columns {
+            mat[r, c] = lhs[r, c] == rhs[r, c]
+        }
+    }
+    return mat
+}
+
 
 public prefix func -(mat: Matrix<Float>) -> Matrix<Float> {
     return -1.0 * mat
@@ -63,15 +125,8 @@ public func -(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
 }
 
 public func +(lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
-//public func + <T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     var mat = lhs
     if lhs.shape == rhs.shape{
-//        switch lhs {
-//        case is Matrix<Float>:
-//            add(lhs as Matrix<Float>, y: rhs)
-//        default:
-//            mat = lhs
-//        }
         mat = add(lhs, y: rhs)
     } else if (lhs.rows == rhs.rows) && (rhs.columns == 1) {
         for col in 0..<lhs.columns {
@@ -139,17 +194,17 @@ public func log(_ mat: Matrix<Float>) -> Matrix<Float> {
 }
 
 
-public func abs<T: FloatingPoint & ExpressibleByFloatLiteral>(_ mat: Matrix<T>) -> Matrix<T> {
+public func abs<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
     var newmat = mat
     newmat.grid = abs(newmat.grid)
     return newmat
 }
 
-public func max<T: FloatingPoint & ExpressibleByFloatLiteral>(_ mat: Matrix<T>) -> T {
+public func max<T: FloatType>(_ mat: Matrix<T>) -> T {
     return mat.grid.max()!
 }
 
-public func min<T: FloatingPoint & ExpressibleByFloatLiteral>(_ mat: Matrix<T>) -> T {
+public func min<T: FloatType>(_ mat: Matrix<T>) -> T {
     return mat.grid.min()!
 }
 
@@ -213,6 +268,49 @@ public func ldlt(_ mat: Matrix<Float>, _ uplo: String = "L") -> Matrix<Float> {
     ssytrf_(&_uplo, &n, &(L.grid), &n, &ipiv, &work, &lwork, &info)
     
     return L
+}
+
+public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A", _ ldu: Int = 1, _ ldvt: Int = 1) -> (Matrix<Float>, Matrix<Float>, Matrix<Float>) {
+//    SGESVD
+    var A = mat
+    var m: __CLPK_integer = __CLPK_integer(mat.rows)
+    var n: __CLPK_integer = __CLPK_integer(mat.columns)
+    var _jobu = ascii(jobu)
+    var _jobv = ascii(jobv)
+    var s: Matrix<Float> = zeros(1, Int(min(m, n)))
+    
+    var _ldu = __CLPK_integer(ldu)
+    if jobu == "A" || jobu == "S" {
+        _ldu = m
+    }
+    
+    var u: Matrix<Float> = Matrix()
+    if jobu == "S" {
+        u = zeros(Int(_ldu), Int(m))
+    }
+    else if jobu == "S" {
+        u = zeros(Int(_ldu), Int(min(m,n)))
+    }
+    
+    var _ldvt = __CLPK_integer(ldvt)
+    if jobv == "A" {
+        _ldvt = n
+    } else if jobv == "S" {
+        _ldvt = min(m, n)
+    }
+    
+    var vt: Matrix<Float> = zeros(Int(_ldvt), Int(n))
+    
+    var info: __CLPK_integer = 0
+    
+    let (v1, v2) = (3 * min(m,n) + max(m,n), 5 * min(m,n))
+    var lwork = __CLPK_integer(max(max(v1, v2), 1)) // __CLPK_integer(mat.columns * mat.columns)
+    var work = [CFloat](repeating: 0.0, count: Int(lwork))
+    sgesvd_(&_jobu, &_jobv, &m, &n, &(A.grid), &m, &(s.grid), &(u.grid), &_ldu, &(vt.grid), &_ldvt, &work, &lwork, &info)
+    
+    assert(info == 0, "SVD failed")
+    
+    return (u, s, vt)
 }
 
 
@@ -323,8 +421,9 @@ public func reduce_prod<T: FloatType>(_ mat: Matrix<T>,_ axis: Int? = nil) -> Ma
 }
 
 // ACCESS
+
 public func diag<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
-    var dmat = Matrix<T>(rows: 1, columns: mat.columns)
+    var dmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: 0.0)
     for i in 0..<mat.columns {
         dmat[0, i] = mat[i, i]
     }
@@ -406,6 +505,15 @@ public func eye<T: FloatingPoint & ExpressibleByFloatLiteral>(_ D: Int) -> Matri
 }
 
 
-public func randMatrix<T: FloatType>(_ rows: Int,_ columns: Int) -> Matrix<T> {
-    return Matrix<T>(rows, columns, randArray(n: rows * columns))
+public func randMatrix(_ rows: Int,_ columns: Int) -> Matrix<Float> {
+    return Matrix<Float>(rows, columns, randArray(n: rows * columns))
+}
+
+
+public func randMatrix(_ rows: Int,_ columns: Int) -> Matrix<Double> {
+    return Matrix<Double>(rows, columns, randArray(n: rows * columns))
+}
+
+public func randMatrix(_ rows: Int,_ columns: Int) -> Matrix<Int> {
+    return Matrix<Int>(rows, columns, randArray(n: rows * columns))
 }
