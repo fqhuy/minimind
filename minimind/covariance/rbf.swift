@@ -125,10 +125,11 @@ public class RBF: Kernel {
         let yy = reduce_sum(Y ∘ Y, 1)!
         var dist = cross_add(xx, yy) - 2.0 * (X * Y′)
         
-        for r in 0..<dist.rows {
+        if X.rows == Y.rows {
+            for r in 0..<dist.rows {
                 dist[r, r] = 0.0
+            }
         }
-        
         dist = clip(dist, 0.0, 1e10)
         return sqrt(dist)
     }

@@ -36,41 +36,33 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         super.viewDidLoad()
 
         let N = 8
-        let Nf = 10
-        let w = Float(300.0)
-        let y: [Float] = arange(0.0, w, w / Float(N))
         
-        let X = Matrix<Float>([[-0.91261869,  1.85426673],
-                               [ 1.34207648, -1.08250752],
-                               [ 1.13998253,  0.69448722],
-                               [ 0.40357421, -0.4739292 ],
-                               [ 0.81214299, -1.23548637],
-                               [-0.7030745,  -0.78750967],
-                               [-0.50155067,  0.464332  ],
-                               [-1.58053235,  0.56634682]])
+        let Nf = 20
+        let X = Matrix<Float>([[-1.50983293], [-1.11726642], [-0.89303372], [ 0.07971517], [ 0.29116607], [ 0.7494249 ], [ 0.93321463], [ 1.46661229]])
         
-        let Y = Matrix<Float>([[0.21198747,  0.0883193,   0.4570866,   0.17492527,  0.03589,     0.06420726,
-                                0.19189653,  0.03121346]]).t
+        let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 0.5, lengthscale: 100.0)
-        let v: Matrix<Float> = zeros(1, N)
+        let kern = RBF(variance: 1.0, lengthscale: 100.0)
+        
         
         let gp = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 500)
+        gp.fit(X, Y, maxiters: 200)
         
-        let gauss = MultivariateNormal(v, kern.K(X, X))
+        print(gp.kernel.get_params())
+        
+        let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
+        let (Mu, Sigma) = gp.predict(Xstar)
+        let gauss = MultivariateNormal(Mu, Sigma)
         let S: Matrix<Float> = gauss.rvs(Nf) // * 20.0
         
-        
-        let xx = y.cgFloat
-        let colors = [UIColor.black, UIColor.blue, UIColor.brown, UIColor.gray, UIColor.red, UIColor.black, UIColor.blue, UIColor.brown, UIColor.gray, UIColor.red]
+        let xx = Xstar.grid.cgFloat // X.grid.cgFloat //
         for i in 0..<Nf {
             let yy = S[i].cgFloat
-            _ = graph.plot(x: xx * 8.0, y: yy * 20.0, c: colors[i])
+            _ = graph.plot(x: xx * 100.0 + 160.0, y: yy * 5.0, c: UIColor.blue)
 
         }
+        _ = graph.scatter(x: (X.grid * 100.0 + Float(160.0)).cgFloat, y: (Y.grid * 5.0).cgFloat, c: UIColor.green, s: 3.0)
         
-//        graph.scatter(x: xx * 8.0, y: (s1 * s2 * 5.0).cgFloat, c: UIColor.green, s: 2.0)
 //
 //        let Cov = Matrix<Float>([[1.0, 0.2],[0.1, 1.4]])
 //        let Mean: Matrix<Float> = Matrix([[0.0, 0.0]])

@@ -74,7 +74,7 @@ public extension GaussianProcessRegressor where T == Float {
         let Sigma = Kzz - Kxz * inv(Kxx + noise) * transpose(Kxz)
         let Mu = Kxz * inv(Kxx + noise) * ytrain
         
-        return (Mu, Sigma)
+        return (Mu.t, Sigma)
     }
     
     public func fit(_ X: MatrixT, _ y: MatrixT, maxiters: Int = 200, verbose: Bool = true) {

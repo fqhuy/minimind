@@ -14,10 +14,19 @@ public typealias FloatType = ExpressibleByFloatLiteral & FloatingPoint
 
 public extension Matrix {
     public init(_ rows: Int,_ columns: Int,_ data: [Element]) {
-        precondition(data.count == rows * columns, "data.count != rows * columns")
+        var rr: Int = rows
+        var cc: Int = columns
+        if rows == -1 && columns > 0{
+            rr = data.count / columns
+        } else if rows > 0 && columns == -1 {
+            cc = data.count / rows
+        }
+        
+        
+        precondition(data.count == rr * cc, "data.count != rows * columns")
 
-        self.rows = rows
-        self.columns = columns
+        self.rows = rr
+        self.columns = cc
         self.grid = data
     }
     
