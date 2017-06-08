@@ -69,6 +69,6 @@ l = np.linalg.cholesky(a)
 evals, evecs = np.linalg.eigh(a)
 ```
 
-## Sampling from an RBF kernel
+## Sampling from a GP prior
 
 ![Sampling](https://github.com/fqhuy/minimind/blob/master/doc/images/sampling.png)
