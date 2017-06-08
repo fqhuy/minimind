@@ -115,6 +115,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matri
     }
     
     public func compute(_ x: MatrixT) -> ScalarT {
+        
         kernel.set_params(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
@@ -122,39 +123,50 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matri
         let D = Float(Xtrain.columns)
         
         let L = cholesky(C, "L")
-        let alpha = solve_triangular(L, ytrain, "L")
+//        let L = ldlt(C, "L")
+//        let alpha = solve_triangular(L, ytrain, "L")
+        let alpha = cho_solve(L, ytrain, "L")
         
         // same as 0.5 * tr(alpha.t * alpha)
-        let ytCy = 0.5 * reduce_sum(alpha • alpha)![0, 0]
+        let ytCy = 0.5 * reduce_sum(alpha ∘ ytrain)![0, 0] //in neill code, it is alpha \circ alpha
 
-        let logdetC = 0.5 * D * logdet(C)
-        
+        let logdetC = reduce_sum(log(diag(L)))![0, 0] // 0.5 * D * logdet(C)
+
         // Negative log likelihood
-        return ytCy + logdetC + N * D / 2.0 * log(2.0 * ScalarT.pi)
+        return ytCy + logdetC + N / 2.0 * log(2.0 * ScalarT.pi) + kernel.log_prior
     }
     
     public func gradient(_ x: MatrixT) -> MatrixT {
+//        let tmp = kernel.get_params()
         kernel.set_params(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
+        let N = Xtrain.rows
+        
 //        direct way
-//        let Cinv = inv(C)
-//        let D = T(Xtrain.columns)
-//        let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
+        let Cinv = inv(C)
+        let D = Float(Xtrain.columns)
+        let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
         
         // Fast
-        let L = cholesky(C, "L")
-        let B = solve_triangular(L, solve_triangular(L.t, ytrain, "U"), "L")
-        
-        let D = ScalarT(Xtrain.columns)
-        
-        // WEIRD! BUT THIS IS HOW IT WORKS
-        let iL = inv(L, "U")
-        
-        // TODO: possibly wrong
-        let t1 = -(B * transpose(B) )
-        let t2 = D * (iL * transpose(iL) )
-        let dLdK = t1 + t2 // -(B * B.t) + D * (iL * iL.t)
+//        let L = cholesky(C, "L")
+////        let L = ldlt(C, "L")
+////        let B = solve_triangular(L, solve_triangular(L.t, ytrain, "U"), "L")
+//        let B = solve_triangular(L, solve_triangular(L.t, ytrain, "U"), "L")
+//        
+//        let D = ScalarT(Xtrain.columns)
+//        
+//        // WEIRD! BUT THIS IS HOW IT WORKS
+//        let iL = inv(L, "U")
+//        
+//        // TODO: possibly wrong
+//        let t1 = -(B * transpose(B) )
+//        let t2 = D * (iL * transpose(iL) )
+//        let dLdK = t1 + t2 // -(B * B.t) + D * (iL * iL.t)
+
+//        let alpha = cholesky(C, "L")
+//        var tmp = alpha * alpha.t
+//        let dLdK = tmp - cho_solve(alpha, eye(N))
         
         return kernel.gradient(Xtrain, Xtrain, dLdK)
     }

@@ -29,7 +29,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
         let xtol: T = 1e-6
         let ftol: T = 1e-6
         let gtol: T = 1e-6
-        let max_f_eval = 20
+        let max_f_eval = 10000
         
         let sigma0: T = 1.0e-7
         var fold: T = self.objective.compute(self.init_x)
@@ -93,6 +93,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
             function_eval += 1
             
             if function_eval >= max_f_eval{
+                print("max_f_eval reached")
                 return (x, flog, function_eval)
             }
             
@@ -153,9 +154,9 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
                 d = Gamma * d - gradnew
             }
         }
-        
-        status = "maxiter exceeded"
-        
+        if iteration == maxiters {
+            status = "maxiter exceeded"
+        }
         if verbose {
             print("iter: ", iteration, fnow)
             print(status)

@@ -31,6 +31,15 @@ public protocol Kernel {
     
     /// return a reasonable initialisation for all parameters
     func init_params() -> MatrixT
+    
+    /// number of hyper parameters
+    var n_dims: Int {get}
+    
+    /// parameters in log space
+    //    var theta: MatrixT {get set}
+    
+    /// log prior
+    var log_prior: ScalarT {get}
 }
 
 

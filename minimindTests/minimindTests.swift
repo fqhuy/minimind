@@ -25,7 +25,7 @@ class minimindTests: XCTestCase {
     func testGaussianProcessRegressor() {
         let N = 8
         let P = 2
-        let kern = RBF(alpha: 1.1, gamma: 1.0)
+        let kern = RBF(variance: 1.1, lengthscale: 1.0)
         let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.01)
         
         var X: Matrix<Float> = randMatrix(N, P + 1) * 10.0
@@ -89,7 +89,7 @@ class minimindTests: XCTestCase {
         s1 -= s1.mean(); s1 /= s1.std()
         s2 -= s2.mean(); s2 /= s2.std()
         
-        let kern = RBF(alpha: 10.0, gamma: 10000.0)
+        let kern = RBF(variance: 10.0, lengthscale: 10000.0)
         let A = kern.K(Matrix<Float>(N, 1, s1), Matrix<Float>(N, 1, s2))
         
 //        let (m1, m2) = (Matrix<Float>(N, 1, s1), Matrix<Float>(N, 1, s2))
@@ -121,7 +121,7 @@ class minimindTests: XCTestCase {
         m1[0, 0] = 100.0
         print(m1 == mat)
         
-        let ids = 0..10
+        let ids = 0∷10
         
 //        let m1 = mat[0..2, 0..2]
     }
@@ -142,6 +142,50 @@ class minimindTests: XCTestCase {
         print(arr.mean())
         //        print(eivecs)
         //        let L = cholesky(mat)
+    }
+    
+    func testGP() {
+        let N = 8
+        let P = 2
+//        let w = Float(300.0)
+        let w = Float.pi * 2.0
+        
+//        var X: Matrix<Float> = randMatrix(N, 2)
+//        var _y: [Float] = X[column: 0] * X[column: 1] + X[column: 1] + randArray(n: N) * 0.05
+//        var y = Matrix<Float>(N, 1, _y)
+        
+//        var y: [Float] = sin(X[column: 0]) * sin(X[column: 1]) + randArray(n: N) * 0.05
+//
+//        X[column: 0] -= X[column: 0].mean(); X[column: 0] /= X[column: 0].std()
+//        X[column: 1] -= X[column: 1].mean(); X[column: 1] /= X[column: 1].std()
+
+        let X = Matrix<Float>([[-0.91261869,  1.85426673],
+            [ 1.34207648, -1.08250752],
+            [ 1.13998253,  0.69448722],
+            [ 0.40357421, -0.4739292 ],
+            [ 0.81214299, -1.23548637],
+            [-0.7030745,  -0.78750967],
+            [-0.50155067,  0.464332  ],
+            [-1.58053235,  0.56634682]])
+        
+        let y = Matrix<Float>([[0.21198747,  0.0883193,   0.4570866,   0.17492527,  0.03589,     0.06420726,
+            0.19189653,  0.03121346]]).t
+        
+        let kern = RBF(variance: 1.0, lengthscale: 10.0)
+        let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
+        
+        gpr.fit(X, y, maxiters: 500)
+        
+        print(gpr.kernel.Kxx)
+        
+//        let Xstar: Matrix<Float> = randMatrix(5, P)
+//        let (Mu, Sigma) = gpr.predict(Xstar)
+//        
+//        print(Mu)
+//        print(Sigma)
+        
+        print(kern.variance)
+        print(kern.lengthscale)
     }
     
     func testPerformanceExample() {

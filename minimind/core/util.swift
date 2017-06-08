@@ -14,24 +14,6 @@ extension Character {
     }
 }
 
-//public func ascii(_ c: String) -> Int8 {
-//    switch c {
-//    case "U":
-//        return 85
-//    case "L":
-//        return 76
-//    case "N":
-//        return 78
-//    case "I":
-//        return 73
-//    case "V":
-//        return 86
-//    default:
-//        return 0
-//    }
-//}
-
-
 public func ascii(_ c: String) -> Int8 {
     let D = ["U" : 85, "L": 76, "N":  78, "I": 73, "V": 86, "A": 65, "S": 83, "O":79]
     return Int8(D[c]!)

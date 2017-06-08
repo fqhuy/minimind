@@ -96,6 +96,24 @@ public extension Matrix where T == Double {
 }
 
 // ARITHMETIC
+infix operator ⊗
+
+//Kronecker product
+public func ⊗ (lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
+    var mat: Matrix<Float> = zeros(lhs.rows * rhs.rows, lhs.columns * rhs.columns)
+    for lr in 0..<lhs.rows {
+        for lc in 0..<lhs.columns {
+            for rr in 0..<rhs.rows {
+                for rc in 0..<rhs.columns {
+                    mat[lr * rhs.rows + rr, lc * rhs.columns + rc] = lhs[lr, lc] * rhs[rr, rc]
+                }
+            }
+        }
+    }
+    return mat
+}
+
+
 public func ==<T: Equatable>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<Bool> {
     precondition(lhs.shape == rhs.shape, "Can't compare matrices with different shapes")
     var mat =  Matrix<Bool>(rows: lhs.rows, columns: lhs.columns,repeatedValue: true)
@@ -170,7 +188,9 @@ public func div (mat: Matrix<Float>, scalar: Float) -> Matrix<Float> {
     return mat / scalar 
 }
 
-public func •<T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+infix operator ∘
+// Entry-wise product
+public func ∘<T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     var newmat = lhs
     newmat.grid = lhs.grid * rhs.grid
 //    newmat.grid = (0..<lhs.grid.count).map{ lhs.grid[$0] * rhs.grid[$0] }
@@ -267,6 +287,7 @@ public func ldlt(_ mat: Matrix<Float>, _ uplo: String = "L") -> Matrix<Float> {
     var ipiv: [__CLPK_integer] = [__CLPK_integer](repeating: 0, count: Int(n))
     ssytrf_(&_uplo, &n, &(L.grid), &n, &ipiv, &work, &lwork, &info)
     
+    assert(info == 0, "LDLT failed")
     return L
 }
 
@@ -315,16 +336,18 @@ public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A"
 
 
 public func logdet(_ mat: Matrix<Float>) -> Float {
-    let L = cholesky(mat, "L")
+//    let L = cholesky(mat, "L")
+    let L = ldlt(mat, "L")
     return (2.0 * reduce_sum(log(diag(L)))!)[0,0]
 }
 
 public func det(_ mat: Matrix<Float>) -> Float {
-    let L = cholesky(mat, "L")
+//    let L = cholesky(mat, "L")
+    let L = ldlt(mat, "L")
     return  powf(reduce_prod(diag(L))![0, 0], 2)
 }
 
-public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "U", _ trans: String = "N") -> Matrix<Float> {
+public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "L", _ trans: String = "N") -> Matrix<Float> {
     var aa = A
     var bb = b
     var uplo: Int8 = ascii(uplo)
@@ -336,6 +359,20 @@ public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: St
     
     strtrs_(&uplo, &trans, &dia, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &n, &info)
     assert(info == 0, "solve triangular failed")
+    
+    return bb
+}
+
+public func cho_solve(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "L") -> Matrix<Float> {
+    var aa = A
+    var bb = b
+    var _uplo: Int8 = ascii(uplo)
+    var n: __CLPK_integer = __CLPK_integer(A.rows)
+    var nrhs: __CLPK_integer = __CLPK_integer(b.columns)
+    var info: __CLPK_integer = __CLPK_integer(0)
+    
+    spotrs_(&_uplo, &n, &nrhs, &(aa.grid), &n, &(bb.grid), &n, &info)
+    assert(info == 0, "Cholesky solve failed")
     
     return bb
 }

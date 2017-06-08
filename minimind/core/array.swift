@@ -148,9 +148,9 @@ public func arange(_ minValue: Int, _ maxValue: Int, _ step: Int) -> [Int] {
     return (0..<n).map{ $0 * step + minValue }
 }
 
-infix operator ..
+infix operator ∷
 
-public func .. (from: Int, step: Int) -> ((Int) -> [Int]) {
+public func ∷ (from: Int, step: Int) -> ((Int) -> [Int]) {
     return { x in arange(from, x, step) }
 }
 
