@@ -22,17 +22,8 @@ import UIKit
     
     public func addItems(_ artists: [Artist]) {
         for item in artists {
-//            item.translatesAutoresizingMaskIntoConstraints = false
             item.center = self.convert(self.center, from: item)
             addSubview(item)
-            
-            
-//            item.frame = self.frame
-            
-//            item.bounds = self.bounds
-//            item.frame.origin = self.bounds.origin
-//            item.translatesAutoresizingMaskIntoConstraints = false
-//            item.bounds = self.bounds
         }
     }
     

@@ -11,11 +11,20 @@ import Surge
 
 class Artist: UIView {
     //MARK: Properties
-    @IBInspectable var thickness: CGFloat = 0.5
+    @IBInspectable var _lineWidth: CGFloat = 0.5
     @IBInspectable var edgeColor: UIColor = UIColor.green
     @IBInspectable var fillColor: UIColor = UIColor.white
     @IBInspectable var xScale: CGFloat = 1.0
     @IBInspectable var yScale: CGFloat = -1.0
+    
+    public var lineWidth: CGFloat {
+        get {
+            return _lineWidth / max(xScale, yScale)
+        }
+        set(val) {
+            _lineWidth = val
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -79,7 +88,7 @@ class Artist: UIView {
             path.addLine(to: CGPoint(x: self.x[i], y: self.y[i] ))
         }
         edgeColor.setStroke()
-        path.lineWidth = thickness
+        path.lineWidth = lineWidth
         path.stroke()
     }
     
@@ -102,7 +111,16 @@ class Artist: UIView {
     //MARK: Properties
     var x: [CGFloat] = [0.0, 100.0, 200.0]
     var y: [CGFloat] = [100.0, 400, 300.0]
-    @IBInspectable var markerSize: CGFloat = 10.0
+    @IBInspectable var _markerSize: CGFloat = 10.0
+    
+    public var markerSize: CGFloat {
+        get {
+            return _markerSize / max(xScale, yScale)
+        }
+        set(val) {
+            _markerSize = val
+        }
+    }
     
     init(x: [CGFloat], y: [CGFloat], frame: CGRect) {
         super.init(frame: frame)
@@ -122,7 +140,7 @@ class Artist: UIView {
         for i in 0..<x.count {
             let r = CGRect(x: x[i] - markerSize / 2.0, y: y[i] - markerSize / 2.0, width: markerSize, height: markerSize)
             let path = UIBezierPath(ovalIn: r)
-            path.lineWidth = thickness
+            path.lineWidth = lineWidth
             path.stroke()
         }
     }
