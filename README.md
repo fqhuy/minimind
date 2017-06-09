@@ -3,33 +3,35 @@
 The only dependency now is [Surge](https://github.com/mattt/Surge) but it might be removed in the future. The main focus now is nonparametric models (Gaussian Processes) but more will be added soon. I aim to keep the interface as close to numpy/scikit-learn as possible. See playground files for examples.
 
 ## Sample code, predictive distribution
-![Predictive](https://github.com/fqhuy/minimind/blob/master/doc/images/predictive.png)
+![Predictive](https://github.com/fqhuy/minimind/blob/master/doc/images/regression.png)
 
 ```swift
-        let Nf = 20
         let X = Matrix<Float>([[-1.50983293], [-1.11726642], [-0.89303372], [ 0.07971517], [ 0.29116607], [ 0.7494249 ], [ 0.93321463], [ 1.46661229]])
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 1.0, lengthscale: 100.0)
+        // start with large variance and lengthscale
+        let kern = RBF(variance: 300.0, lengthscale: 1000.0)
+        
         let gp = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 200) // lengthscale = 3.68, fixed variance
+        gp.fit(X, Y, maxiters: 500)
         
         print(gp.kernel.get_params())
         
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
-        let gauss = MultivariateNormal(Mu, Sigma)
-        let S: Matrix<Float> = gauss.rvs(Nf)
-        
-        // Plotting, x and y are scaled for visibility
-        let xx = Xstar.grid.cgFloat 
-        for i in 0..<Nf {
-            let yy = S[i].cgFloat
-            _ = graph.plot(x: xx * 100.0 + 160.0, y: yy * 5.0, c: UIColor.blue)
 
-        }
-        _ = graph.scatter(x: (X.grid * 100.0 + Float(160.0)).cgFloat, y: (Y.grid * 5.0).cgFloat, c: UIColor.green, s: 3.0)
+        // plot variance 
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu + diag(Sigma)).grid.cgFloat , c: UIColor.blue, s: 1.0)
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu - diag(Sigma)).grid.cgFloat, c: UIColor.blue, s: 1.0)
+        
+        // plot mean
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: Mu.grid.cgFloat, c: UIColor.red, s: 3.0)
+
+        // plot training data
+        _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 10.0)
+        
+        graph.autoscale()
 ```
 ## Sample code, side-by-side with numpy
 ```swift

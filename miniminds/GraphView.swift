@@ -35,9 +35,10 @@ import UIKit
         super.init(coder: coder)
     }
 
-    public func plot(x: [CGFloat], y: [CGFloat], c: UIColor) -> Line2D {
+    public func plot(x: [CGFloat], y: [CGFloat], c: UIColor, s: CGFloat) -> Line2D {
         let line = Line2D(x: x, y: y, frame: self.bounds)
         line.edgeColor = c
+        line.lineWidth = s
         self.items.append(line)
         return line
     }

@@ -171,7 +171,7 @@ class minimindTests: XCTestCase {
         let y = Matrix<Float>([[0.21198747,  0.0883193,   0.4570866,   0.17492527,  0.03589,     0.06420726,
             0.19189653,  0.03121346]]).t
         
-        let kern = RBF(variance: 1.0, lengthscale: 10.0)
+        let kern = RBF(variance: 250, lengthscale: 1000.0)
         let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
         
         gpr.fit(X, y, maxiters: 500)

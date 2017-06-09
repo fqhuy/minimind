@@ -71,8 +71,11 @@ public extension GaussianProcessRegressor where T == Float {
     public func predict(_ X: MatrixT) -> (MatrixT, MatrixT) {
         let Kxz = kernel.K(X, Xtrain)
         let Kzz = kernel.K(X, X)
-        let Sigma = Kzz - Kxz * inv(Kxx + noise) * transpose(Kxz)
-        let Mu = Kxz * inv(Kxx + noise) * ytrain
+        Kxx = kernel.K(Xtrain, Xtrain)
+        
+        let invK = inv(Kxx + noise)
+        let Sigma = Kzz - Kxz * invK * transpose(Kxz)
+        let Mu = Kxz * invK * ytrain
         
         return (Mu.t, Sigma)
     }

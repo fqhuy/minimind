@@ -41,7 +41,7 @@ class Artist: UIView {
         
         context.saveGState();
 
-        context.translateBy(x: 0.0, y: rect.height / 2.0);
+        context.translateBy(x: rect.width / 2.0, y: rect.height / 2.0);
         context.scaleBy(x: xScale, y: -yScale);
         
         drawInternal(rect)
@@ -99,7 +99,7 @@ class Artist: UIView {
         let maxY = max(y.float)
         
         xScale = frame.width / CGFloat(maxX - minX)
-        yScale = frame.height / CGFloat(maxY - minY)
+        yScale = frame.height / CGFloat(maxY - minY) / 2
     }
     
     override func autocenter() {
@@ -152,7 +152,7 @@ class Artist: UIView {
         let maxY = max(y.float)
         
         xScale = frame.width / CGFloat(maxX - minX)
-        yScale = frame.height / CGFloat(maxY - minY)
+        yScale = frame.height / CGFloat(maxY - minY) / 2
     }
     
     override func autocenter() {

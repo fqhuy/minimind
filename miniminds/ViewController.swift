@@ -42,26 +42,30 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 1.0, lengthscale: 100.0)
+        let kern = RBF(variance: 300.0, lengthscale: 1000.0)
         
         
         let gp = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 200)
+        gp.fit(X, Y, maxiters: 500)
         
         print(gp.kernel.get_params())
         
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
-        let gauss = MultivariateNormal(Mu, Sigma)
-        let S: Matrix<Float> = gauss.rvs(Nf) // * 20.0
+//        let gauss = MultivariateNormal(Mu, Sigma)
+//        let S: Matrix<Float> = gauss.rvs(Nf)
+//        
+//        let xx = Xstar.grid.cgFloat
+//        for i in 0..<Nf {
+//            let yy = S[i].cgFloat
+//            _ = graph.plot(x: xx, y: yy, c: UIColor.blue, s: 2.0)
+//
+//        }
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu + diag(Sigma)).grid.cgFloat , c: UIColor.blue, s: 1.0)
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu - diag(Sigma)).grid.cgFloat, c: UIColor.blue, s: 1.0)
         
-        let xx = Xstar.grid.cgFloat // X.grid.cgFloat //
-        for i in 0..<Nf {
-            let yy = S[i].cgFloat
-            _ = graph.plot(x: xx, y: yy, c: UIColor.blue)
-
-        }
-        _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 3.0)
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: Mu.grid.cgFloat, c: UIColor.red, s: 3.0)
+        _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 10.0)
         
         graph.autoscale()
 

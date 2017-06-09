@@ -63,25 +63,25 @@ public class RBF: Kernel {
     }
     
     public func set_params(_ params: MatrixT) {
-//        log_variance = params[0, 0]
-//        log_lengthscale = params[0, 1]
+        log_variance = max(params[0, 0], 1e-5)
+        log_lengthscale = max(params[0, 1], 1e-5)
         
 //        lengthscale = params[0, 0]
-        log_lengthscale = params[0, 0]
+//        log_lengthscale = params[0, 0]
     }
     
     public func get_params() -> MatrixT {
-//        return MatrixT([[log_variance, log_lengthscale]])
+        return MatrixT([[log_variance, log_lengthscale]])
 //        return MatrixT([[lengthscale]])
-        return MatrixT([[log_lengthscale]])
+//        return MatrixT([[log_lengthscale]])
 
     }
     
     public func init_params() -> MatrixT {
-//        return MatrixT([[log_variance, log_lengthscale]])
+        return MatrixT([[log_variance, log_lengthscale]])
         
 //        return MatrixT([[lengthscale]])
-        return MatrixT([[log_lengthscale]])
+//        return MatrixT([[log_lengthscale]])
     }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {
@@ -108,15 +108,15 @@ public class RBF: Kernel {
 //        d[0, 0] = (reduce_sum(Kr ∘ dLdK)! )[0, 0] * variance
 //        d[0, 1] = -(reduce_sum((dKr ∘ dLdK) ∘ r)! )[0, 0] / lengthscale
         
-        var d: MatrixT = zeros(1, 1)
+        var d: MatrixT = zeros(1, 2)
         let r = scaledDist(X, Y)
         let Kr = K(r: r)
-        let dKr = dKdr(r: r)
-//        d[0, 0] = (reduce_sum(Kr ∘ dKr)! / variance)[0, 0]
+//        let dKr = dKdr(r: r)
+        d[0, 0] = (reduce_sum(Kr ∘ dLdK)!)[0, 0] / variance
         
 //        d[0, 0] = -(reduce_sum((dKr ∘ dLdK) ∘ r)!)[0, 0] / lengthscale
         
-        d[0, 0] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) )!)[0,0]
+        d[0, 1] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) )!)[0,0]
         return d
     }
     

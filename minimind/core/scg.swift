@@ -26,9 +26,9 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
     }
     
     public func optimize(verbose: Bool = false) -> (MatrixT, [Float], Int) {
-        let xtol: T = 1e-6
-        let ftol: T = 1e-6
-        let gtol: T = 1e-6
+        let xtol: T = 1e-12
+        let ftol: T = 1e-12
+        let gtol: T = 1e-12
         let max_f_eval = 10000
         
         let sigma0: T = 1.0e-7
