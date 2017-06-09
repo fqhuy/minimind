@@ -52,9 +52,7 @@ import UIKit
     }
     
     public func scatter(x: [CGFloat], y: [CGFloat], c: UIColor, s: CGFloat ) -> PathCollection {
-        //CGRect(x: 0.0, y: 0.0, width: 50.0, height: 50.0))//
         let coll = PathCollection(x: x, y: y, frame:  self.bounds) //self.frame
-//        coll.backgroundColor = UIColor.blue
         coll.edgeColor = c
         coll.markerSize = s
         self.items.append(coll)
@@ -71,5 +69,11 @@ import UIKit
         path.addLine(to: CGPoint(x: frame.width, y: 0.0))
         path.stroke()
 
+    }
+    
+    override func autoscale() {
+        for item in self.items {
+            item.autoscale()
+        }
     }
 }

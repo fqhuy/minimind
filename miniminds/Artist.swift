@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import Surge
 
 class Artist: UIView {
     //MARK: Properties
     @IBInspectable var thickness: CGFloat = 0.5
     @IBInspectable var edgeColor: UIColor = UIColor.green
     @IBInspectable var fillColor: UIColor = UIColor.white
+    @IBInspectable var xScale: CGFloat = 1.0
+    @IBInspectable var yScale: CGFloat = -1.0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,7 +33,7 @@ class Artist: UIView {
         context.saveGState();
 
         context.translateBy(x: 0.0, y: rect.height / 2.0);
-        context.scaleBy(x: 1.0, y: -1.0);
+        context.scaleBy(x: xScale, y: -yScale);
         
         drawInternal(rect)
         
@@ -38,7 +41,15 @@ class Artist: UIView {
     }
 
     func drawInternal(_ rect: CGRect) {
-        
+        fatalError("not implemented")
+    }
+    
+    func autoscale() {
+        fatalError("not implemented")
+    }
+    
+    func autocenter() {
+        fatalError("not implemented")
     }
 }
 
@@ -71,6 +82,20 @@ class Artist: UIView {
         path.lineWidth = thickness
         path.stroke()
     }
+    
+    override func autoscale() {
+        let minX = min(x.float)
+        let maxX = max(x.float)
+        let minY = min(y.float)
+        let maxY = max(y.float)
+        
+        xScale = frame.width / CGFloat(maxX - minX)
+        yScale = frame.height / CGFloat(maxY - minY)
+    }
+    
+    override func autocenter() {
+        
+    }
 }
 
 @IBDesignable class PathCollection: Artist {
@@ -100,5 +125,19 @@ class Artist: UIView {
             path.lineWidth = thickness
             path.stroke()
         }
+    }
+    
+    override func autoscale() {
+        let minX = min(x.float)
+        let maxX = max(x.float)
+        let minY = min(y.float)
+        let maxY = max(y.float)
+        
+        xScale = frame.width / CGFloat(maxX - minX)
+        yScale = frame.height / CGFloat(maxY - minY)
+    }
+    
+    override func autocenter() {
+        
     }
 }

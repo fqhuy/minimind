@@ -23,6 +23,7 @@
 		363DDCBF1EE4AF47003607B4 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDCBE1EE4AF47003607B4 /* GraphView.swift */; };
 		363DDCC81EE56B54003607B4 /* GraphModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDCC71EE56B54003607B4 /* GraphModel.swift */; };
 		363DDCCC1EE58024003607B4 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDCCB1EE58024003607B4 /* Artist.swift */; };
+		3670FD9B1EEAA6B200AC07F2 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FD9A1EEAA6B200AC07F2 /* Utils.swift */; };
 		367E89141C963D2600C96392 /* minimind.h in Headers */ = {isa = PBXBuildFile; fileRef = 367E89131C963D2600C96392 /* minimind.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		367E891B1C963D2600C96392 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89101C963D2600C96392 /* minimind.framework */; };
 		367E89201C963D2600C96392 /* minimindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E891F1C963D2600C96392 /* minimindTests.swift */; };
@@ -113,6 +114,7 @@
 		363DDCC71EE56B54003607B4 /* GraphModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphModel.swift; sourceTree = "<group>"; };
 		363DDCCB1EE58024003607B4 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		366141651EE7435400FD776F /* MathPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MathPlayground.playground; sourceTree = "<group>"; };
+		3670FD9A1EEAA6B200AC07F2 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		367E89101C963D2600C96392 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		367E89131C963D2600C96392 /* minimind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = minimind.h; sourceTree = "<group>"; };
 		367E89151C963D2600C96392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				363DDCBE1EE4AF47003607B4 /* GraphView.swift */,
 				363DDCC71EE56B54003607B4 /* GraphModel.swift */,
 				363DDCCB1EE58024003607B4 /* Artist.swift */,
+				3670FD9A1EEAA6B200AC07F2 /* Utils.swift */,
 			);
 			path = miniminds;
 			sourceTree = "<group>";
@@ -654,6 +657,7 @@
 				363DDCCC1EE58024003607B4 /* Artist.swift in Sources */,
 				363DDCA61EE4AF02003607B4 /* miniminds.xcdatamodeld in Sources */,
 				363DDCC81EE56B54003607B4 /* GraphModel.swift in Sources */,
+				3670FD9B1EEAA6B200AC07F2 /* Utils.swift in Sources */,
 				363DDCA01EE4AF02003607B4 /* ViewController.swift in Sources */,
 				363DDC9E1EE4AF02003607B4 /* AppDelegate.swift in Sources */,
 				363DDCBF1EE4AF47003607B4 /* GraphView.swift in Sources */,

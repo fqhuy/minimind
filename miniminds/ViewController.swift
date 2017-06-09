@@ -58,27 +58,12 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let xx = Xstar.grid.cgFloat // X.grid.cgFloat //
         for i in 0..<Nf {
             let yy = S[i].cgFloat
-            _ = graph.plot(x: xx * 100.0 + 160.0, y: yy * 5.0, c: UIColor.blue)
+            _ = graph.plot(x: xx, y: yy, c: UIColor.blue)
 
         }
-        _ = graph.scatter(x: (X.grid * 100.0 + Float(160.0)).cgFloat, y: (Y.grid * 5.0).cgFloat, c: UIColor.green, s: 3.0)
+        _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 3.0)
         
-//
-//        let Cov = Matrix<Float>([[1.0, 0.2],[0.1, 1.4]])
-//        let Mean: Matrix<Float> = Matrix([[0.0, 0.0]])
-//        
-//        let gauss = MultivariateNormal(Mean, Cov)
-//        var X: Matrix<Float> = gauss.rvs(200)
-//        print(X[column: 0].mean())
-//        print(X[column: 1].mean())
-//        
-//        X = X * 20.0
-//        _ = graph.scatter(x:  (X[column: 0] ).cgFloat,
-//                          y: (X[column: 1]).cgFloat, c: UIColor.blue, s: 5.0)
-//        
-////        _ = graph.scatter(x: [0.0], y: [0.0], c: UIColor.red, s: 10.0)
-//        print(X[column: 0].mean())
-//        print(X[column: 1].mean())
+        graph.autoscale()
 
     }
 
