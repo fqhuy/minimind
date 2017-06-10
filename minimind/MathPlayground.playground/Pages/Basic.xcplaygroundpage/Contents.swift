@@ -28,3 +28,14 @@ let v1 = [1.0, 2.0 ]
 let v2 = [2.0, 3.0]
 
 v1 * v2
+
+let subM1 = m[1∶, 1∶]
+
+
+let mask = Matrix<Bool>([[true, true, true],
+                         [true, false, false],
+                         [false, false, false]])
+
+let subM2 = m[mask]
+
+print(subM2)

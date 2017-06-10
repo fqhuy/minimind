@@ -46,7 +46,7 @@ let a = Matrix<Float>([[1.2, 0.2, 0.3],
                        [0.1, 0.2, 2.0]])
 
 let subM = m[0∷2, 0∷2] // matrix slicing
-let cmean = m.mean(0) // mean across columns
+let cmean = m.mean(0) // mean accross columns
 let b = (m * a + a) ∘ m.t // linear math
 let (u, s, v) = svd(a) // Singular values & vectors
 let l = cholesky(a, "L") // Cholesky & LDLT

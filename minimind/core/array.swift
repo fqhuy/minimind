@@ -154,6 +154,23 @@ public func ∷ (from: Int, step: Int) -> ((Int) -> [Int]) {
     return { x in arange(from, x, step) }
 }
 
+infix operator ∶
+public  func ∶(_ from: Int, _ to: Int) -> [Int] {
+    return arange(from, to, 1)
+}
+
+postfix operator ∶
+public postfix func ∶(_ from: Int) -> ((Int) -> [Int]) {
+    return { n in arange(from, n, 1)}
+}
+
+prefix operator ∶
+public prefix func ∶(_ to: Int) -> ((Int) -> [Int]) {
+    return { n in arange(0, to, 1)}
+}
+
+public let forall = { i in arange(0, i, 1)}
+
 //MARK: Array extensions
 
 public extension Array where Element == Float {

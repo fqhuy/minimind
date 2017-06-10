@@ -24,11 +24,16 @@
 		363DDCC81EE56B54003607B4 /* GraphModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDCC71EE56B54003607B4 /* GraphModel.swift */; };
 		363DDCCC1EE58024003607B4 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDCCB1EE58024003607B4 /* Artist.swift */; };
 		3670FD9B1EEAA6B200AC07F2 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FD9A1EEAA6B200AC07F2 /* Utils.swift */; };
+		3670FDA21EEBC8BB00AC07F2 /* arithmetic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FD9C1EEBC8BB00AC07F2 /* arithmetic.swift */; };
+		3670FDA31EEBC8BB00AC07F2 /* auxiliary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FD9D1EEBC8BB00AC07F2 /* auxiliary.swift */; };
+		3670FDA41EEBC8BB00AC07F2 /* exponential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FD9E1EEBC8BB00AC07F2 /* exponential.swift */; };
+		3670FDA51EEBC8BB00AC07F2 /* hyperbolic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FD9F1EEBC8BB00AC07F2 /* hyperbolic.swift */; };
+		3670FDA61EEBC8BB00AC07F2 /* power.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FDA01EEBC8BB00AC07F2 /* power.swift */; };
+		3670FDA71EEBC8BB00AC07F2 /* trigonometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FDA11EEBC8BB00AC07F2 /* trigonometric.swift */; };
 		367E89141C963D2600C96392 /* minimind.h in Headers */ = {isa = PBXBuildFile; fileRef = 367E89131C963D2600C96392 /* minimind.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		367E891B1C963D2600C96392 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89101C963D2600C96392 /* minimind.framework */; };
 		367E89201C963D2600C96392 /* minimindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E891F1C963D2600C96392 /* minimindTests.swift */; };
 		367E89351C965A3600C96392 /* base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E89341C965A3600C96392 /* base.swift */; };
-		367E89BB1C96BB4400C96392 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BA1C96BB4400C96392 /* Surge.framework */; };
 		367E89BD1C96BB4B00C96392 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BC1C96BB4B00C96392 /* Accelerate.framework */; };
 		36B2CB161EE322C3001751D3 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B2CB0D1EE322C3001751D3 /* minimind.framework */; };
 		36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */; };
@@ -115,6 +120,12 @@
 		363DDCCB1EE58024003607B4 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		366141651EE7435400FD776F /* MathPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MathPlayground.playground; sourceTree = "<group>"; };
 		3670FD9A1EEAA6B200AC07F2 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		3670FD9C1EEBC8BB00AC07F2 /* arithmetic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = arithmetic.swift; sourceTree = "<group>"; };
+		3670FD9D1EEBC8BB00AC07F2 /* auxiliary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = auxiliary.swift; sourceTree = "<group>"; };
+		3670FD9E1EEBC8BB00AC07F2 /* exponential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = exponential.swift; sourceTree = "<group>"; };
+		3670FD9F1EEBC8BB00AC07F2 /* hyperbolic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = hyperbolic.swift; sourceTree = "<group>"; };
+		3670FDA01EEBC8BB00AC07F2 /* power.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = power.swift; sourceTree = "<group>"; };
+		3670FDA11EEBC8BB00AC07F2 /* trigonometric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = trigonometric.swift; sourceTree = "<group>"; };
 		367E89101C963D2600C96392 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		367E89131C963D2600C96392 /* minimind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = minimind.h; sourceTree = "<group>"; };
 		367E89151C963D2600C96392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -123,7 +134,6 @@
 		367E89211C963D2600C96392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		367E89341C965A3600C96392 /* base.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = base.swift; sourceTree = "<group>"; };
 		367E89631C96AF3C00C96392 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
-		367E89BA1C96BB4400C96392 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = "../lib/Surge/build/Debug-iphoneos/Surge.framework"; sourceTree = "<group>"; };
 		367E89BC1C96BB4B00C96392 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		36B2CB0D1EE322C3001751D3 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B2CB0F1EE322C3001751D3 /* minimind mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "minimind mac.h"; sourceTree = "<group>"; };
@@ -162,7 +172,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				367E89BD1C96BB4B00C96392 /* Accelerate.framework in Frameworks */,
-				367E89BB1C96BB4400C96392 /* Surge.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,7 +349,6 @@
 		367E89BE1C96BB5E00C96392 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				367E89BA1C96BB4400C96392 /* Surge.framework */,
 				367E89BC1C96BB4B00C96392 /* Accelerate.framework */,
 			);
 			name = Frameworks;
@@ -376,6 +384,12 @@
 		36DFA3E81D3FC30F005CBBC0 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				3670FD9C1EEBC8BB00AC07F2 /* arithmetic.swift */,
+				3670FD9D1EEBC8BB00AC07F2 /* auxiliary.swift */,
+				3670FD9E1EEBC8BB00AC07F2 /* exponential.swift */,
+				3670FD9F1EEBC8BB00AC07F2 /* hyperbolic.swift */,
+				3670FDA01EEBC8BB00AC07F2 /* power.swift */,
+				3670FDA11EEBC8BB00AC07F2 /* trigonometric.swift */,
 				36C3CEFC1EDECCA600CE1E42 /* random.swift */,
 				36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */,
 				3617FA021EDB225F0087C682 /* scg.swift */,
@@ -679,16 +693,22 @@
 				3617FA051EDB226E0087C682 /* optimization.swift in Sources */,
 				3617FA091EDC81FB0087C682 /* kernel.swift in Sources */,
 				3617FA071EDC23860087C682 /* matrix.swift in Sources */,
+				3670FDA41EEBC8BB00AC07F2 /* exponential.swift in Sources */,
+				3670FDA31EEBC8BB00AC07F2 /* auxiliary.swift in Sources */,
+				3670FDA61EEBC8BB00AC07F2 /* power.swift in Sources */,
 				36DFA3EA1D3FC336005CBBC0 /* base_estimator.swift in Sources */,
 				36E619891EE156FD00B12612 /* util.swift in Sources */,
 				3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */,
 				3617FA031EDB225F0087C682 /* scg.swift in Sources */,
 				36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */,
+				3670FDA51EEBC8BB00AC07F2 /* hyperbolic.swift in Sources */,
 				36DFA3EC1D3FC570005CBBC0 /* gaussian_process.swift in Sources */,
+				3670FDA21EEBC8BB00AC07F2 /* arithmetic.swift in Sources */,
 				3617FA0B1EDD973C0087C682 /* array.swift in Sources */,
 				36E368DA1EE295C80026F5DB /* distributions.swift in Sources */,
 				36E619871EDF5FFA00B12612 /* rbf.swift in Sources */,
 				367E89351C965A3600C96392 /* base.swift in Sources */,
+				3670FDA71EEBC8BB00AC07F2 /* trigonometric.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -176,7 +176,7 @@ class minimindTests: XCTestCase {
         
         gpr.fit(X, y, maxiters: 500)
         
-        print(gpr.kernel.Kxx)
+        print(gpr.kernel.K(X, X))
         
 //        let Xstar: Matrix<Float> = randMatrix(5, P)
 //        let (Mu, Sigma) = gpr.predict(Xstar)

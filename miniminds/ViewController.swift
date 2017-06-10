@@ -46,7 +46,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         
         let gp = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 500)
+        gp.fit(X, Y, maxiters: 1000)
         
         print(gp.kernel.get_params())
         
