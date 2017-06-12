@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Surge
+//import Surge
 
 public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
     public typealias ScalarT = Float

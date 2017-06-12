@@ -7,16 +7,20 @@
 //
 
 import Foundation
-import Surge
+//import Surge
 
 public protocol BaseEstimator {
+    associatedtype ScalarT
+    associatedtype MatrixT
+    
     func get_params() -> [String:Any]
     func set_params(params: [String:Any])
 }
 
 public protocol RegressorMixin {
-    associatedtype MatrixT
     associatedtype ScalarT
+    associatedtype MatrixT
+    
     func score(X: MatrixT, y: MatrixT) -> ScalarT
 }
 

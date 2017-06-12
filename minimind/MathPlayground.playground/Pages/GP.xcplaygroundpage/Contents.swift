@@ -4,8 +4,6 @@ import Foundation
 
 var str = "Hello, playground"
 //: [Next](@next)
-
-import Surge
 import minimind
 
 

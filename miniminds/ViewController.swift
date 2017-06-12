@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Surge
 import minimind
 
 extension Array where Element == Float {

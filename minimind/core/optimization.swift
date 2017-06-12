@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Surge
+//import Surge
 
 public protocol ObjectiveFunction {
     associatedtype ScalarT: FloatType

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Surge
+//import Surge
 
 public protocol Distribution {
     associatedtype ScalarT: FloatType
@@ -65,7 +65,7 @@ extension MultivariateNormal where T == Float {
             }
 
             let y = L * X + mu
-            Y[n] = y.grid
+            Y[n] = y
         }        
         return Y
     }

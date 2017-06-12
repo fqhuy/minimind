@@ -119,6 +119,9 @@ public func clip<T: FloatingPoint>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
     return arr.map{ $0 < floor ? floor : $0}.map{ $0 > ceil ? ceil : $0 }
 }
 
+public func minimum<T: FloatingPoint>(_ arr1: [T], _ arr2: [T]) -> [T] {
+    return (0..<arr1.count).map{ i in arr1[i] <= arr2[i] ? arr1[i] : arr2[i] }
+}
 
 //MARK: Creators
 public func randArray(n: Int) -> [Float] {
@@ -169,38 +172,99 @@ public prefix func ∶(_ to: Int) -> ((Int) -> [Int]) {
     return { n in arange(0, to, 1)}
 }
 
-public let forall = { i in arange(0, i, 1)}
-
-//MARK: Array extensions
-
-public extension Array where Element == Float {
-    public func std() -> Element {
-        let m = mean()
-        let v = mean(self.map{ powf(($0 - m), 2.0)})
-        return sqrtf(v)
+infix operator ∪
+public func ∪<T>(_ lhs: [T], _ rhs: [T]) -> [T] {
+    var re = lhs
+    for i in 0..<rhs.count {
+        re.append(rhs[i])
     }
-    
-    public func mean() -> Element {
-        return sum() / Element(count)
-    }
-    
-    public func mean(_ arr: [Element]) -> Element {
-        return sum(arr) / Element(arr.count)
-    }
-    
-    public func sum() -> Element {
-        return self.reduce(0.0, {x, y in x + y} )
-    }
-    
-    public func sum(_ arr: [Element]) -> Element {
-        return arr.reduce(0.0, {x, y in x + y} )
-    }
-    
-    public func norm() -> Element {
-        return sqrt((self ** 2).sum())
-    }
+    return re
 }
 
-//public func log<T: FloatingPoint>(_ arr: [T]) -> [T] {
-//    return arr.map{_log($0)}
+public let forall = { i in arange(0, i, 1)}
+
+//MARK: Tuples
+
+public func tuple<T>(_ arr: [T]) -> (T, T) {
+    return (arr[0], arr[1])
+}
+
+//MARK: Array<Bool>
+
+//extension Array where Element == Bool {
+//    public func all() {
+//        return reduce(true, {x, y in x && y})
+//    }
+//    
+//    public func any() {
+//        return reduce(false, {x,y in x || y})
+//    }
 //}
+
+public func all(_ arr: [Bool]) -> Bool {
+    return arr.reduce(true, {x, y in x && y})
+}
+
+public func any(_ arr: [Bool]) -> Bool {
+    return arr.reduce(false, {x,y in x || y})
+}
+
+public func ==<T: Equatable>(_ arr: [T], _ t: T) -> [Bool] {
+    return arr.map{ $0 == t }
+}
+
+public func >=<T: Comparable>(_ arr: [T], _ t: T) -> [Bool] {
+    return arr.map{ $0 >= t }
+}
+
+public func <=<T: Comparable>(_ arr: [T], _ t: T) -> [Bool] {
+    return arr.map{ $0 <= t }
+}
+
+public func > <T: Comparable>(_ arr: [T], _ t: T) -> [Bool] {
+    return arr.map{ $0 > t }
+}
+
+public func < <T: Comparable>(_ arr: [T], _ t: T) -> [Bool] {
+    return arr.map{ $0 < t }
+}
+
+public func ==<T: Equatable>(_ t: T, _ arr: [T]) -> [Bool] {
+    return arr.map{ $0 == t }
+}
+
+public func >=<T: Comparable>(_ t: T, _ arr: [T]) -> [Bool] {
+    return arr.map{ $0 >= t }
+}
+
+public func <=<T: Comparable>(_ t: T, _ arr: [T]) -> [Bool] {
+    return arr.map{ $0 <= t }
+}
+
+public func > <T: Comparable>(_ t: T, _ arr: [T]) -> [Bool] {
+    return arr.map{ $0 > t }
+}
+
+public func < <T: Comparable>(_ t: T, _ arr: [T]) -> [Bool] {
+    return arr.map{ $0 < t }
+}
+
+public func ==<T: Equatable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
+    return (0..<lhs.count).map{ lhs[$0] == rhs[$0]}
+}
+
+public func >=<T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
+    return (0..<lhs.count).map{ lhs[$0] >= rhs[$0]}
+}
+
+public func <=<T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
+    return (0..<lhs.count).map{ lhs[$0] <= rhs[$0]}
+}
+
+public func > <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
+    return (0..<lhs.count).map{ lhs[$0] > rhs[$0]}
+}
+
+public func < <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
+    return (0..<lhs.count).map{ lhs[$0] < rhs[$0]}
+}

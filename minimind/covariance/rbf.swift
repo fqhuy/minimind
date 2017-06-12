@@ -69,13 +69,13 @@ public class RBF: Kernel {
     }
     
     public func get_params() -> MatrixT {
-        return MatrixT([[log_variance, log_lengthscale]])
-//        return MatrixT([[log_lengthscale]])
+//        return MatrixT([[log_variance, log_lengthscale]])
+        return MatrixT([[log_variance, log_lengthscale] ∪ X.grid ])
 
     }
     
     public func init_params() -> MatrixT {
-        return MatrixT([[log_variance, log_lengthscale]])
+        return MatrixT([[log_variance, log_lengthscale] ∪ X.grid])
 //        return MatrixT([[log_lengthscale]])
     }
     
@@ -95,8 +95,7 @@ public class RBF: Kernel {
     
     public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
 //        var d: MatrixT = zeros(1, 2)
-        let N = X.shape[0]
-        let D = X.shape[1]
+        let (N, D) = X.shape
         var d: MatrixT = zeros(1, 2 + D * N)
         let r = scaledDist(X, Y)
         let Kr = K(r: r)

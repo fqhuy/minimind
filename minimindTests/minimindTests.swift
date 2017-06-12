@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import Surge
 @testable import minimind
 
 class minimindTests: XCTestCase {
@@ -29,7 +28,7 @@ class minimindTests: XCTestCase {
         let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.01)
         
         var X: Matrix<Float> = randMatrix(N, P + 1) * 10.0
-        X[column: 0] = [Float](repeating: 1.0, count: N)
+        X[column: 0] = ones(N, 1) // [Float](repeating: 1.0, count: N)
         var XX: Matrix<Float> = zeros(N, P)
         for i in 1..<P+1 {
             XX[column: i - 1] = X[column: i]
@@ -108,9 +107,7 @@ class minimindTests: XCTestCase {
         let gauss = MultivariateNormal(v, A)
         
         let X = gauss.rvs(1000)
-        print(X[0].mean())
-        print(X[1].mean())
-        print(X[2].mean())
+        print(X.mean(0))
         
         gauss.pdf(randMatrix(5, 3))
     }
@@ -119,7 +116,7 @@ class minimindTests: XCTestCase {
         let mat: Matrix<Float> = randMatrix(5, 5)
         var m1 = mat
         m1[0, 0] = 100.0
-        print(m1 == mat)
+//        print(m1 == mat)
         
         let ids = 0∷10
         
@@ -133,7 +130,7 @@ class minimindTests: XCTestCase {
         let (eivals, eivecs) = eigh(m, "L")
         
         for i in 0..<3 {
-            print( eivecs[column: i].norm())
+            print( eivecs[column: i].grid.norm())
         }
         print(eivals)
         

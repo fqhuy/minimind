@@ -88,11 +88,11 @@ public extension GaussianProcessRegressor where T == Float {
         let e: Matrix<T> = eye(X.rows)
         noise = e * (alpha * alpha)
         
-        var llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
+        let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
-        var scg = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.init_params(), maxiters: maxiters)
+        let scg = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.init_params(), maxiters: maxiters)
         
-        let (x, flog, _) = scg.optimize(verbose: verbose)
+        let (x, _, _) = scg.optimize(verbose: verbose)
         
         kernel.set_params(x)
     }
@@ -123,7 +123,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matri
         
         let C = kernel.K(Xtrain, Xtrain) + noise
         let N = Float(Xtrain.rows)
-        let D = Float(Xtrain.columns)
+//        let D = Float(Xtrain.columns)
         
         let L = cholesky(C, "L")
 //        let L = ldlt(C, "L")
@@ -144,7 +144,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matri
         kernel.set_params(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
-        let N = Xtrain.rows
+//        let N = Xtrain.rows
         
 //        direct way
         let Cinv = inv(C)
