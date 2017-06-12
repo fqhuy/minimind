@@ -1,6 +1,6 @@
 # ![minimind](https://github.com/fqhuy/minimind/blob/master/doc/images/minimind128.png) minimind: A Minimalist Machine Learning Library written in Swift
 
-The only dependency now is [Surge](https://github.com/mattt/Surge) but it might be removed in the future. The main focus now is nonparametric models (Gaussian Processes) but more will be added soon. I aim to keep the interface as close to numpy/scikit-learn as possible. See playground files for examples.
+The main focus of this library is dimensionality reduction and multi-output regression. I aim to keep the interface as close to numpy/scikit-learn/matplotlib as possible. See playground files for examples. Some wrapper functions for Accelerate were borrowed from [Surge](https://github.com/mattt/Surge).
 
 ## Sample code, predictive distribution
 ![Predictive](https://github.com/fqhuy/minimind/blob/master/doc/images/regression.png)
