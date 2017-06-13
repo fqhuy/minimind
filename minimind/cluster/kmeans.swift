@@ -42,6 +42,8 @@ class KMeans {
         var nT = 5
         if nTrials == nil {
             nT =  2 + Int(log(Float(nClusters)))
+        } else {
+            nT = nTrials!
         }
         
         let centerId = Randoms.randomInt(0, N)

@@ -8,6 +8,57 @@
 
 import Foundation
 
+//MARK: EXTENSIONS
+public extension Matrix where T: Integer {
+    public var t: Matrix {
+        get {
+            var newmat = self
+            for r in 0..<rows {
+                for c in 0..<columns {
+                    newmat[c, r] = self[r, c]
+                }
+            }
+            return newmat
+        }
+    }
+    
+//    public func mean(_ axis: Int) -> Matrix {
+//        if axis == 0 {
+//            var m: Matrix = zeros(1, columns)
+//            for col in 0..<columns {
+//                m[0, col] = minimind.mean(self[column: col].grid)
+//            }
+//            return m
+//        } else if axis == 1 {
+//            var m: Matrix = zeros(rows, 1)
+//            for row in 0..<rows {
+//                m[row, 0] = minimind.mean(self[row].grid)
+//            }
+//            return m
+//        } else {
+//            return Matrix([[minimind.mean(grid)]])
+//        }
+//    }
+    
+    public func sum(_ axis: Int = -1) -> Matrix {
+        if axis == 0 {
+            var m: Matrix = zeros(1, columns)
+            for col in 0..<columns {
+                m[0, col] = minimind.sum(self[column: col].grid)
+            }
+            return m
+        } else if axis == 1 {
+            var m: Matrix = zeros(rows, 1)
+            for row in 0..<rows {
+                m[row, 0] = minimind.sum(self[row].grid)
+            }
+            return m
+        } else {
+            return Matrix([[minimind.sum(grid)]])
+        }
+    }
+}
+
 //MARK: CREATORS
 public func ones<T: IntType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
     return Matrix<T>(rows: rows, columns: columns, repeatedValue: 1 as T)

@@ -75,10 +75,9 @@ public struct Matrix<T> {
         self.init(rows: m, columns: n, repeatedValue: repeatedValue)
         
         for (i, row) in data.enumerated() {
-            grid.replaceSubrange(i*n..<i*n+Swift.min(m, row.count), with: row)
+            _grid.replaceSubrange(i*n..<i*n+Swift.min(m, row.count), with: row)
         }
     }
-    
     
     public subscript(row: Int, column: Int) -> Element {
         get {
@@ -148,6 +147,44 @@ public struct Matrix<T> {
         mat.columns = shape[1]
         
         return mat
+    }
+    
+//    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
+//        if axis == 0 {
+//            var m: Matrix<T> = Matrix<T>(1, columns, 0 as! T)
+//            for col in 0..<columns {
+//                m[0, col] = f(self[column: col].grid)
+//            }
+//            return m
+//        } else if axis == 1 {
+//            var m: Matrix<T> = zeros(rows, 1)
+//            for row in 0..<rows {
+//                m[row, 0] = f(self[row].grid)
+//            }
+//            return m
+//        } else {
+//            return Matrix<T>([[f(grid)]])
+//        }
+//    }
+    
+    // Apply a transformation function to an axis
+    public func apply(_ f: ([Element], [Element]) -> [Element], _ arr: [Element], _ axis: Int = 0) -> Matrix<Element> {
+        var re: Matrix<Element> = self.zeros(rows, columns)
+        switch axis {
+        case 1: for c in 0..<columns {
+            re[0∶, c] = Matrix(rows, 1, f(self[column: c].grid, arr))
+            }
+        case 0: for r in 0..<rows {
+            re[r, 0∶] = Matrix(1, columns, f(self[r].grid, arr))
+            }
+        default :
+            fatalError("invalid axis")
+        }
+        return re
+    }
+    
+    public func zeros(_ rows: Int, _ columns: Int) -> Matrix<Element> {
+        fatalError("unimplemented")
     }
 }
 
@@ -317,8 +354,6 @@ public extension Matrix {
 
 
 //MARK: OPERATORS
-
-
 
 
 //public func ==<T: Equatable>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<Bool> {
@@ -521,8 +556,24 @@ public func tile<T: FloatType>(_ mat: Matrix<T>, _ shape: [Int]) -> Matrix<T> {
     return newmat
 }
 
-//public func vstack<T: FloatType>(_ mats: [Matrix<FloatType>]) -> Matrix<FloatType> {
-//    
+public func vstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
+    checkMatrices(mats, "sameColumns")
+    let rows = mats.map{ x in x.rows}.sum()
+    var data = [T]()
+    for i in 0..<mats.count {
+        data.append(contentsOf: mats[i].grid)
+    }
+    return Matrix<T>(rows, mats[0].columns, data)
+}
+
+//public func hstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
+//    checkMatrices(mats, "sameRows")
+//    let cols = mats.map{ x in x.columns}.sum()
+//    var data = [T]()
+//    for i in 0..<mats.count {
+//        data.append(contentsOf: mats[i].grid)
+//    }
+//    return Matrix<T>(mats[0].rows, cols, data)
 //}
 
 //MARK: CREATORS

@@ -17,39 +17,53 @@ public extension Matrix where T == Double {
         }
     }
     
-    public func mean(_ axis: Int) -> Matrix {
+    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
         if axis == 0 {
             var m: Matrix = zeros(1, columns)
             for col in 0..<columns {
-                m[0, col] = minimind.mean(self[column: col].grid)
+                m[0, col] = f(self[column: col].grid)
             }
             return m
         } else if axis == 1 {
             var m: Matrix = zeros(rows, 1)
             for row in 0..<rows {
-                m[row, 0] = minimind.mean(self[row].grid)
+                m[row, 0] = f(self[row].grid)
             }
             return m
         } else {
-            return Matrix([[minimind.mean(grid)]])
+            return Matrix([[f(grid)]])
         }
     }
     
+    public func mean(_ axis: Int) -> Matrix {
+        return apply(minimind.min, axis)
+    }
+    
+    public func std(_ axis: Int) -> Matrix {
+        return apply(minimind.std, axis)
+    }
+    
     public func sum(_ axis: Int = -1) -> Matrix {
+        return apply(minimind.sum, axis)
+    }
+    
+    public func cumsum(_ axis: Int = -1) -> Matrix {
         if axis == 0 {
-            var m: Matrix = zeros(1, columns)
+            var m: Matrix = zeros(rows, columns)
             for col in 0..<columns {
-                m[0, col] = minimind.sum(self[column: col].grid)
+                m[0∶, col] = Matrix(rows, 1, self[column: col].grid.cumsum())
             }
             return m
         } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
+            var m: Matrix = zeros(rows, columns)
             for row in 0..<rows {
-                m[row, 0] = minimind.sum(self[row].grid)
+                m[row, 0∶] = Matrix(1, columns, self[row].grid.cumsum())
             }
             return m
         } else {
-            return Matrix([[minimind.sum(grid)]])
+            var m = self
+            m.grid = grid.cumsum()
+            return m
         }
     }
 }

@@ -26,7 +26,8 @@ public struct MultivariateNormal<T: FloatType>: Distribution {
     public var cov: MatrixT
     public var shape: [Int]
     
-    public init(_ mean: MatrixT, _ cov: MatrixT){
+    public init(mean: MatrixT, cov: MatrixT){
+        precondition(mean.rows == 1 && mean.columns > 0 && (mean.columns == cov.columns) && mean.columns == cov.rows, "invalid mean and/or covariance matrices")
         self.mean = mean
         self.cov = cov
         self.shape = [mean.columns]

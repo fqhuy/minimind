@@ -31,9 +31,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBOutlet var mainView: UIView!
     @IBOutlet weak var graph: GraphView!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
+    
+    func visualise1DRegression() {
         let N = 8
         
         let Nf = 20
@@ -42,8 +41,6 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
         let kern = RBF(variance: 300.0, lengthscale: 1000.0)
-        
-        
         let gp = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
         gp.fit(X, Y, maxiters: 1000)
         
@@ -51,15 +48,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
-//        let gauss = MultivariateNormal(Mu, Sigma)
-//        let S: Matrix<Float> = gauss.rvs(Nf)
-//        
-//        let xx = Xstar.grid.cgFloat
-//        for i in 0..<Nf {
-//            let yy = S[i].cgFloat
-//            _ = graph.plot(x: xx, y: yy, c: UIColor.blue, s: 2.0)
-//
-//        }
+
         _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu + diag(Sigma)).grid.cgFloat , c: UIColor.blue, s: 1.0)
         _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu - diag(Sigma)).grid.cgFloat, c: UIColor.blue, s: 1.0)
         
@@ -67,7 +56,26 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 10.0)
         
         graph.autoscale()
+    }
+    
+    func visualiseMixtureOfGaussians() {
+        let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
+        let mean1 = Matrix<Float>([[-2.0, 0.0]])
+        let mean2 = Matrix<Float>([[3.0, 0.0]])
+        
+        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(50)
+        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(50)
+        
+        let X = vstack([X1, X2])
+        
+        _ = graph.scatter(x: X[column: 0].grid.cgFloat, y: X[column: 1].grid.cgFloat, c: UIColor.green, s: 10.0)
+        graph.autoscale()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
+        visualiseMixtureOfGaussians()
     }
 
     override func didReceiveMemoryWarning() {

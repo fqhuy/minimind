@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Surge
+//import Surge
 
 public protocol GaussianProcess: BaseEstimator, RegressorMixin {
     associatedtype KernelT: Kernel

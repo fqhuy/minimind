@@ -17,40 +17,39 @@ public extension Matrix where T == Float {
         }
     }
     
-    public func mean(_ axis: Int) -> Matrix {
+    // apply a function to reduce an axis to scalar
+    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
         if axis == 0 {
             var m: Matrix = zeros(1, columns)
             for col in 0..<columns {
-                m[0, col] = minimind.mean(self[column: col].grid)
+                m[0, col] = f(self[column: col].grid)
             }
             return m
         } else if axis == 1 {
             var m: Matrix = zeros(rows, 1)
             for row in 0..<rows {
-                m[row, 0] = minimind.mean(self[row].grid)
+                m[row, 0] = f(self[row].grid)
             }
             return m
         } else {
-            return Matrix([[minimind.mean(grid)]])
+            return Matrix([[f(grid)]])
         }
     }
     
+    public func zeros(_ rows: Int, columns: Int) -> Matrix<T> {
+        return zeros(rows, columns)
+    }
+    
+    public func mean(_ axis: Int) -> Matrix {
+        return apply(minimind.mean, axis)
+    }
+    
+    public func std(_ axis: Int) -> Matrix {
+        return apply(minimind.std, axis)
+    }
+    
     public func sum(_ axis: Int = -1) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = minimind.sum(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = minimind.sum(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[minimind.sum(grid)]])
-        }
+        return apply(minimind.sum, axis)
     }
     
     public func cumsum(_ axis: Int = -1) -> Matrix {
@@ -167,7 +166,7 @@ public func += (lhs: inout Matrix<Float>, rhs: Float) {
 }
 
 public func -= (lhs: inout Matrix<Float>, rhs: Float) {
-    lhs = lhs - rhs
+    lhs = lhs + (-rhs)
 }
 
 public func /= (lhs: inout Matrix<Float>, rhs: Float) {
@@ -188,12 +187,8 @@ public func +(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
     return mat
 }
 
-public func -(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
-    var mat = lhs
-    mat.grid = mat.grid - rhs
-    return mat
-}
-
+//MARK: ARITHMETIC MATRIX & VECTOR
+//public func +(lhs: Matrix<Float>, rhs: [Float]) -> Matrix
 
 //MARK: LINEAR ALGEBRA
 public func inv(_ x : Matrix<Float>) -> Matrix<Float> {

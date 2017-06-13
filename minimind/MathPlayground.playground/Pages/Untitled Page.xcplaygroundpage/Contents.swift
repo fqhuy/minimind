@@ -12,8 +12,5 @@ let a: [Float] = [0.0, 0.2, 0.4, 1.2]
 
 //print(searchsorted(v, a))
 
-let x = Matrix([[1, 1], [2, 2]])
-print(x * 2)
-print(2 * x)
-print(4 / x)
-print(x * x)
+let x = Matrix<Float>([[1, 1], [2, 2]])
+x.apply({x, y in x * y }, Array<Float>([5.0, 10.0]), 0)
