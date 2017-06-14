@@ -8,6 +8,13 @@
 
 import Foundation
 
+//MARK: EXTENSIONS
+extension Array where Element: ScalarType {
+//    public func sum() -> Element {
+//        return self.reduce(Element.zero, {x, y in x + y})
+//    }
+}
+
 //MARK: Arithmetic
 
 public func **(lhs: [Float], rhs: Float) -> [Float] {
@@ -115,12 +122,20 @@ public func abs<T: SignedNumber>(_ arr: [T]) -> [T] {
     return arr.map{ abs($0) }
 }
 
-public func clip<T: FloatingPoint>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
+public func clip<T: ScalarType>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
     return arr.map{ $0 < floor ? floor : $0}.map{ $0 > ceil ? ceil : $0 }
 }
 
-public func minimum<T: FloatingPoint>(_ arr1: [T], _ arr2: [T]) -> [T] {
+public func minimum<T: ScalarType>(_ arr1: [T], _ arr2: [T]) -> [T] {
     return (0..<arr1.count).map{ i in arr1[i] <= arr2[i] ? arr1[i] : arr2[i] }
+}
+
+public func sum<T: ScalarType>(_ arr: [T]) -> T {
+    return arr.reduce(T.zero, {x,y in x + y})
+}
+
+public func prod<T: ScalarType>(_ arr: [T]) -> T {
+    return arr.reduce(T.zero, {x,y in x * y})
 }
 
 //MARK: Creators
@@ -267,4 +282,37 @@ public func > <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
 
 public func < <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
     return (0..<lhs.count).map{ lhs[$0] < rhs[$0]}
+}
+
+//MARK: ALGORITHMS
+
+public func binarysearch<T: ScalarType>(_ arr: [T], _ t: T) -> Int {
+    precondition(arr.count > 0)
+    var (l, r, m) = (Float(0.0), Float(arr.count - 1), Float(0.0))
+    if t < arr.first! {
+        return 0
+    } else if t > arr.last! {
+        return arr.count
+    }
+    while true {
+        m = floorf((l + r) / 2.0)
+        
+        if arr[Int(m)] < t {
+            l = m + 1
+        } else if arr[Int(m)] > t {
+            r = m - 1
+        }
+        
+        if (arr[Int(m)] == t){
+            return Int(m)
+        }
+        
+        if Int(l) >= Int(r) {
+            if arr[Int(m)] > t {
+                return Int(m)
+            } else {
+                return Int(m + 1)
+            }
+        }
+    }
 }

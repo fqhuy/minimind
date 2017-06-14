@@ -12,8 +12,7 @@ import Foundation
 import Accelerate
 
 typealias NumberType = Float
-public typealias FloatType = ExpressibleByFloatLiteral & FloatingPoint
-public typealias IntType = Integer
+
 
 //MARK: SURGE
 public enum MatrixAxies {
@@ -21,7 +20,7 @@ public enum MatrixAxies {
     case column
 }
 
-public struct Matrix<T> {
+public struct Matrix<T: ScalarType> {
     public typealias Element = T
     
     public var rows: Int
@@ -149,43 +148,12 @@ public struct Matrix<T> {
         return mat
     }
     
-//    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
-//        if axis == 0 {
-//            var m: Matrix<T> = Matrix<T>(1, columns, 0 as! T)
-//            for col in 0..<columns {
-//                m[0, col] = f(self[column: col].grid)
-//            }
-//            return m
-//        } else if axis == 1 {
-//            var m: Matrix<T> = zeros(rows, 1)
-//            for row in 0..<rows {
-//                m[row, 0] = f(self[row].grid)
-//            }
-//            return m
-//        } else {
-//            return Matrix<T>([[f(grid)]])
-//        }
-//    }
-    
-    // Apply a transformation function to an axis
-    public func apply(_ f: ([Element], [Element]) -> [Element], _ arr: [Element], _ axis: Int = 0) -> Matrix<Element> {
-        var re: Matrix<Element> = self.zeros(rows, columns)
-        switch axis {
-        case 1: for c in 0..<columns {
-            re[0∶, c] = Matrix(rows, 1, f(self[column: c].grid, arr))
-            }
-        case 0: for r in 0..<rows {
-            re[r, 0∶] = Matrix(1, columns, f(self[r].grid, arr))
-            }
-        default :
-            fatalError("invalid axis")
-        }
-        return re
+    public func zeros(_ rows: Int, _ columns: Int) -> Matrix {
+        let data = [T](repeating: T.zero, count: rows * columns)
+        return Matrix(rows, columns, data)
     }
     
-    public func zeros(_ rows: Int, _ columns: Int) -> Matrix<Element> {
-        fatalError("unimplemented")
-    }
+
 }
 
 // MARK: - Printable
@@ -350,6 +318,41 @@ public extension Matrix {
             }
         }
     }
+    
+    // apply a function to reduce an axis to scalar
+    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
+        if axis == 0 {
+            var m: Matrix = zeros(1, columns)
+            for col in 0..<columns {
+                m[0, col] = f(self[column: col].grid)
+            }
+            return m
+        } else if axis == 1 {
+            var m: Matrix = zeros(rows, 1)
+            for row in 0..<rows {
+                m[row, 0] = f(self[row].grid)
+            }
+            return m
+        } else {
+            return Matrix([[f(grid)]])
+        }
+    }
+    
+    // Apply a transformation function to an axis
+    public func apply(_ f: ([T]) -> [T], _ axis: Int) -> Matrix<Element> {
+        var re: Matrix<T> = self.zeros(rows, columns)
+        switch axis {
+        case 1: for c in 0..<columns {
+            re[0∶, c] = Matrix(rows, 1, f(self[column: c].grid))
+            }
+        case 0: for r in 0..<rows {
+            re[r, 0∶] = Matrix(1, columns, f(self[r].grid))
+            }
+        default :
+            fatalError("invalid axis")
+        }
+        return re
+    }
 }
 
 
@@ -410,12 +413,6 @@ public func ∘<T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return newmat
 }
 
-infix operator **
-public func ** (_ mat: Matrix<Float>, _ e: Float) -> Matrix<Float> {
-    let newgrid: [Float] = mat.grid.map{ powf($0, e) }
-    return Matrix<Float>( mat.rows, mat.columns, newgrid)
-}
-
 //MARK: LINEAR ALGEBRA & MATH
 
 public func sqrt<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
@@ -436,7 +433,7 @@ public func min<T: FloatType>(_ mat: Matrix<T>) -> T {
     return mat.grid.min()!
 }
 
-public func cross_add<T: FloatType>(_ lhs: Matrix<T>, _ rhs: Matrix<T>) -> Matrix<T> {
+public func cross_add<T: ScalarType>(_ lhs: Matrix<T>, _ rhs: Matrix<T>) -> Matrix<T> {
     precondition((lhs.columns == 1) && (rhs.columns == 1), "lhs and rhs must have shape (N, 1)")
     
     var re: Matrix<T> = zeros(lhs.rows, rhs.rows)
@@ -448,86 +445,48 @@ public func cross_add<T: FloatType>(_ lhs: Matrix<T>, _ rhs: Matrix<T>) -> Matri
     return re
 }
 
-public func trace<T: FloatType>(_ mat: Matrix<T>) ->T {
-    return reduce_sum(diag(mat))![0,0]
+public func trace<T: ScalarType>(_ mat: Matrix<T>) ->T {
+    return sum(diag(mat).grid)
 }
 
 //MARK: TRAVERSE
 
-public func reduce_sum<T: FloatType>(_ mat: Matrix<T>,_ axis: Int? = nil) -> Matrix<T>? {
-    if axis == nil {
-        var newmat = Matrix<T>([[0.0]])
-        newmat[0,0] = mat.grid.reduce(0.0, {x , y in x + y})
-        return newmat
-    } else if axis! == 1 {
-        var newmat = Matrix<T>(rows: mat.rows, columns: 1, repeatedValue: 0.0)
-        for i in 0..<mat.rows {
-            newmat.grid[i] = mat[i].grid.reduce(0.0, {x,y in x+y})
-        }
-
-        return newmat
-    } else if axis! == 0 {
-        var newmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: 0.0)
-        for i in 0..<mat.columns {
-            newmat.grid[i] = mat[column: i].grid.reduce(0.0, {x,y in x+y})
-        }
-        return newmat
-    } else {
-        return nil
-    }
+public func reduce_sum<T: ScalarType>(_ mat: Matrix<T>,_ axis: Int = -1) -> Matrix<T> {
+    return mat.apply(minimind.sum, axis)
 }
 
-public func reduce_prod<T: FloatType>(_ mat: Matrix<T>,_ axis: Int? = nil) -> Matrix<T>? {
-    if axis == nil {
-        var newmat = Matrix<T>([[0.0]])
-        newmat[0,0] = mat.grid.reduce(1.0, {x , y in x * y})
-        return newmat
-    } else if axis! == 1 {
-        var newmat = Matrix<T>(rows: mat.rows, columns: 1, repeatedValue: 0.0)
-        for i in 0..<mat.rows {
-            newmat.grid[i] = mat[i].grid.reduce(1.0, {x,y in x * y})
-        }
-        
-        return newmat
-    } else if axis! == 0 {
-        var newmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: 0.0)
-        for i in 0..<mat.columns {
-            newmat.grid[i] = mat[column: i].grid.reduce(1.0, {x,y in x * y})
-        }
-        return newmat
-    } else {
-        return nil
-    }
+public func reduce_prod<T: ScalarType>(_ mat: Matrix<T>,_ axis: Int = -1) -> Matrix<T> {
+    return mat.apply(minimind.prod, axis)
 }
 
 //MARK: ACCESS
 
-public func diag<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
-    var dmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: 0.0)
+public func diag<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
+    var dmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: T.zero)
     for i in 0..<mat.columns {
         dmat[0, i] = mat[i, i]
     }
     return dmat
 }
 
-public func tril<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
+public func tril<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
     var dmat = mat
     for i in 0..<mat.rows{
         for j in 0...i {
             if i != j {
-                dmat[j, i] = 0
+                dmat[j, i] = T.zero
             }
         }
     }
     return dmat
 }
 
-public func triu<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
+public func triu<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
     var dmat = mat
     for i in 0..<mat.rows{
         for j in 0...i {
             if i != j {
-                dmat[i, j] = 0
+                dmat[i, j] = T.zero
             }
         }
     }
@@ -542,7 +501,7 @@ public func clip<T: FloatType>(_ mat: Matrix<T>, _ floor: T, _ ceil: T, _ inplac
         return newmat
 }
 
-public func tile<T: FloatType>(_ mat: Matrix<T>, _ shape: [Int]) -> Matrix<T> {
+public func tile<T: ScalarType>(_ mat: Matrix<T>, _ shape: [Int]) -> Matrix<T> {
     var newmat: Matrix<T> = zeros(mat.rows * shape[0], mat.columns * shape[1])
     for row in 0..<shape[0] {
         for col in 0..<shape[1] {
@@ -577,7 +536,7 @@ public func vstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
 //}
 
 //MARK: CREATORS
-public func diagonal<T: FloatType>(_ a: [T]) -> Matrix<T> {
+public func diagonal<T: ScalarType>(_ a: [T]) -> Matrix<T> {
     var m: Matrix<T> = zeros(a.count, a.count)
     for i in 0..<a.count {
         m[i, i] = a[i]
@@ -586,18 +545,18 @@ public func diagonal<T: FloatType>(_ a: [T]) -> Matrix<T> {
     return m
 }
 
-public func ones<T: FloatType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
-    return Matrix<T>(rows: rows, columns: columns, repeatedValue: 1.0 as T)
+public func ones<T: ScalarType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
+    return Matrix<T>(rows: rows, columns: columns, repeatedValue: T.one)
 }
 
-public func zeros<T: FloatType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
-    return Matrix<T>(rows: rows, columns: columns, repeatedValue: 0.0 as T)
+public func zeros<T: ScalarType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
+    return Matrix<T>(rows: rows, columns: columns, repeatedValue: T.zero)
 }
 
-public func eye<T: FloatType>(_ D: Int) -> Matrix<T> {
-    var mat = Matrix<T>(rows: D, columns: D, repeatedValue: 0.0)
+public func eye<T: ScalarType>(_ D: Int) -> Matrix<T> {
+    var mat = Matrix<T>(rows: D, columns: D, repeatedValue: T.zero)
     for i in 0..<D {
-        mat[i, i] = 1.0
+        mat[i, i] = T.one
     }
     return mat
 }

@@ -17,24 +17,6 @@ public extension Matrix where T == Double {
         }
     }
     
-    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = f(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = f(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[f(grid)]])
-        }
-    }
-    
     public func mean(_ axis: Int) -> Matrix {
         return apply(minimind.min, axis)
     }

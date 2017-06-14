@@ -63,6 +63,8 @@
 		3689624A1EEFDC04009134A3 /* matrix_int_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962351EEEC2F1009134A3 /* matrix_int_extension.swift */; };
 		3689624B1EEFDC04009134A3 /* array_int_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962391EEED815009134A3 /* array_int_extension.swift */; };
 		3689624C1EEFDC0E009134A3 /* kernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FDA81EEBCD5400AC07F2 /* kernel.swift */; };
+		368962631EF10F0A009134A3 /* core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962621EF10F0A009134A3 /* core.swift */; };
+		368962641EF1101F009134A3 /* core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962621EF10F0A009134A3 /* core.swift */; };
 		36B2CB161EE322C3001751D3 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B2CB0D1EE322C3001751D3 /* minimind.framework */; };
 		36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */; };
 		36B2CB1D1EE322C3001751D3 /* minimind mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B2CB0F1EE322C3001751D3 /* minimind mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -173,6 +175,7 @@
 		368962371EEED366009134A3 /* clusterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = clusterTests.swift; sourceTree = "<group>"; };
 		368962391EEED815009134A3 /* array_int_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = array_int_extension.swift; sourceTree = "<group>"; };
 		3689623B1EEF2E15009134A3 /* array_double_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = array_double_extension.swift; sourceTree = "<group>"; };
+		368962621EF10F0A009134A3 /* core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = core.swift; sourceTree = "<group>"; };
 		36B2CB0D1EE322C3001751D3 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B2CB0F1EE322C3001751D3 /* minimind mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "minimind mac.h"; sourceTree = "<group>"; };
 		36B2CB101EE322C3001751D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -464,6 +467,7 @@
 				3689622F1EEEAA56009134A3 /* array_float_extension.swift */,
 				368962351EEEC2F1009134A3 /* matrix_int_extension.swift */,
 				368962391EEED815009134A3 /* array_int_extension.swift */,
+				368962621EF10F0A009134A3 /* core.swift */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -762,6 +766,7 @@
 				3670FDAD1EEBD06400AC07F2 /* matrix_double_extension.swift in Sources */,
 				368962291EEBE247009134A3 /* pca.swift in Sources */,
 				3670FDA31EEBC8BB00AC07F2 /* auxiliary.swift in Sources */,
+				368962631EF10F0A009134A3 /* core.swift in Sources */,
 				3670FDAF1EEBD07400AC07F2 /* matrix_bool_extension.swift in Sources */,
 				3670FDA91EEBCD5400AC07F2 /* kernel.swift in Sources */,
 				3670FDA61EEBC8BB00AC07F2 /* power.swift in Sources */,
@@ -808,6 +813,7 @@
 				368962471EEFDC04009134A3 /* matrix_double_extension.swift in Sources */,
 				36B2CB2C1EE323B0001751D3 /* distributions.swift in Sources */,
 				36B2CB2A1EE323B0001751D3 /* array.swift in Sources */,
+				368962641EF1101F009134A3 /* core.swift in Sources */,
 				36B2CB291EE323B0001751D3 /* matrix.swift in Sources */,
 				368962431EEFDC04009134A3 /* hyperbolic.swift in Sources */,
 				3689623D1EEFDBFA009134A3 /* array_double_extension.swift in Sources */,

@@ -10,7 +10,7 @@ import Foundation
 //import Surge
 
 public protocol ObjectiveFunction {
-    associatedtype ScalarT: FloatType
+    associatedtype ScalarT: ScalarType
     typealias MatrixT = Matrix<ScalarT>
     
      func compute(_ x: MatrixT) -> ScalarT
@@ -19,7 +19,7 @@ public protocol ObjectiveFunction {
 
 
 public protocol Optimizer {
-    associatedtype ScalarT: FloatType
+    associatedtype ScalarT: ScalarType
     typealias MatrixT = Matrix<ScalarT>
     
      func optimize(verbose: Bool) -> (MatrixT, [Float], Int)

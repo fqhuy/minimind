@@ -23,7 +23,7 @@ public protocol GaussianProcess: BaseEstimator, RegressorMixin {
     func predict(X: MatrixT) -> (MatrixT, MatrixT) 
 }
 
-public class GaussianProcessRegressor<T, K: Kernel >: GaussianProcess where T: ExpressibleByFloatLiteral & FloatingPoint, K.MatrixT == Matrix<T>, K.ScalarT == T {
+public class GaussianProcessRegressor<T: ScalarType, K: Kernel >: GaussianProcess where T: ExpressibleByFloatLiteral & FloatingPoint, K.MatrixT == Matrix<T>, K.ScalarT == T {
     public var kernel: K
     public var Kxx: MatrixT
     public var alpha: T
@@ -131,9 +131,9 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matri
         let alpha = cho_solve(L, ytrain, "L")
         
         // same as 0.5 * tr(alpha.t * alpha)
-        let ytCy = 0.5 * reduce_sum(alpha ∘ ytrain)![0, 0] //in neill code, it is alpha \circ alpha
+        let ytCy = 0.5 * reduce_sum(alpha ∘ ytrain)[0, 0] //in neill code, it is alpha \circ alpha
 
-        let logdetC = reduce_sum(log(diag(L)))![0, 0] // 0.5 * D * logdet(C)
+        let logdetC = reduce_sum(log(diag(L)))[0, 0] // 0.5 * D * logdet(C)
 
         // Negative log likelihood
         return ytCy + logdetC + N / 2.0 * log(2.0 * ScalarT.pi) + kernel.log_prior

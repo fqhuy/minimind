@@ -43,37 +43,6 @@ public func searchsorted(_ arr1: [Float], _ arr2: [Float]) -> [Int] {
     return re
 }
 
-public func binarysearch(_ arr: [Float], _ t: Float) -> Int {
-    precondition(arr.count > 0)
-    var (l, r, m) = (Float(0.0), Float(arr.count - 1), Float(0.0))
-    if t < arr.first! {
-        return 0
-    } else if t > arr.last! {
-        return arr.count
-    }
-    while true {
-        m = floorf((l + r) / 2.0)
-        
-        if arr[Int(m)] < t {
-            l = m + 1
-        } else if arr[Int(m)] > t {
-            r = m - 1
-        }
-        
-        if (arr[Int(m)] == t){
-            return Int(m)
-        }
-        
-        if Int(l) >= Int(r) {
-            if arr[Int(m)] > t {
-                return Int(m)
-            } else {
-                return Int(m + 1)
-            }
-        }
-    }
-}
-
 //MARK: ARITHMETIC
 
 public func std(_ arr: [Float]) -> Float {

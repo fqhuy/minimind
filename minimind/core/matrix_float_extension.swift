@@ -17,25 +17,6 @@ public extension Matrix where T == Float {
         }
     }
     
-    // apply a function to reduce an axis to scalar
-    public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = f(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = f(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[f(grid)]])
-        }
-    }
-    
     public func zeros(_ rows: Int, columns: Int) -> Matrix<T> {
         return zeros(rows, columns)
     }
@@ -53,23 +34,7 @@ public extension Matrix where T == Float {
     }
     
     public func cumsum(_ axis: Int = -1) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(rows, columns)
-            for col in 0..<columns {
-                m[0∶, col] = Matrix(rows, 1, self[column: col].grid.cumsum())
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, columns)
-            for row in 0..<rows {
-                m[row, 0∶] = Matrix(1, columns, self[row].grid.cumsum())
-            }
-            return m
-        } else {
-            var m = self
-            m.grid = grid.cumsum()
-            return m
-        }
+        return apply(minimind.cumsum, axis)
     }
 }
 
@@ -308,13 +273,13 @@ public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A"
 public func logdet(_ mat: Matrix<Float>) -> Float {
     //    let L = cholesky(mat, "L")
     let L = ldlt(mat, "L")
-    return (2.0 * reduce_sum(log(diag(L)))!)[0,0]
+    return (2.0 * reduce_sum(log(diag(L))))[0,0]
 }
 
 public func det(_ mat: Matrix<Float>) -> Float {
     //    let L = cholesky(mat, "L")
     let L = ldlt(mat, "L")
-    return  powf(reduce_prod(diag(L))![0, 0], 2)
+    return  powf(reduce_prod(diag(L))[0, 0], 2)
 }
 
 public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "L", _ trans: String = "N") -> Matrix<Float> {
@@ -402,6 +367,12 @@ public func ⊗ (lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
         
     }
     return mat
+}
+
+infix operator **
+public func ** (_ mat: Matrix<Float>, _ e: Float) -> Matrix<Float> {
+    let newgrid: [Float] = mat.grid.map{ powf($0, e) }
+    return Matrix<Float>( mat.rows, mat.columns, newgrid)
 }
 
 //MARK: MATH FUNCTIONS

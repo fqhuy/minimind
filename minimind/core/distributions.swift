@@ -10,7 +10,7 @@ import Foundation
 //import Surge
 
 public protocol Distribution {
-    associatedtype ScalarT: FloatType
+    associatedtype ScalarT: ScalarType
     typealias MatrixT = Matrix<ScalarT>
     
     func rvs(_ size: Int) -> MatrixT
@@ -20,7 +20,7 @@ public protocol Distribution {
     func logpdf(_ x: MatrixT) -> MatrixT
 }
 
-public struct MultivariateNormal<T: FloatType>: Distribution {
+public struct MultivariateNormal<T: ScalarType>: Distribution {
     public typealias ScalarT = T
     public var mean: MatrixT
     public var cov: MatrixT
