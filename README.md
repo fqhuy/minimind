@@ -76,5 +76,5 @@ evals, evecs = np.linalg.eigh(a)
 ![Sampling](https://github.com/fqhuy/minimind/blob/master/doc/images/sampling.png)
 
 ## Internal Design Philosophy
-To maximise code reusability, Swift extensions are used extensively. For instance, Matrix is generically defined as Matrix<T>, with no constraints on T. This basically means that Matrix can contain any data types like Float, Double, Int, Bool and even String. Matrix<T> can be specialised to deal with a certain group of data such as ScalarType (Similar to Swift Numeric type, which will comes with XCode 9). Accelerations are used whenever possible by further specialising Matrix (e.g to Matrix<Float>, Matrix<Double>).
+To maximise code reusability, Swift extensions are used extensively. For instance, Matrix is generically defined as ```Matrix<T>```, with no constraints on T. This basically means that Matrix can contain any data types like Float, Double, Int, Bool and even String. ```Matrix<T>``` can be specialised to deal with a certain group of data such as ScalarType (Similar to Swift Numeric type, which will comes with XCode 9). Accelerations are used whenever possible by further specialising Matrix (e.g to ```Matrix<Float>```, ```Matrix<Double>```).
 
