@@ -65,3 +65,12 @@ public func checkMatrices<T>(_ mats: [Matrix<T>], _ mode: String ) {
             fatalError("unrecognized check mode")
     }
 }
+
+public func checkArray<T>(_ arr1: [T], _ arr2: [T], _ mode: String = "sameCount") {
+    switch mode {
+    case "sameCount":
+        assert(arr1.count == arr2.count, "arrays must have the same count")
+    default:
+        fatalError("unrecognized check mode")
+    }
+}

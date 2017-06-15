@@ -13,12 +13,12 @@ public extension Matrix where T == Double {
     public var t: Matrix {
         get {
             let newmat = self
-            return transpose(newmat)
+            return minimind.transpose(newmat)
         }
     }
     
     public func mean(_ axis: Int) -> Matrix {
-        return apply(minimind.min, axis)
+        return apply(minimind.mean, axis)
     }
     
     public func std(_ axis: Int) -> Matrix {
@@ -30,28 +30,11 @@ public extension Matrix where T == Double {
     }
     
     public func cumsum(_ axis: Int = -1) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(rows, columns)
-            for col in 0..<columns {
-                m[0∶, col] = Matrix(rows, 1, self[column: col].grid.cumsum())
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, columns)
-            for row in 0..<rows {
-                m[row, 0∶] = Matrix(1, columns, self[row].grid.cumsum())
-            }
-            return m
-        } else {
-            var m = self
-            m.grid = grid.cumsum()
-            return m
-        }
+        return apply(minimind.cumsum, axis)
     }
 }
 
 //MARK: ARITHMETIC
-
 public func add(_ x: Matrix<Double>, y: Matrix<Double>) -> Matrix<Double> {
     precondition(x.rows == y.rows && x.columns == y.columns, "Matrix dimensions not compatible with addition")
     
@@ -187,6 +170,13 @@ public func -(lhs: Matrix<Double>, rhs: Double) -> Matrix<Double> {
     var mat = lhs
     mat.grid = mat.grid - rhs
     return mat
+}
+
+// Entry-wise product
+public func ∘(lhs: Matrix<Double>, rhs: Matrix<Double>) -> Matrix<Double> {
+    var newmat = lhs
+    newmat.grid = mul(lhs.grid , y: rhs.grid)
+    return newmat
 }
 
 //MARK: LINEAR ALGEBRA

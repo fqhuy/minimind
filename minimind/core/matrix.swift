@@ -20,7 +20,7 @@ public enum MatrixAxies {
     case column
 }
 
-public struct Matrix<T: ScalarType> {
+public struct Matrix<T> {
     public typealias Element = T
     
     public var rows: Int
@@ -60,6 +60,22 @@ public struct Matrix<T: ScalarType> {
         self.columns = columns
         
         _grid = [Element](repeating: repeatedValue, count: rows * columns)
+    }
+
+    public init(_ rows: Int,_ columns: Int,_ data: [Element]) {
+        var rr: Int = rows
+        var cc: Int = columns
+        if rows == -1 && columns > 0{
+            rr = data.count / columns
+        } else if rows > 0 && columns == -1 {
+            cc = data.count / rows
+        }
+        
+        precondition(data.count == rr * cc, "data.count != rows * columns")
+        
+        self.rows = rr
+        self.columns = cc
+        _grid = data
     }
     
     public init(_ data: [[Element]]) {
@@ -126,6 +142,97 @@ public struct Matrix<T: ScalarType> {
             }
         }
     }
+
+    public subscript(_ rows: [Int], _ columns: [Int]) -> Matrix {
+        get {
+            var arr: [Element] = []
+            for r in 0..<rows.count {
+                for c in 0..<columns.count {
+                    arr.append(self[rows[r], columns[c]])
+                }
+            }
+            return Matrix(rows.count, columns.count, arr)
+        }
+        set(val) {
+            for r in 0..<rows.count {
+                for c in 0..<columns.count {
+                    self[rows[r], columns[c]] = val[r, c]
+                }
+            }
+        }
+    }
+    
+    public subscript(_ frow: (Int) -> [Int], _ fcol: ((Int) -> [Int])) -> Matrix {
+        get {
+            let rows = frow(self.rows)
+            let cols = fcol(self.columns)
+            
+            return self[rows, cols]
+        }
+        set(val) {
+            let rows = frow(self.rows)
+            let cols = fcol(self.columns)
+            self[rows, cols] = val
+        }
+    }
+    
+    public subscript(_ rows: [Int]) -> Matrix {
+        return self[rows, Array(0..<columns)]
+    }
+    
+    public subscript(cols columns: [Int]) -> Matrix {
+        return self[Array(0..<rows), columns]
+    }
+    
+    public subscript(_ frow: (Int) -> [Int], _ col: Int) -> Matrix {
+        get {
+            let rows = frow(self.rows)
+            let cols = [col]
+            
+            return self[rows, cols]
+        }
+        set(val) {
+            let rows = frow(self.rows)
+            let cols = [col]
+            self[rows, cols] = val
+        }
+    }
+    
+    public subscript(_ row: Int, _ fcol: (Int) -> [Int]) -> Matrix {
+        get {
+            let rows = [row]
+            let cols = fcol(self.columns)
+            return self[rows, cols]
+        }
+        set(val) {
+            let rows = [row]
+            let cols = fcol(self.columns)
+            self[rows, cols] = val
+        }
+    }
+    
+    public subscript(_ mask: Matrix<Bool>) -> Matrix<Element> {
+        get {
+            var re: [Element] = []
+            for r in 0..<rows {
+                for c in 0..<columns {
+                    if mask[r, c] == true {
+                        re.append(self[r, c])
+                    }
+                }
+            }
+            return Matrix(1, re.count, re)
+        }
+        set(arr) {
+            for r in 0..<rows {
+                for c in 0..<columns {
+                    if mask[r, c] == true {
+                        self[r, c] = arr[0, r * columns + c]
+                    }
+                }
+            }
+        }
+    }
     
     fileprivate func indexIsValidForRow(_ row: Int, column: Int) -> Bool {
         return row >= 0 && row < rows && column >= 0 && column < columns
@@ -148,12 +255,11 @@ public struct Matrix<T: ScalarType> {
         return mat
     }
     
-    public func zeros(_ rows: Int, _ columns: Int) -> Matrix {
-        let data = [T](repeating: T.zero, count: rows * columns)
-        return Matrix(rows, columns, data)
+    public var t: Matrix {
+        get {
+            return transpose(self)
+        }
     }
-    
-
 }
 
 // MARK: - Printable
@@ -209,115 +315,9 @@ extension Matrix: Sequence {
 //    return lhs.rows == rhs.rows && lhs.columns == rhs.columns && lhs.grid == rhs.grid
 //}
 
-//MARK: MINIMIND
-public extension Matrix {
-    public init(_ rows: Int,_ columns: Int,_ data: [Element]) {
-        var rr: Int = rows
-        var cc: Int = columns
-        if rows == -1 && columns > 0{
-            rr = data.count / columns
-        } else if rows > 0 && columns == -1 {
-            cc = data.count / rows
-        }
-        
-        
-        precondition(data.count == rr * cc, "data.count != rows * columns")
+//MARK: Matrix<ScalarType>
 
-        self.rows = rr
-        self.columns = cc
-        _grid = data
-    }
-    
-    public subscript(_ rows: [Int], _ columns: [Int]) -> Matrix {
-        get {
-            var arr: [Element] = []
-            for r in 0..<rows.count {
-                for c in 0..<columns.count {
-                    arr.append(self[rows[r], columns[c]])
-                }
-            }
-            return Matrix(rows.count, columns.count, arr)
-        }
-        set(val) {
-            for r in 0..<rows.count {
-                for c in 0..<columns.count {
-                    self[rows[r], columns[c]] = val[r, c]
-                }
-            }
-        }
-    }
-    
-    public subscript(_ frow: (Int) -> [Int], _ fcol: ((Int) -> [Int])) -> Matrix {
-        get {
-            let rows = frow(self.rows)
-            let cols = fcol(self.columns)
-            
-            return self[rows, cols]
-        }
-        set(val) {
-            let rows = frow(self.rows)
-            let cols = fcol(self.columns)
-            self[rows, cols] = val
-        }
-    }
-    
-    public subscript(_ rows: [Int]) -> Matrix {
-        return self[rows, Array(0..<columns)]
-    }
-    
-    public subscript(cols columns: [Int]) -> Matrix {
-        return self[Array(0..<rows), columns]
-    }
-    
-    public subscript(_ frow: (Int) -> [Int], _ col: Int) -> Matrix {
-        get {
-            let rows = frow(self.rows)
-            let cols = [col]
-        
-            return self[rows, cols]
-        }
-        set(val) {
-            let rows = frow(self.rows)
-            let cols = [col]
-            self[rows, cols] = val
-        }
-    }
-
-    public subscript(_ row: Int, _ fcol: (Int) -> [Int]) -> Matrix {
-        get {
-            let rows = [row]
-            let cols = fcol(self.columns)
-            return self[rows, cols]
-        }
-        set(val) {
-            let rows = [row]
-            let cols = fcol(self.columns)
-            self[rows, cols] = val
-        }
-    }
-    
-    public subscript(_ mask: Matrix<Bool>) -> Matrix<Element> {
-        get {
-            var re: [Element] = []
-            for r in 0..<rows {
-                for c in 0..<columns {
-                    if mask[r, c] == true {
-                        re.append(self[r, c])
-                    }
-                }
-            }
-            return Matrix(1, re.count, re)
-        }
-        set(arr) {
-            for r in 0..<rows {
-                for c in 0..<columns {
-                    if mask[r, c] == true {
-                        self[r, c] = arr[0, r * columns + c]
-                    }
-                }
-            }
-        }
-    }
+public extension Matrix where T: ScalarType {
     
     // apply a function to reduce an axis to scalar
     public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
@@ -352,6 +352,14 @@ public extension Matrix {
             fatalError("invalid axis")
         }
         return re
+    }
+    
+    public func sum(_ axis: Int = -1) -> Matrix {
+        return apply(minimind.sum, axis)
+    }
+    
+    public func zeros(_ rows: Int, _ columns: Int) -> Matrix {
+        return minimind.zeros(rows, columns)
     }
 }
 
@@ -389,25 +397,125 @@ public extension Matrix {
 //    return mat
 //}
 
-public func * <T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-    var newmat = lhs
-    newmat.grid = newmat.grid * rhs
-    return newmat
+//public func * <T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
+//    var newmat = lhs
+//    newmat.grid = newmat.grid * rhs
+//    return newmat
+//}
+//
+//public func /<T: FloatType> (lhs: Matrix<T>, rhs: T) -> Matrix<T> {
+//    var newmat = lhs
+//    newmat.grid = newmat.grid / rhs
+//    return newmat
+//}
+//
+//public func div (mat: Matrix<Float>, scalar: Float) -> Matrix<Float> {
+//    return mat / scalar 
+//}
+
+public func add<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    checkMatrices(x, y, "same")
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] + y.grid[i] } )
 }
 
-public func /<T: FloatType> (lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-    var newmat = lhs
-    newmat.grid = newmat.grid / rhs
-    return newmat
+public func add<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] + y } )
 }
 
-public func div (mat: Matrix<Float>, scalar: Float) -> Matrix<Float> {
-    return mat / scalar 
+public func add<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return Matrix<T>( y.rows, y.columns, (0..<y.grid.count).map{ i in x + y.grid[i] } )
+}
+
+public func sub<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    checkMatrices(x, y, "same")
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] - y.grid[i] } )
+}
+
+public func sub<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] - y } )
+}
+
+public func sub<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return Matrix<T>( y.rows, y.columns, (0..<y.grid.count).map{ i in x - y.grid[i] } )
+}
+
+public func mul<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    checkMatrices(x, y, "same")
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] * y.grid[i] } )
+}
+
+public func mul<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] * y } )
+}
+
+public func mul<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return Matrix<T>( y.rows, y.columns, (0..<y.grid.count).map{ i in x * y.grid[i] } )
+}
+
+public func div<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    checkMatrices(x, y, "same")
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] / y.grid[i] } )
+}
+
+public func div<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] / y } )
+}
+
+public func div<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return Matrix<T>( y.rows, y.columns, (0..<y.grid.count).map{ i in x / y.grid[i] } )
+}
+
+public func +<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    return add(x, y: y)
+}
+
+public func +<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return add(x, y: y)
+}
+
+public func +<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return add(x, y: y)
+}
+
+public func -<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    return sub(x, y: y)
+}
+
+public func -<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return sub(x, y: y)
+}
+
+public func -<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return sub(x, y: y)
+}
+
+public func *<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    return mul(x, y: y)
+}
+
+public func *<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return mul(x, y: y)
+}
+
+public func *<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return mul(x, y: y)
+}
+
+public func /<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
+    return div(x, y: y)
+}
+
+public func /<T: ScalarType>(_ x: Matrix<T>, y: T) -> Matrix<T> {
+    return div(x, y: y)
+}
+
+public func /<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
+    return div(x, y: y)
 }
 
 infix operator ∘
 // Entry-wise product
-public func ∘<T: FloatType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+public func ∘<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     var newmat = lhs
     newmat.grid = lhs.grid * rhs.grid
     return newmat
@@ -419,18 +527,26 @@ public func sqrt<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
     return Matrix<T>(mat.rows, mat.columns, sqrt(mat.grid))
 }
 
-public func abs<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
+public func abs<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
     var newmat = mat
-    newmat.grid = abs(newmat.grid)
+    newmat.grid = minimind.abs(newmat.grid)
     return newmat
 }
 
-public func max<T: FloatType>(_ mat: Matrix<T>) -> T {
-    return mat.grid.max()!
+public func max<T: ScalarType>(_ mat: Matrix<T>) -> T {
+    return minimind.max(mat.grid)
 }
 
-public func min<T: FloatType>(_ mat: Matrix<T>) -> T {
-    return mat.grid.min()!
+public func min<T: ScalarType>(_ mat: Matrix<T>) -> T {
+    return minimind.min(mat.grid)
+}
+
+public func max<T: ScalarType>(_ mat: Matrix<T>, axis: Int) -> Matrix<T> {
+    return mat.apply(minimind.max, axis)
+}
+
+public func min<T: ScalarType>(_ mat: Matrix<T>, axis: Int) -> Matrix<T> {
+    return mat.apply(minimind.min, axis)
 }
 
 public func cross_add<T: ScalarType>(_ lhs: Matrix<T>, _ rhs: Matrix<T>) -> Matrix<T> {
@@ -494,8 +610,19 @@ public func triu<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
 }
 
 //MARK: TRANSFORMERS
+public func transpose<T>(_ mat: Matrix<T>) -> Matrix<T>{
+    var newmat = mat
+    newmat.rows = mat.columns
+    newmat.columns = mat.rows
+    for r in 0..<newmat.rows {
+        for c in 0..<newmat.columns {
+            newmat[r, c] = mat[c, r]
+        }
+    }
+    return newmat
+}
 
-public func clip<T: FloatType>(_ mat: Matrix<T>, _ floor: T, _ ceil: T, _ inplace: Bool = false) -> Matrix<T> {
+public func clip<T: ScalarType>(_ mat: Matrix<T>, _ floor: T, _ ceil: T, _ inplace: Bool = false) -> Matrix<T> {
         var newmat = mat
         newmat.grid = clip(mat.grid, floor, ceil)
         return newmat
@@ -525,15 +652,12 @@ public func vstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
     return Matrix<T>(rows, mats[0].columns, data)
 }
 
-//public func hstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
-//    checkMatrices(mats, "sameRows")
-//    let cols = mats.map{ x in x.columns}.sum()
-//    var data = [T]()
-//    for i in 0..<mats.count {
-//        data.append(contentsOf: mats[i].grid)
-//    }
-//    return Matrix<T>(mats[0].rows, cols, data)
-//}
+public func hstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
+    checkMatrices(mats, "sameRows")
+    let cols = mats.map{ x in x.columns}.sum()
+    let newmats = mats.map{ transpose($0) }
+    return Matrix<T>(mats[0].rows, cols, transpose(vstack(newmats)).grid)
+}
 
 //MARK: CREATORS
 public func diagonal<T: ScalarType>(_ a: [T]) -> Matrix<T> {

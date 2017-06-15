@@ -10,7 +10,15 @@ import Foundation
 
 public typealias FloatType = ExpressibleByFloatLiteral & FloatingPoint
 public typealias IntType = Integer
-public typealias ScalarType = HasZero & HasOne & HasNumericalOps & HasComparisonOps
+
+//MARK: Can ScalaType be SignedNumber ?
+public typealias ScalarType = HasSign & HasZero & HasOne & HasArithmeticOps & HasComparisonOps
+
+public protocol HasSign {
+    prefix static func -(x: Self) -> Self
+    static func -(lhs: Self, rhs: Self) -> Self
+    static func abs(_ x: Self) -> Self
+}
 
 public protocol HasZero {
     static var zero: Self {get}
@@ -20,10 +28,28 @@ public protocol HasOne {
     static var one: Self {get}
 }
 
-public protocol HasNumericalOps {
+public protocol HasArithmeticOps {
     static func +(lhs: Self, rhs: Self) -> Self
-    static func -(lhs: Self, rhs: Self) -> Self
     static func *(lhs: Self, rhs: Self) -> Self
+    static func /(lhs: Self, rhs: Self) -> Self
+}
+
+extension HasArithmeticOps{
+    static func +=(lhs: inout Self, rhs: Self) {
+        lhs = lhs + rhs
+    }
+    static func *=(lhs: inout Self, rhs: Self) {
+        lhs = lhs * rhs
+    }
+    static func /=(lhs: inout Self, rhs: Self) {
+        lhs = lhs / rhs
+    }
+}
+
+extension HasArithmeticOps where Self: HasSign {
+    static func -=(lhs: inout Self, rhs: Self) {
+        lhs = lhs - rhs
+    }
 }
 
 public protocol HasComparisonOps {
@@ -63,6 +89,10 @@ extension Double: ScalarType {
 }
 
 extension Int: ScalarType {
+    public static func abs(_ x: Int) -> Int {
+        return abs(x)
+    }
+
     public static var zero: Int {
         get {
             return 0
@@ -76,6 +106,18 @@ extension Int: ScalarType {
 }
 
 extension Bool: ScalarType {
+    public static func abs(_ x: Bool) -> Bool {
+        return x
+    }
+    
+    public prefix static func -(x: Bool) -> Bool {
+        return !x
+    }
+
+    public static func /(lhs: Bool, rhs: Bool) -> Bool {
+        return lhs && rhs
+    }
+
     public static func <=(lhs: Bool, rhs: Bool) -> Bool {
         return (lhs < rhs) || (lhs == rhs)
     }
@@ -104,16 +146,16 @@ extension Bool: ScalarType {
         }
     }
     
-        public static func +(lhs: Bool, rhs: Bool) -> Bool {
-            return lhs && rhs
-        }
+    public static func +(lhs: Bool, rhs: Bool) -> Bool {
+        return lhs || rhs
+    }
     
-        public static func -(lhs: Bool, rhs: Bool) -> Bool {
-            return lhs || rhs
-        }
+    public static func -(lhs: Bool, rhs: Bool) -> Bool {
+        return lhs && (!rhs)
+    }
     
-        public static func *(lhs: Bool, rhs: Bool) -> Bool {
-            return lhs || rhs
-        }
+    public static func *(lhs: Bool, rhs: Bool) -> Bool {
+        return lhs && rhs
+    }
 }
 

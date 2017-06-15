@@ -8,8 +8,8 @@ var str = "Hello, playground"
 
 //: [Next](@next)
 
-let mat: Matrix<Float> = randMatrix(5, 5)
+let v1: [Float] = [1, 2, 3]
+let v2: [Float] = [4, 5, 6]
 
-let ids = 0..10
-
-let m1 = mat[0..2, 0..2]
+let x = v1 + v2
+print(x)

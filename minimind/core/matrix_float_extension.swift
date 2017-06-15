@@ -13,14 +13,10 @@ public extension Matrix where T == Float {
     public var t: Matrix {
         get {
             let newmat = self
-            return transpose(newmat)
+            return minimind.transpose(newmat)
         }
     }
-    
-    public func zeros(_ rows: Int, columns: Int) -> Matrix<T> {
-        return zeros(rows, columns)
-    }
-    
+
     public func mean(_ axis: Int) -> Matrix {
         return apply(minimind.mean, axis)
     }
@@ -152,8 +148,12 @@ public func +(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
     return mat
 }
 
-//MARK: ARITHMETIC MATRIX & VECTOR
-//public func +(lhs: Matrix<Float>, rhs: [Float]) -> Matrix
+// Entry-wise product
+public func ∘ (lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
+    var newmat = lhs
+    newmat.grid = mul(lhs.grid , y: rhs.grid)
+    return newmat
+}
 
 //MARK: LINEAR ALGEBRA
 public func inv(_ x : Matrix<Float>) -> Matrix<Float> {
