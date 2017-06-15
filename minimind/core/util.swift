@@ -24,6 +24,16 @@ public func ascii(_ c: String) -> Int8 {
     return vals[keys.index(of: c)!] // Int8(D[c]!)
 }
 
+
+
+public func len<T>(_ arr: [T]) -> Int {
+    return arr.count
+}
+
+public func len<T>(_ mat: Matrix<T>) -> Int {
+    return mat.rows
+}
+
 public func checkMatrices<T>(_ lhs: Matrix<T>, _ rhs: Matrix<T>, _ mode: String) {
     let (lr, lc) = lhs.shape
     let (rr, rc) = rhs.shape
@@ -32,6 +42,34 @@ public func checkMatrices<T>(_ lhs: Matrix<T>, _ rhs: Matrix<T>, _ mode: String)
         assert(lhs.shape == rhs.shape)
     case "transpose":
         assert(lr == rc && lc == rr)
+    default:
+        fatalError("unrecognized check mode")
+    }
+}
+
+public func checkMatrices<T>(_ mats: [Matrix<T>], _ mode: String ) {
+    if len(mats) == 0{
+        return
+    }
+    
+    let (r, c) = mats[0].shape
+    
+    switch mode {
+        case "sameRows":
+            assert(all( (0..<mats.count).map{ mats[$0].rows == r } ), "matrices's rows are not euqal")
+        case "same":
+            assert(all( (0..<mats.count).map{ (mats[$0].rows == r) && (mats[$0].columns == c) } ), "matrices's shapes are not euqal")
+        case "sameColumns":
+            assert(all( (0..<mats.count).map{ mats[$0].columns == c } ), "matrices's columns are not euqal")
+        default:
+            fatalError("unrecognized check mode")
+    }
+}
+
+public func checkArray<T>(_ arr1: [T], _ arr2: [T], _ mode: String = "sameCount") {
+    switch mode {
+    case "sameCount":
+        assert(arr1.count == arr2.count, "arrays must have the same count")
     default:
         fatalError("unrecognized check mode")
     }

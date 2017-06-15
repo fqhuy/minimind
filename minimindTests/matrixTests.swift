@@ -12,6 +12,7 @@ import XCTest
 class matrixTests: XCTestCase {
     var x: Matrix<Int> = Matrix([[0, 0],[4, 5]])
     var y: Matrix<Int> = Matrix([[4, 4], [2, 2]])
+    var fx: Matrix<Float> = Matrix([[0.0, 1.0],[1.0, 1.0]])
     
     override func setUp() {
         super.setUp()
@@ -34,6 +35,12 @@ class matrixTests: XCTestCase {
         XCTAssert(all(x * 2 == 2 * x), "matrix mul failed")
         XCTAssert(all((y / 2) == Matrix([[2, 2],[1, 1]])), "matrix div failed")
         XCTAssert(all(x - 2 == -1 * (2 - x) ), "matrix sub failed")
+    }
+    
+    func testArithmetic() {
+        XCTAssert(all(fx.mean(0) == Matrix<Float>([[0.5, 1.0]])), " matrix mean failed")
+        XCTAssert(all(fx.std(0) == Matrix<Float>([[0.5, 0.0]])), " matrix std failed")
+        XCTAssert(all(fx.sum(0) == Matrix<Float>([[1.0, 2.0]])), " matrix sum failed")
     }
     
     func testPerformanceExample() {

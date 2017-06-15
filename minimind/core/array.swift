@@ -8,6 +8,11 @@
 
 import Foundation
 
+//MARK: EXTENSIONS
+extension Array where Element: ScalarType {
+
+}
+
 //MARK: Arithmetic
 
 public func **(lhs: [Float], rhs: Float) -> [Float] {
@@ -19,89 +24,97 @@ public func **(lhs: [Double], rhs: Double) -> [Double] {
 }
 
 
-public func +=<T: FloatingPoint>(lhs: inout [T], rhs: T) {
+public func +=<T: ScalarType>(lhs: inout [T], rhs: T) {
     lhs = lhs + rhs
 }
 
-public func +=<T: FloatingPoint>(lhs: inout [T], rhs: [T]){
+public func +=<T: ScalarType>(lhs: inout [T], rhs: [T]){
     lhs = lhs + rhs
 }
 
-public func -=<T: FloatingPoint>(lhs: inout [T], rhs: T) {
+public func -=<T: ScalarType>(lhs: inout [T], rhs: T) {
     lhs = lhs - rhs
 }
 
-public func -=<T: FloatingPoint>(lhs: inout [T], rhs: [T]) {
+public func -=<T: ScalarType>(lhs: inout [T], rhs: [T]) {
     lhs = lhs - rhs
 }
 
-public func *=<T: FloatingPoint>(lhs: inout [T], rhs: T)  {
+public func *=<T: ScalarType>(lhs: inout [T], rhs: T)  {
     lhs = lhs * rhs
 }
 
-public func *=<T: FloatingPoint>(lhs: inout [T], rhs: [T])  {
+//public func *=<T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
+//    return rhs * lhs
+//}
+
+public func *=<T: ScalarType>(lhs: inout [T], rhs: [T])  {
     lhs =  lhs * rhs
 }
 
-public func /=<T: FloatingPoint>(lhs: inout [T], rhs: T)  {
+public func /=<T: ScalarType>(lhs: inout [T], rhs: T)  {
     lhs = lhs / rhs
 }
 
-public func /=<T: FloatingPoint>(lhs: inout [T], rhs: [T])  {
+//public func /=<T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
+//    return rhs / lhs
+//}
+
+public func /=<T: ScalarType>(lhs: inout [T], rhs: [T])  {
     lhs = lhs / rhs
 }
 
-public prefix func -<T: SignedNumber>(arr: [T]) -> [T] {
+public prefix func -<T: ScalarType>(arr: [T]) -> [T] {
     return arr.map{x in -x}
 }
 
-public func -<T: SignedNumber>(lhs: [T], rhs: [T]) -> [T] {
+public func -<T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] - rhs[$0] }
 }
 
-public func -<T: SignedNumber>(lhs: T, rhs: [T]) -> [T] {
+public func -<T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
     return (0..<rhs.count).map{ lhs - rhs[$0] }
 }
 
-public func -<T: SignedNumber>(lhs: [T], rhs: T) -> [T] {
+public func -<T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] - rhs }
 }
 
-public func +<T: FloatingPoint>(lhs: [T], rhs: [T]) -> [T] {
+public func +<T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] + rhs[$0] }
 }
 
-public func +<T: FloatingPoint>(lhs: T, rhs: [T]) -> [T] {
+public func +<T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
     return (0..<rhs.count).map{ lhs + rhs[$0] }
 }
 
-public func +<T: FloatingPoint>(lhs: [T], rhs: T) -> [T] {
+public func +<T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] + rhs }
 }
 
 
-public func * <T: FloatingPoint>(lhs: T, rhs: [T]) -> [T] {
+public func * <T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
     return rhs.map{ lhs * $0 }
 }
 
-public func * <T: FloatingPoint>(lhs: [T], rhs: [T]) -> [T] {
+public func * <T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
     precondition(lhs.count == rhs.count, "rhs.count must == lhs.count")
     return (0..<lhs.count).map{ lhs[$0] * rhs[$0] }
 }
 
-public func * <T: FloatingPoint>(lhs: [T], rhs: T) -> [T] {
+public func * <T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] * rhs }
 }
 
-public func / <T: FloatingPoint>(lhs: T, rhs: [T]) -> [T] {
+public func / <T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
     return rhs.map{ lhs / $0 }
 }
 
-public func / <T: FloatingPoint>(lhs: [T], rhs: [T]) -> [T] {
+public func / <T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] / rhs[$0] }
 }
 
-public func / <T: FloatingPoint>(lhs: [T], rhs: T) -> [T] {
+public func / <T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] / rhs }
 }
 
@@ -111,16 +124,36 @@ public func sqrt<T: FloatingPoint>(_ arr: [T]) -> [T] {
     return arr.map{ sqrt($0) }
 }
 
-public func abs<T: SignedNumber>(_ arr: [T]) -> [T] {
-    return arr.map{ abs($0) }
+public func abs<T: ScalarType>(_ arr: [T]) -> [T] {
+    return arr.map{ T.abs($0) }
 }
 
-public func clip<T: FloatingPoint>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
+public func clip<T: ScalarType>(_ arr: [T], _ floor: T,_ ceil: T) -> [T] {
     return arr.map{ $0 < floor ? floor : $0}.map{ $0 > ceil ? ceil : $0 }
 }
 
-public func minimum<T: FloatingPoint>(_ arr1: [T], _ arr2: [T]) -> [T] {
+public func minimum<T: ScalarType>(_ arr1: [T], _ arr2: [T]) -> [T] {
     return (0..<arr1.count).map{ i in arr1[i] <= arr2[i] ? arr1[i] : arr2[i] }
+}
+
+public func maximum<T: ScalarType>(_ arr1: [T], _ arr2: [T]) -> [T] {
+    return (0..<arr1.count).map{ i in arr1[i] >= arr2[i] ? arr1[i] : arr2[i] }
+}
+
+public func sum<T: ScalarType>(_ arr: [T]) -> T {
+    return arr.reduce(T.zero, {x,y in x + y})
+}
+
+public func prod<T: ScalarType>(_ arr: [T]) -> T {
+    return arr.reduce(T.zero, {x,y in x * y})
+}
+
+public func max<T: ScalarType>(_ arr: [T]) -> T {
+    return arr.max(by: {x, y in x >= y})!
+}
+
+public func min<T: ScalarType>(_ arr: [T]) -> T {
+    return arr.max(by: {x, y in x >= y})!
 }
 
 //MARK: Creators
@@ -191,16 +224,6 @@ public func tuple<T>(_ arr: [T]) -> (T, T) {
 
 //MARK: Array<Bool>
 
-//extension Array where Element == Bool {
-//    public func all() {
-//        return reduce(true, {x, y in x && y})
-//    }
-//    
-//    public func any() {
-//        return reduce(false, {x,y in x || y})
-//    }
-//}
-
 public func all(_ arr: [Bool]) -> Bool {
     return arr.reduce(true, {x, y in x && y})
 }
@@ -267,4 +290,37 @@ public func > <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
 
 public func < <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
     return (0..<lhs.count).map{ lhs[$0] < rhs[$0]}
+}
+
+//MARK: ALGORITHMS
+
+public func binarysearch<T: ScalarType>(_ arr: [T], _ t: T) -> Int {
+    precondition(arr.count > 0)
+    var (l, r, m) = (Float(0.0), Float(arr.count - 1), Float(0.0))
+    if t < arr.first! {
+        return 0
+    } else if t > arr.last! {
+        return arr.count
+    }
+    while true {
+        m = floorf((l + r) / 2.0)
+        
+        if arr[Int(m)] < t {
+            l = m + 1
+        } else if arr[Int(m)] > t {
+            r = m - 1
+        }
+        
+        if (arr[Int(m)] == t){
+            return Int(m)
+        }
+        
+        if Int(l) >= Int(r) {
+            if arr[Int(m)] > t {
+                return Int(m)
+            } else {
+                return Int(m + 1)
+            }
+        }
+    }
 }

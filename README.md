@@ -2,7 +2,7 @@
 
 The main focus of this library is dimensionality reduction and multi-output regression. I aim to keep the interface as close to numpy/scikit-learn/matplotlib as possible. See playground files for examples. Some wrapper functions for Accelerate were borrowed from [Surge](https://github.com/mattt/Surge).
 
-## Sample code, predictive distribution
+## Learning A Predictive Distribution
 ![Predictive](https://github.com/fqhuy/minimind/blob/master/doc/images/regression.png)
 
 ```swift
@@ -33,7 +33,7 @@ The main focus of this library is dimensionality reduction and multi-output regr
         
         graph.autoscale()
 ```
-## Sample code, side-by-side with numpy
+## Matrix Operations, side-by-side with numpy
 ```swift
 import Foundation
 import Surge
@@ -74,3 +74,7 @@ evals, evecs = np.linalg.eigh(a)
 ## Sampling from a GP prior
 
 ![Sampling](https://github.com/fqhuy/minimind/blob/master/doc/images/sampling.png)
+
+## Internal Design Philosophy
+To maximise code reusability, Swift extensions are used extensively. For instance, Matrix is generically defined as Matrix<T>, with no constraints on T. This basically means that Matrix can contain any data types like Float, Double, Int, Bool and even String. Matrix<T> can be specialised to deal with a certain group of data such as ScalarType (Similar to Swift Numeric type, which will comes with XCode 9). Accelerations are used whenever possible by further specialising Matrix (e.g to Matrix<Float>, Matrix<Double>).
+

@@ -95,7 +95,7 @@ class minimindTests: XCTestCase {
 //        let A = 10.0 * m1 * m2.t
         let v: Matrix<Float> = zeros(1, N)
         
-        let gauss = MultivariateNormal(v, A)
+        let gauss = MultivariateNormal(mean: v, cov: A)
         let X: Matrix<Float> = gauss.rvs(Nf) + 100.0
         print(X[0])
     }
@@ -104,7 +104,7 @@ class minimindTests: XCTestCase {
         let A = Matrix<Float>([[1.0, 0.1, 0.1],[0.01, 2.0, 0.3], [0.02, 0.2, 1.5]])
         let v = Matrix<Float>([[0.0, 0.0, 0.0]])
         
-        let gauss = MultivariateNormal(v, A)
+        let gauss = MultivariateNormal(mean: v, cov: A)
         
         let X = gauss.rvs(1000)
         print(X.mean(0))

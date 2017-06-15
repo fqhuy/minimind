@@ -13,64 +13,24 @@ public extension Matrix where T == Float {
     public var t: Matrix {
         get {
             let newmat = self
-            return transpose(newmat)
+            return minimind.transpose(newmat)
         }
     }
-    
+
     public func mean(_ axis: Int) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = minimind.mean(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = minimind.mean(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[minimind.mean(grid)]])
-        }
+        return apply(minimind.mean, axis)
+    }
+    
+    public func std(_ axis: Int) -> Matrix {
+        return apply(minimind.std, axis)
     }
     
     public func sum(_ axis: Int = -1) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = minimind.sum(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = minimind.sum(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[minimind.sum(grid)]])
-        }
+        return apply(minimind.sum, axis)
     }
     
     public func cumsum(_ axis: Int = -1) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(rows, columns)
-            for col in 0..<columns {
-                m[0∶, col] = Matrix(rows, 1, self[column: col].grid.cumsum())
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, columns)
-            for row in 0..<rows {
-                m[row, 0∶] = Matrix(1, columns, self[row].grid.cumsum())
-            }
-            return m
-        } else {
-            var m = self
-            m.grid = grid.cumsum()
-            return m
-        }
+        return apply(minimind.cumsum, axis)
     }
 }
 
@@ -167,7 +127,7 @@ public func += (lhs: inout Matrix<Float>, rhs: Float) {
 }
 
 public func -= (lhs: inout Matrix<Float>, rhs: Float) {
-    lhs = lhs - rhs
+    lhs = lhs + (-rhs)
 }
 
 public func /= (lhs: inout Matrix<Float>, rhs: Float) {
@@ -188,12 +148,12 @@ public func +(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
     return mat
 }
 
-public func -(lhs: Matrix<Float>, rhs: Float) -> Matrix<Float> {
-    var mat = lhs
-    mat.grid = mat.grid - rhs
-    return mat
+// Entry-wise product
+public func ∘ (lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
+    var newmat = lhs
+    newmat.grid = mul(lhs.grid , y: rhs.grid)
+    return newmat
 }
-
 
 //MARK: LINEAR ALGEBRA
 public func inv(_ x : Matrix<Float>) -> Matrix<Float> {
@@ -313,13 +273,13 @@ public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A"
 public func logdet(_ mat: Matrix<Float>) -> Float {
     //    let L = cholesky(mat, "L")
     let L = ldlt(mat, "L")
-    return (2.0 * reduce_sum(log(diag(L)))!)[0,0]
+    return (2.0 * reduce_sum(log(diag(L))))[0,0]
 }
 
 public func det(_ mat: Matrix<Float>) -> Float {
     //    let L = cholesky(mat, "L")
     let L = ldlt(mat, "L")
-    return  powf(reduce_prod(diag(L))![0, 0], 2)
+    return  powf(reduce_prod(diag(L))[0, 0], 2)
 }
 
 public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "L", _ trans: String = "N") -> Matrix<Float> {
@@ -407,6 +367,12 @@ public func ⊗ (lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
         
     }
     return mat
+}
+
+infix operator **
+public func ** (_ mat: Matrix<Float>, _ e: Float) -> Matrix<Float> {
+    let newgrid: [Float] = mat.grid.map{ powf($0, e) }
+    return Matrix<Float>( mat.rows, mat.columns, newgrid)
 }
 
 //MARK: MATH FUNCTIONS

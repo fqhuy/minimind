@@ -10,7 +10,7 @@ import Foundation
 //import Surge
 
 public protocol Distribution {
-    associatedtype ScalarT: FloatType
+    associatedtype ScalarT: ScalarType
     typealias MatrixT = Matrix<ScalarT>
     
     func rvs(_ size: Int) -> MatrixT
@@ -20,13 +20,14 @@ public protocol Distribution {
     func logpdf(_ x: MatrixT) -> MatrixT
 }
 
-public struct MultivariateNormal<T: FloatType>: Distribution {
+public struct MultivariateNormal<T: ScalarType>: Distribution {
     public typealias ScalarT = T
     public var mean: MatrixT
     public var cov: MatrixT
     public var shape: [Int]
     
-    public init(_ mean: MatrixT, _ cov: MatrixT){
+    public init(mean: MatrixT, cov: MatrixT){
+        precondition(mean.rows == 1 && mean.columns > 0 && (mean.columns == cov.columns) && mean.columns == cov.rows, "invalid mean and/or covariance matrices")
         self.mean = mean
         self.cov = cov
         self.shape = [mean.columns]

@@ -7,13 +7,27 @@ var str = "Hello, playground"
 
 //: [Next](@next)
 
-let v: [Float] = [0.1, 0.3, 0.5, 0.9]
-let a: [Float] = [0.0, 0.2, 0.4, 1.2]
+let v1: [Float] = [0.1, 0.3, 0.5, 0.9]
+let v2: [Float] = [0.0, 0.2, 0.4, 1.2]
 
-//print(searchsorted(v, a))
+let v3: [Bool] = [true, true, false]
+let v4: [Bool] = [false, true, false]
 
-let x = Matrix([[1, 1], [2, 2]])
-print(x * 2)
-print(2 * x)
-print(4 / x)
-print(x * x)
+func foo<T: ScalarType>(_ x: T, _ y: T) -> T {
+    print("ScalarType")
+    return x + y
+}
+
+func foo(_ x: Bool, _ y: Bool) -> Bool {
+    print("Just Bool")
+    return true
+}
+
+foo(10, 10)
+foo(true, false)
+
+
+let A = Matrix<String>([["a", "b"],["x", "y"]])
+print(A)
+print(transpose(A))
+

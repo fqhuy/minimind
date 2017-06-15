@@ -13,49 +13,28 @@ public extension Matrix where T == Double {
     public var t: Matrix {
         get {
             let newmat = self
-            return transpose(newmat)
+            return minimind.transpose(newmat)
         }
     }
     
     public func mean(_ axis: Int) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = minimind.mean(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = minimind.mean(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[minimind.mean(grid)]])
-        }
+        return apply(minimind.mean, axis)
+    }
+    
+    public func std(_ axis: Int) -> Matrix {
+        return apply(minimind.std, axis)
     }
     
     public func sum(_ axis: Int = -1) -> Matrix {
-        if axis == 0 {
-            var m: Matrix = zeros(1, columns)
-            for col in 0..<columns {
-                m[0, col] = minimind.sum(self[column: col].grid)
-            }
-            return m
-        } else if axis == 1 {
-            var m: Matrix = zeros(rows, 1)
-            for row in 0..<rows {
-                m[row, 0] = minimind.sum(self[row].grid)
-            }
-            return m
-        } else {
-            return Matrix([[minimind.sum(grid)]])
-        }
+        return apply(minimind.sum, axis)
+    }
+    
+    public func cumsum(_ axis: Int = -1) -> Matrix {
+        return apply(minimind.cumsum, axis)
     }
 }
 
 //MARK: ARITHMETIC
-
 public func add(_ x: Matrix<Double>, y: Matrix<Double>) -> Matrix<Double> {
     precondition(x.rows == y.rows && x.columns == y.columns, "Matrix dimensions not compatible with addition")
     
@@ -191,6 +170,13 @@ public func -(lhs: Matrix<Double>, rhs: Double) -> Matrix<Double> {
     var mat = lhs
     mat.grid = mat.grid - rhs
     return mat
+}
+
+// Entry-wise product
+public func ∘(lhs: Matrix<Double>, rhs: Matrix<Double>) -> Matrix<Double> {
+    var newmat = lhs
+    newmat.grid = mul(lhs.grid , y: rhs.grid)
+    return newmat
 }
 
 //MARK: LINEAR ALGEBRA

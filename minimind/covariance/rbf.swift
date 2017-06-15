@@ -101,15 +101,15 @@ public class RBF: Kernel {
         let Kr = K(r: r)
         let dLdr = dKdr(r: r) ∘ dLdK
         
-        d[0, 0] = (reduce_sum(Kr ∘ dLdK)!)[0, 0] / variance
-        d[0, 1] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) )!)[0,0]
+        d[0, 0] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
+        d[0, 1] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
         
         // gradient wrt X
         var tmp = dLdr ∘ invDist(r)
         tmp = tmp + tmp.t
         var grad: MatrixT = zeros(N ,D)
         for i in 0..<D {
-            grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)!
+            grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
         }
         
         d[0, 2∶] = grad
@@ -118,8 +118,8 @@ public class RBF: Kernel {
     }
     
     public func dist(_ X: MatrixT, _ Y: MatrixT) -> MatrixT {
-        let xx = reduce_sum(X ∘ X, 1)!
-        let yy = reduce_sum(Y ∘ Y, 1)!
+        let xx = reduce_sum(X ∘ X, 1)
+        let yy = reduce_sum(Y ∘ Y, 1)
         var dist = cross_add(xx, yy) - 2.0 * (X * Y′)
         
         if X.rows == Y.rows {
