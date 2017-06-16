@@ -15,25 +15,59 @@ class KMeans {
     typealias MatrixT = Matrix<ScalarT>
     
     public var clusterCenters: MatrixT
+    public var labels: Matrix<IndexType>
     public var nClusters: Int
     var tol: ScalarT
     
     public init(_ nClusters: Int, _ tol: ScalarT = 1e-5) {
         self.nClusters = nClusters
         self.clusterCenters = MatrixT()
+        self.labels = Matrix<IndexType>()
         self.tol = tol
     }
     
-    public func fit(_ X: MatrixT) {
+    public func fit(_ X: MatrixT, _ maxIters: Int, _ verbose: Bool) {
         let (N, D) = X.shape
-        var Z: Matrix<Int> = zeros(N, nClusters)
-        Z[0∶, 0] = ones(N, 1)
         
-        var J = ScalarT(1e10)
-        var oldJ = ScalarT(0.0)
-        while J - oldJ > tol {
+        var iter = 0
+        let XSq = (X ∘ X).sum(1)
+        var centers: Matrix<ScalarT> = KMeans.kMeansPlusPlus(X, XSq, nClusters, nil)
+        
+        var score = ScalarT(1e10)
+        var bestScore = ScalarT(1e9)
+        var bestCenters: MatrixT = zeros(nClusters, D)
+        var bestLabels: Matrix<IndexType> = -1 * ones(1, N)
+        
+        while (iter < maxIters) {
             
+            // compute new score & new labels from current centers
+            let dists = euclideanDistances(X: X, Y: centers, YNormSquared: nil, squared: true, XNormSquared: XSq)
+            let lbls = argmin(dists, 1)
+            score = min(dists, axis: 1).grid.sum()
+            
+            // compute new means from labels
+            for c in 0..<nClusters {
+                centers[c] = X[nonzero(lbls.grid == c)].mean(0)
+            }
+            
+            if norm(centers - bestCenters, "F") < tol {
+                break
+            }
+            
+            if score < bestScore {
+                bestScore = score
+                bestCenters = centers
+                bestLabels = lbls
+            }
+            
+            iter += 1
+            if verbose {
+                print(String(format: "score: %4.2f", score))
+            }
         }
+        
+        clusterCenters = bestCenters
+        self.labels = bestLabels
     }
     
     static func kMeansPlusPlus(_ X: MatrixT, _ XSquaredNorm: MatrixT, _ nClusters: Int, _ nTrials: Int?) -> MatrixT {
@@ -54,7 +88,7 @@ class KMeans {
         
         for c in 1..<nClusters {
             let randVals = randMatrix(1, nT) * currentPot
-            let candidateIds = searchsorted(closestDistSq.cumsum().grid, randVals.grid)
+            let candidateIds = searchsorted(closestDistSq.grid.cumsum(), randVals.grid)
             
             let distanceToCandidates = euclideanDistances(X: X[candidateIds], Y: X, YNormSquared: XSquaredNorm, squared: true, XNormSquared: nil)
             

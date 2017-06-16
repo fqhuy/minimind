@@ -112,7 +112,7 @@ public class RBF: Kernel {
             grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
         }
         
-        d[0, 2∶] = grad
+        d[0, 2∶] = grad.reshape([1, -1])
         
         return d
     }

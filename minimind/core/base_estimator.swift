@@ -11,17 +11,23 @@ import Foundation
 
 public protocol BaseEstimator {
     associatedtype ScalarT
-    associatedtype MatrixT
+    typealias MatrixT = Matrix<ScalarT>
     
     func get_params() -> [String:Any]
     func set_params(params: [String:Any])
 }
 
-public protocol RegressorMixin {
+public protocol Regressor {
     associatedtype ScalarT
-    associatedtype MatrixT
+    typealias MatrixT = Matrix<ScalarT>
     
     func score(X: MatrixT, y: MatrixT) -> ScalarT
+    func fit(X: MatrixT, Y: MatrixT)
+    func predict(Xstar: MatrixT) -> MatrixT
+}
+
+public protocol Classifier {
+    
 }
 
 

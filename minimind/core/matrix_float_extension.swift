@@ -377,6 +377,9 @@ public func ** (_ mat: Matrix<Float>, _ e: Float) -> Matrix<Float> {
 
 //MARK: MATH FUNCTIONS
 
+/// compute the norm of an matrix
+/// Parameter mat: Matrix
+/// Parameter ord: order of the norm, can be F, f, E, e for Frobenius, I, i for Infinity, M, m for Max
 public func norm(_ mat: Matrix<Float>, _ ord: String) -> Float {
     var n = __CLPK_integer(mat.columns)
     var m = __CLPK_integer(mat.rows)

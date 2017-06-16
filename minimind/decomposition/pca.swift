@@ -45,4 +45,9 @@ class PCA: BaseEstimator {
         self.mean = Xmean
         
     }
+    
+    public func predict(_ Y: Matrix<Float>) -> Matrix<Float> {
+        checkMatrices(components, Y, "sameRows")
+        return self.components * Y
+    }
 }

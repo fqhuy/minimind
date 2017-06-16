@@ -11,7 +11,7 @@ import Surge
 
 public protocol Kernel {
     associatedtype ScalarT
-    associatedtype MatrixT
+    typealias MatrixT = Matrix<ScalarT>
     
     init()
     

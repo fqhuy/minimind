@@ -148,12 +148,22 @@ public func prod<T: ScalarType>(_ arr: [T]) -> T {
     return arr.reduce(T.zero, {x,y in x * y})
 }
 
-public func max<T: ScalarType>(_ arr: [T]) -> T {
-    return arr.max(by: {x, y in x >= y})!
+public func max<T: HasComparisonOps>(_ arr: [T]) -> T {
+    return arr.max(by: {x, y in x <= y})!
 }
 
-public func min<T: ScalarType>(_ arr: [T]) -> T {
-    return arr.max(by: {x, y in x >= y})!
+public func min<T: HasComparisonOps>(_ arr: [T]) -> T {
+    return arr.min(by: {x, y in x <= y})!
+}
+
+public func argmax<T: HasComparisonOps>(_ arr: [T]) -> IndexType {
+    let (_, idx) = find(arr, {(x, y) -> Bool in x <= y} )
+    return idx
+}
+
+public func argmin<T: HasComparisonOps>(_ arr: [T]) -> IndexType {
+    let (_, idx) = find(arr, {(x, y) -> Bool in x >= y} )
+    return idx
 }
 
 //MARK: Creators
@@ -232,6 +242,16 @@ public func any(_ arr: [Bool]) -> Bool {
     return arr.reduce(false, {x,y in x || y})
 }
 
+public func nonzero(_ arr: [Bool]) -> [IndexType] {
+    var re: [IndexType] = []
+    for i in 0..<arr.count {
+        if arr[i] {
+            re.append(i)
+        }
+    }
+    return re
+}
+
 public func ==<T: Equatable>(_ arr: [T], _ t: T) -> [Bool] {
     return arr.map{ $0 == t }
 }
@@ -293,6 +313,13 @@ public func < <T: Comparable>(_ lhs: [T], _ rhs: [T]) -> [Bool] {
 }
 
 //MARK: ALGORITHMS
+extension Array {
+    public mutating func swap(_ i1: IndexType, _ i2: IndexType) {
+        let tmp = self[i1]
+        self[i1] = self[i2]
+        self[i2] = tmp
+    }
+}
 
 public func binarysearch<T: ScalarType>(_ arr: [T], _ t: T) -> Int {
     precondition(arr.count > 0)
@@ -323,4 +350,61 @@ public func binarysearch<T: ScalarType>(_ arr: [T], _ t: T) -> Int {
             }
         }
     }
+}
+
+public func quicksort<T: Comparable>(_ arr: [T]) -> ([T], [IndexType]) {
+    func _partition(_ arr: inout [T], _ iarr: inout [IndexType], _ from: IndexType, _ to: IndexType) -> IndexType {
+        let pivot = from
+        var left = from + 1
+        var right = to
+        
+        while true {
+            // Slide left and right until an exchange point is found
+            while (arr[left] <= arr[pivot]) && (right >= left) {
+                left += 1
+            }
+            
+            while (arr[right] >= arr[pivot]) && (right >= left) {
+                right -= 1
+            }
+            
+            // Stop condition
+            if (right < left) {
+                arr.swap(pivot, right)
+                iarr.swap(pivot, right)
+                return right
+            }
+            
+            // Exchange left and right
+            arr.swap(left, right)
+            iarr.swap(left, right)
+        }
+    }
+    
+    func _sort(_ arr: inout [T], _ iarr: inout [IndexType], _ from: IndexType, _ to: IndexType) {
+        if from < to - 1 {
+            let splitPoint = _partition(&arr, &iarr, from, to)
+            _sort(&arr, &iarr, from, splitPoint - 1)
+            _sort(&arr, &iarr, splitPoint + 1, to)
+        }
+    }
+    var newarr = arr
+    var iarr: [IndexType] = arange(0, arr.count, 1)
+    _sort(&newarr, &iarr, 0, arr.count - 1)
+    return (newarr, iarr)
+}
+
+
+public func find<T>(_ arr: [T], _ f: (T, T) -> Bool) -> (T, IndexType) {
+    var idx: IndexType = 0
+    var item = arr[0]
+    
+    for i in 1..<arr.count {
+        if f(item, arr[i]) {
+            item = arr[i]
+            idx = i
+        }
+    }
+    
+    return (item, idx)
 }

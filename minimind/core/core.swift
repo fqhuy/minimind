@@ -10,6 +10,7 @@ import Foundation
 
 public typealias FloatType = ExpressibleByFloatLiteral & FloatingPoint
 public typealias IntType = Integer
+public typealias IndexType = Int 
 
 //MARK: Can ScalaType be SignedNumber ?
 public typealias ScalarType = HasSign & HasZero & HasOne & HasArithmeticOps & HasComparisonOps

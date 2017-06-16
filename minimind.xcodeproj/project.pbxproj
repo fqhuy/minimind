@@ -41,7 +41,6 @@
 		3689622C1EEC41AD009134A3 /* kmeans.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622B1EEC41AD009134A3 /* kmeans.swift */; };
 		3689622E1EEE90C7009134A3 /* minimindTestArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622D1EEE90C7009134A3 /* minimindTestArray.swift */; };
 		368962301EEEAA56009134A3 /* array_float_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622F1EEEAA56009134A3 /* array_float_extension.swift */; };
-		368962321EEEB450009134A3 /* metricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962311EEEB450009134A3 /* metricsTests.swift */; };
 		368962341EEEC1A5009134A3 /* matrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962331EEEC1A5009134A3 /* matrixTests.swift */; };
 		368962361EEEC2F1009134A3 /* matrix_int_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962351EEEC2F1009134A3 /* matrix_int_extension.swift */; };
 		368962381EEED366009134A3 /* clusterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962371EEED366009134A3 /* clusterTests.swift */; };
@@ -65,6 +64,8 @@
 		3689624C1EEFDC0E009134A3 /* kernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3670FDA81EEBCD5400AC07F2 /* kernel.swift */; };
 		368962631EF10F0A009134A3 /* core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962621EF10F0A009134A3 /* core.swift */; };
 		368962641EF1101F009134A3 /* core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962621EF10F0A009134A3 /* core.swift */; };
+		368962661EF2C045009134A3 /* arrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962651EF2C045009134A3 /* arrayTests.swift */; };
+		368962681EF2C153009134A3 /* metricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962671EF2C153009134A3 /* metricsTests.swift */; };
 		36B2CB161EE322C3001751D3 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B2CB0D1EE322C3001751D3 /* minimind.framework */; };
 		36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */; };
 		36B2CB1D1EE322C3001751D3 /* minimind mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B2CB0F1EE322C3001751D3 /* minimind mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -169,13 +170,14 @@
 		3689622B1EEC41AD009134A3 /* kmeans.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = kmeans.swift; path = cluster/kmeans.swift; sourceTree = "<group>"; };
 		3689622D1EEE90C7009134A3 /* minimindTestArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = minimindTestArray.swift; sourceTree = "<group>"; };
 		3689622F1EEEAA56009134A3 /* array_float_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = array_float_extension.swift; sourceTree = "<group>"; };
-		368962311EEEB450009134A3 /* metricsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = metricsTests.swift; sourceTree = "<group>"; };
 		368962331EEEC1A5009134A3 /* matrixTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = matrixTests.swift; sourceTree = "<group>"; };
 		368962351EEEC2F1009134A3 /* matrix_int_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = matrix_int_extension.swift; sourceTree = "<group>"; };
 		368962371EEED366009134A3 /* clusterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = clusterTests.swift; sourceTree = "<group>"; };
 		368962391EEED815009134A3 /* array_int_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = array_int_extension.swift; sourceTree = "<group>"; };
 		3689623B1EEF2E15009134A3 /* array_double_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = array_double_extension.swift; sourceTree = "<group>"; };
 		368962621EF10F0A009134A3 /* core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = core.swift; sourceTree = "<group>"; };
+		368962651EF2C045009134A3 /* arrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = arrayTests.swift; sourceTree = "<group>"; };
+		368962671EF2C153009134A3 /* metricsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = metricsTests.swift; sourceTree = "<group>"; };
 		36B2CB0D1EE322C3001751D3 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B2CB0F1EE322C3001751D3 /* minimind mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "minimind mac.h"; sourceTree = "<group>"; };
 		36B2CB101EE322C3001751D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -332,9 +334,10 @@
 				367E891F1C963D2600C96392 /* minimindTests.swift */,
 				367E89211C963D2600C96392 /* Info.plist */,
 				3689622D1EEE90C7009134A3 /* minimindTestArray.swift */,
-				368962311EEEB450009134A3 /* metricsTests.swift */,
 				368962331EEEC1A5009134A3 /* matrixTests.swift */,
 				368962371EEED366009134A3 /* clusterTests.swift */,
+				368962651EF2C045009134A3 /* arrayTests.swift */,
+				368962671EF2C153009134A3 /* metricsTests.swift */,
 			);
 			path = minimindTests;
 			sourceTree = "<group>";
@@ -796,8 +799,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				368962341EEEC1A5009134A3 /* matrixTests.swift in Sources */,
+				368962681EF2C153009134A3 /* metricsTests.swift in Sources */,
+				368962661EF2C045009134A3 /* arrayTests.swift in Sources */,
 				3689622E1EEE90C7009134A3 /* minimindTestArray.swift in Sources */,
-				368962321EEEB450009134A3 /* metricsTests.swift in Sources */,
 				367E89201C963D2600C96392 /* minimindTests.swift in Sources */,
 				368962381EEED366009134A3 /* clusterTests.swift in Sources */,
 			);

@@ -9,55 +9,29 @@
 import Foundation
 //import Surge
 
-public protocol GaussianProcess: BaseEstimator, RegressorMixin {
+public protocol GaussianProcess: BaseEstimator {
     associatedtype KernelT: Kernel
     associatedtype ScalarT = KernelT.ScalarT
-    associatedtype MatrixT = KernelT.MatrixT
     
     var kernel: KernelT {get set}
-
-    func fit(X: MatrixT, y: MatrixT, maxiters: Int, verbose: Bool)
-    
-    func score(X: MatrixT, y: MatrixT) -> ScalarT
-    
-    func predict(X: MatrixT) -> (MatrixT, MatrixT) 
+    var alpha: ScalarT {get set}
+    var noise: MatrixT {get}
+    var Xtrain: MatrixT {get}
+    var ytrain: MatrixT {get}
 }
 
-public class GaussianProcessRegressor<T: ScalarType, K: Kernel >: GaussianProcess where T: ExpressibleByFloatLiteral & FloatingPoint, K.MatrixT == Matrix<T>, K.ScalarT == T {
-    public var kernel: K
-    public var Kxx: MatrixT
-    public var alpha: T
-    public var Xtrain: MatrixT
-    var noise: MatrixT
-    public var ytrain: MatrixT
-    
+public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor where K.ScalarT == Float {
+    public typealias ScalarT = Float
+    public typealias MatrixT = Matrix<ScalarT>
     public typealias KernelT = K
-    public typealias ScalarT = T
-    public typealias MatrixT = Matrix<T>
+
+    public var kernel: K
+    public var alpha: ScalarT
+    public var Xtrain: MatrixT
+    public var noise: MatrixT
+    public var ytrain: MatrixT
+    public var Kxx: MatrixT
     
-    public init( kernel: KernelT, alpha: T = 1.0) {
-        self.kernel = kernel
-        Kxx = MatrixT()
-        Xtrain = MatrixT()
-        noise = MatrixT()
-        ytrain = MatrixT()
-        self.alpha = alpha
-    }
-    
-    public func predict(X: MatrixT) -> (MatrixT, MatrixT)  {
-        fatalError("unimplemented")
-    }
-
-    public func score(X: MatrixT, y: MatrixT) -> ScalarT {
-        fatalError("unimplemented")
-    }
-
-    public func fit(X: MatrixT, y: MatrixT, maxiters: Int = 200, verbose: Bool = true) {
-        fatalError("unimplemented")
-    }
-}
-
-public extension GaussianProcessRegressor where T == Float {
     public var likelihood: GPLikelihood<KernelT> {
         get {
             return GPLikelihood(kernel, noise, Xtrain, ytrain)
@@ -68,6 +42,21 @@ public extension GaussianProcessRegressor where T == Float {
         }
     }
 
+    public init( kernel: KernelT, alpha: ScalarT = 1.0) {
+        self.kernel = kernel
+        Kxx = MatrixT()
+        Xtrain = MatrixT()
+        noise = MatrixT()
+        ytrain = MatrixT()
+        self.alpha = alpha
+    }
+    
+    public convenience init(X: MatrixT, Y: MatrixT, kernel: KernelT, alpha: ScalarT = 1.0) {
+        self.init(kernel: kernel, alpha: alpha)
+        self.Xtrain = X
+        self.ytrain = Y
+    }
+    
     public func predict(_ X: MatrixT) -> (MatrixT, MatrixT) {
         let Kxz = kernel.K(X, Xtrain)
         let Kzz = kernel.K(X, X)
@@ -85,7 +74,7 @@ public extension GaussianProcessRegressor where T == Float {
         Xtrain = X
         ytrain = y
         
-        let e: Matrix<T> = eye(X.rows)
+        let e: Matrix<ScalarT> = eye(X.rows)
         noise = e * (alpha * alpha)
         
         let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
@@ -96,10 +85,23 @@ public extension GaussianProcessRegressor where T == Float {
         
         kernel.set_params(x)
     }
+    
+    public func fit(X: Matrix<GaussianProcessRegressor.ScalarT>, Y: Matrix<GaussianProcessRegressor.ScalarT>) {
+        self.fit(X, Y)
+    }
+    
+    public func predict(Xstar: MatrixT) -> MatrixT {
+        let (mu, _) = predict(Xstar)
+        return mu
+    }
+    
+    public func score(X: MatrixT, y: MatrixT) -> Float {
+        fatalError("unimplemented")
+    }
 }
 
 
-public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.MatrixT == Matrix<Float>, K.ScalarT == Float  {
+public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float  {
     public typealias ScalarT = Float
     public typealias MatrixT = Matrix<ScalarT>
     public typealias KernelT = K

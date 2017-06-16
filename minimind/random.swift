@@ -266,16 +266,16 @@ public struct Randoms {
         return currencyList.randomItem()!
     }
 
-    public enum GravatarStyle: String {
-        case Standard
-        case MM
-        case Identicon
-        case MonsterID
-        case Wavatar
-        case Retro
-
-        static let allValues = [Standard, MM, Identicon, MonsterID, Wavatar, Retro]
-    }
+//    public enum GravatarStyle: String {
+//        case Standard
+//        case MM
+//        case Identicon
+//        case MonsterID
+//        case Wavatar
+//        case Retro
+//
+//        static let allValues = [Standard, MM, Identicon, MonsterID, Wavatar, Retro]
+//    }
 
 //    public static func createGravatar(_ style: Randoms.GravatarStyle = .Standard, size: Int = 80, completion: ((_ image: UIImage?, _ error: Error?) -> Void)?) {
 //        var url = "https://secure.gravatar.com/avatar/thisimagewillnotbefound?s=\(size)"

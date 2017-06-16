@@ -25,7 +25,7 @@ class minimindTests: XCTestCase {
         let N = 8
         let P = 2
         let kern = RBF(variance: 1.1, lengthscale: 1.0)
-        let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.01)
+        let gpr = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.01)
         
         var X: Matrix<Float> = randMatrix(N, P + 1) * 10.0
         X[column: 0] = ones(N, 1) // [Float](repeating: 1.0, count: N)
@@ -142,20 +142,6 @@ class minimindTests: XCTestCase {
     }
     
     func testGP() {
-        let N = 8
-        let P = 2
-//        let w = Float(300.0)
-        let w = Float.pi * 2.0
-        
-//        var X: Matrix<Float> = randMatrix(N, 2)
-//        var _y: [Float] = X[column: 0] * X[column: 1] + X[column: 1] + randArray(n: N) * 0.05
-//        var y = Matrix<Float>(N, 1, _y)
-        
-//        var y: [Float] = sin(X[column: 0]) * sin(X[column: 1]) + randArray(n: N) * 0.05
-//
-//        X[column: 0] -= X[column: 0].mean(); X[column: 0] /= X[column: 0].std()
-//        X[column: 1] -= X[column: 1].mean(); X[column: 1] /= X[column: 1].std()
-
         let X = Matrix<Float>([[-0.91261869,  1.85426673],
             [ 1.34207648, -1.08250752],
             [ 1.13998253,  0.69448722],
@@ -169,7 +155,7 @@ class minimindTests: XCTestCase {
             0.19189653,  0.03121346]]).t
         
         let kern = RBF(variance: 250, lengthscale: 1000.0)
-        let gpr = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
+        let gpr = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
         
         gpr.fit(X, y, maxiters: 500)
         

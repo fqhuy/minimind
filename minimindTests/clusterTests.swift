@@ -19,12 +19,12 @@ class clusterTests: XCTestCase {
         let mean1 = Matrix<Float>([[-3, 0]])
         let mean2 = Matrix<Float>([[3, 0]])
         
-        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(5)
-        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(5)
+        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(50)
+        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(50)
         
         let xx = vstack([X1, X2]) 
-        X = xx - xx.mean(0)
-        X = X / X.std(0)
+        X = xx .- xx.mean(0)
+        X = X ./ X.std(0)
     }
     
     override func tearDown() {
@@ -38,6 +38,13 @@ class clusterTests: XCTestCase {
         let clusters = KMeans.kMeansPlusPlus(X, XSquaredNorm, 2, 5)
         print(clusters)
 //        print(X)
+    }
+    
+    func testKMeans() {
+        let km = KMeans(2, 0.01)
+        km.fit(X, 200, true)
+        print(km.clusterCenters)
+        print(km.labels)
     }
     
     func testPerformanceExample() {

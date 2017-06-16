@@ -247,11 +247,19 @@ public struct Matrix<T> {
     }
     
     public func reshape(_ shape: [Int]) -> Matrix {
-        precondition(shape[0] * shape[1] == self.size, "invalid shape")
-        var mat = self        
-        mat.rows = shape[0]
-        mat.columns = shape[1]
-        
+        precondition((shape[0] * shape[1] == self.size) || (shape[0] == -1) || (shape[1] == -1), "invalid shape")
+        var mat = self
+        var (rr, cc) = tuple(shape)
+        if (shape[0] == -1) && (shape[1] > 0) {
+            assert(size % shape[1] == 0)
+            rr = size / shape[1]
+            cc = shape[1]
+        } else if (shape[1] == -1) && (shape[0] > 0) {
+            cc = size / shape[0]
+            rr = shape[0]
+        }
+        mat.rows = rr
+        mat.columns = cc
         return mat
     }
     
@@ -291,23 +299,23 @@ extension Matrix: CustomStringConvertible {
 
 // MARK: - SequenceType
 
-extension Matrix: Sequence {
-    public func makeIterator() -> AnyIterator<ArraySlice<Element>> {
-        let endIndex = rows * columns
-        var nextRowStartIndex = 0
-        
-        return AnyIterator {
-            if nextRowStartIndex == endIndex {
-                return nil
-            }
-            
-            let currentRowStartIndex = nextRowStartIndex
-            nextRowStartIndex += self.columns
-            
-            return self.grid[currentRowStartIndex..<nextRowStartIndex]
-        }
-    }
-}
+//extension Matrix: Sequence {
+//    public func makeIterator() -> AnyIterator<ArraySlice<Element>> {
+//        let endIndex = rows * columns
+//        var nextRowStartIndex = 0
+//        
+//        return AnyIterator {
+//            if nextRowStartIndex == endIndex {
+//                return nil
+//            }
+//            
+//            let currentRowStartIndex = nextRowStartIndex
+//            nextRowStartIndex += self.columns
+//            
+//            return self.grid[currentRowStartIndex..<nextRowStartIndex]
+//        }
+//    }
+//}
 
 //extension Matrix: Equatable {}
 
@@ -337,6 +345,25 @@ public extension Matrix where T: ScalarType {
             return Matrix([[f(grid)]])
         }
     }
+
+    // apply a function to reduce an axis to scalar
+    public func apply<T2: ScalarType>(_ f: ([T]) -> T2, _ axis: Int) -> Matrix<T2> {
+        if axis == 0 {
+            var m: Matrix<T2> = minimind.zeros(1, columns)
+            for col in 0..<columns {
+                m[0, col] = f(self[column: col].grid)
+            }
+            return m
+        } else if axis == 1 {
+            var m: Matrix<T2> = minimind.zeros(rows, 1)
+            for row in 0..<rows {
+                m[row, 0] = f(self[row].grid)
+            }
+            return m
+        } else {
+            return Matrix<T2>([[f(grid)]])
+        }
+    }
     
     // Apply a transformation function to an axis
     public func apply(_ f: ([T]) -> [T], _ axis: Int) -> Matrix<Element> {
@@ -347,6 +374,21 @@ public extension Matrix where T: ScalarType {
             }
         case 0: for r in 0..<rows {
             re[r, 0∶] = Matrix(1, columns, f(self[r].grid))
+            }
+        default :
+            fatalError("invalid axis")
+        }
+        return re
+    }
+    
+    public func apply(f: ([T], [T]) -> [T], arr: [T], axis: Int) -> Matrix<Element> {
+        var re: Matrix<T> = self.zeros(rows, columns)
+        switch axis {
+        case 1: for c in 0..<columns {
+            re[0∶, c] = Matrix(rows, 1, f(self[column: c].grid, arr))
+            }
+        case 0: for r in 0..<rows {
+            re[r, 0∶] = Matrix(1, columns, f(self[r].grid, arr))
             }
         default :
             fatalError("invalid axis")
@@ -521,6 +563,49 @@ public func ∘<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return newmat
 }
 
+// Columns wise operators
+infix operator |+
+public func |+<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x + y}, arr: rhs.grid, axis: 1)
+}
+
+infix operator |-
+public func |-<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x - y}, arr: rhs.grid, axis: 1)
+}
+
+infix operator |*
+public func |*<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x * y}, arr: rhs.grid, axis: 1)
+}
+
+infix operator |/
+public func |/<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x / y}, arr: rhs.grid, axis: 1)
+}
+
+// Row-wise operators
+
+infix operator .+
+public func .+<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x + y}, arr: rhs.grid, axis: 0)
+}
+
+infix operator .-
+public func .-<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x - y}, arr: rhs.grid, axis: 0)
+}
+
+infix operator .*
+public func .*<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x * y}, arr: rhs.grid, axis: 0)
+}
+
+infix operator ./
+public func ./<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x / y}, arr: rhs.grid, axis: 0)
+}
+
 //MARK: LINEAR ALGEBRA & MATH
 
 public func sqrt<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
@@ -547,6 +632,14 @@ public func max<T: ScalarType>(_ mat: Matrix<T>, axis: Int) -> Matrix<T> {
 
 public func min<T: ScalarType>(_ mat: Matrix<T>, axis: Int) -> Matrix<T> {
     return mat.apply(minimind.min, axis)
+}
+
+public func argmax<T: ScalarType>(_ mat: Matrix<T>, _ axis: Int) -> Matrix<IndexType> {
+    return mat.apply(minimind.argmax, axis)
+}
+
+public func argmin<T: ScalarType>(_ mat: Matrix<T>, _ axis: Int) -> Matrix<IndexType> {
+    return mat.apply(minimind.argmin, axis)
 }
 
 public func cross_add<T: ScalarType>(_ lhs: Matrix<T>, _ rhs: Matrix<T>) -> Matrix<T> {
