@@ -79,11 +79,11 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         
         let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
-        let scg = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.init_params(), maxiters: maxiters)
+        let scg = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
         
         let (x, _, _) = scg.optimize(verbose: verbose)
         
-        kernel.set_params(x)
+        kernel.setParams(x)
     }
     
     public func fit(X: Matrix<GaussianProcessRegressor.ScalarT>, Y: Matrix<GaussianProcessRegressor.ScalarT>) {
@@ -121,7 +121,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     
     public func compute(_ x: MatrixT) -> ScalarT {
         
-        kernel.set_params(x)
+        kernel.setParams(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
         let N = Float(Xtrain.rows)
@@ -138,12 +138,12 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
         let logdetC = reduce_sum(log(diag(L)))[0, 0] // 0.5 * D * logdet(C)
 
         // Negative log likelihood
-        return ytCy + logdetC + N / 2.0 * log(2.0 * ScalarT.pi) + kernel.log_prior
+        return ytCy + logdetC + N / 2.0 * log(2.0 * ScalarT.pi) + kernel.logPrior
     }
     
     public func gradient(_ x: MatrixT) -> MatrixT {
 //        let tmp = kernel.get_params()
-        kernel.set_params(x)
+        kernel.setParams(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
 //        let N = Xtrain.rows

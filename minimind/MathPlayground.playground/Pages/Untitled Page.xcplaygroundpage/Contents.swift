@@ -14,3 +14,8 @@ let v2: [Float] = [0.0, 0.2, 0.4, 1.2]
 let v = [v1, v2, v1]
 let cv = v.reduce([], {x, y in x ∪ y})
 print(cv)
+
+var d = ["a": 10, "b": 9]
+d["c"] = 7
+
+print(d)

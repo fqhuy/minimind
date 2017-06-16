@@ -795,6 +795,10 @@ public func zeros<T: ScalarType>(_ rows: Int, _ columns: Int) -> Matrix<T> {
     return Matrix<T>(rows: rows, columns: columns, repeatedValue: T.zero)
 }
 
+public func zeros_like<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
+    return zeros(mat.rows, mat.columns)
+}
+
 public func eye<T: ScalarType>(_ D: Int) -> Matrix<T> {
     var mat = Matrix<T>(rows: D, columns: D, repeatedValue: T.zero)
     for i in 0..<D {

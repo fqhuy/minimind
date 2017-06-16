@@ -14,17 +14,37 @@ public class RBF: Kernel {
     public typealias ScalarT = Float
     public typealias MatrixT = Matrix<ScalarT>
     
-    public var n_dims: Int {
+    public var X: MatrixT
+    public var parametersData: [ScalarT]
+    public var trainables: [String] = []
+    public var parametersIds: [String:[IndexType]]
+    
+    
+    public var variance: ScalarT {
         get {
-            return 2
+            return parametersData[parametersIds["variance"]!][0]
+        }
+        set(val) {
+            parametersData[parametersIds["variance"]!] = [val]
         }
     }
     
-    public var variance: ScalarT
-    public var lengthscale: ScalarT
-    public var X: MatrixT
+    public var lengthscale: ScalarT {
+        get {
+            return parametersData[parametersIds["lengthscale"]!][0]
+        }
+        set(val) {
+            parametersData[parametersIds["lengthscale"]!] = [val]
+        }
+    }
     
-    public var log_variance: ScalarT {
+    public var nDims: Int {
+        get {
+            return parametersIds.count
+        }
+    }
+    
+    public var logVariance: ScalarT {
         get {
             return log(variance)
         }
@@ -33,7 +53,7 @@ public class RBF: Kernel {
         }
     }
     
-    public var log_lengthscale: ScalarT {
+    public var logLengthscale: ScalarT {
         get {
             return log(lengthscale)
         }
@@ -42,41 +62,40 @@ public class RBF: Kernel {
         }
     }
     
-    public var log_prior: ScalarT {
+    public var logPrior: ScalarT {
         get {
-            return 0.5 * ( pow(log_variance, 2.0) + pow(log_lengthscale, 2.0) )
+            return 0.5 * ( pow(logVariance, 2.0) + pow(logLengthscale, 2.0) )
         }
     }
     
     required public init() {
-        variance = 1.0
-        lengthscale = 1.0
         X = MatrixT()
+        parametersData = zeros(n: 2)
+        parametersIds = ["variance": [0], "lengthscale": [1]]
+        variance = 100.0
+        lengthscale = 100.0
     }
     
-    required public init(variance: ScalarT = 0.1, lengthscale: ScalarT = 0.1) {
-        self.variance = variance
-        self.lengthscale = lengthscale
-        X = MatrixT()
-    }
-    
-    public func set_params(_ params: MatrixT) {
-        log_variance = max(params[0, 0], 1e-5)
-        log_lengthscale = max(params[0, 1], 1e-5)
+    public convenience init(variance: ScalarT, lengthscale: ScalarT, X: MatrixT, trainables: [String] = [], capacity: Int = 10000) {
+        self.init()
+        self.trainables = trainables
+        parametersData = []
+        parametersData.reserveCapacity(capacity)
         
-        X.grid = params[0, 2∶].grid
-//        log_lengthscale = params[0, 0]
+        parametersIds["variance"] = [parametersData.count]
+        parametersData.append(variance)
+        
+        parametersIds["lengthscale"] = [parametersData.count]
+        parametersData.append(lengthscale)
+        
+        parametersIds["X"] = arange(parametersData.count, parametersData.count + X.size, 1)
+        parametersData.append(contentsOf: X.grid)
+        
+        self.X = X
     }
     
-    public func get_params() -> MatrixT {
-//        return MatrixT([[log_variance, log_lengthscale]])
-        return MatrixT([[log_variance, log_lengthscale] ∪ X.grid ])
-
-    }
-    
-    public func init_params() -> MatrixT {
-        return MatrixT([[log_variance, log_lengthscale] ∪ X.grid])
-//        return MatrixT([[log_lengthscale]])
+    public func initParams() -> MatrixT {
+        return MatrixT([[logVariance, logLengthscale] ∪ self.X.grid])
     }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {
@@ -94,26 +113,33 @@ public class RBF: Kernel {
     }
     
     public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
-//        var d: MatrixT = zeros(1, 2)
         let (N, D) = X.shape
-        var d: MatrixT = zeros(1, 2 + D * N)
+        var d: MatrixT =  zeros(1, parametersData.count) // zeros(1, 2 + D * N)
         let r = scaledDist(X, Y)
         let Kr = K(r: r)
         let dLdr = dKdr(r: r) ∘ dLdK
         
-        d[0, 0] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
-        d[0, 1] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
-        
-        // gradient wrt X
-        var tmp = dLdr ∘ invDist(r)
-        tmp = tmp + tmp.t
-        var grad: MatrixT = zeros(N ,D)
-        for i in 0..<D {
-            grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
+        // variance
+        if trainables.contains("variance") {
+            d[0, parametersIds["variance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
         }
         
-        d[0, 2∶] = grad.reshape([1, -1])
+        // lengthscale
+        if trainables.contains("lengthscale") {
+            d[0, parametersIds["lengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
+        }
         
+        // gradient wrt X
+        if trainables.contains("X") {
+            var tmp = dLdr ∘ invDist(r)
+            tmp = tmp + tmp.t
+            var grad: MatrixT = zeros(N ,D)
+            for i in 0..<D {
+                grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
+            }
+        
+            d[[0], parametersIds["X"]!] = grad.reshape([1, -1])
+        }
         return d
     }
     

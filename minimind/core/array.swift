@@ -9,8 +9,22 @@
 import Foundation
 
 //MARK: EXTENSIONS
-extension Array where Element: ScalarType {
-
+extension Array {
+    public subscript(_ ids: [IndexType]) -> [Element] {
+        get{
+            var re: [Element] = []
+            for id in ids {
+                re.append(self[id])
+            }
+            return re
+        }
+        set(val) {
+            assert(val.count == ids.count)
+            for (i, id) in ids.enumerated() {
+                self[id] = val[i]
+            }
+        }
+    }
 }
 
 //MARK: Arithmetic
@@ -176,7 +190,15 @@ public func argmin<T: HasComparisonOps>(_ arr: [T]) -> IndexType {
 
 //MARK: Creators
 public func concatenate<T>(_ arrays: [T]) -> [T] {
-    
+    var re: [T] = []
+    for array in arrays {
+        re.append(array)
+    }
+    return re
+}
+
+public func zeros<T: HasZero>(n: Int) -> [T] {
+    return [T](repeating: T.zero, count: n)
 }
 
 public func randArray(n: Int) -> [Float] {

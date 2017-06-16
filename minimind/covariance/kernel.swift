@@ -13,6 +13,11 @@ public protocol Kernel {
     associatedtype ScalarT
     typealias MatrixT = Matrix<ScalarT>
     
+    var parametersData: [ScalarT] {get set}
+    var parametersIds: [String:[IndexType]] {get set}
+    var trainables: [String] {get set}
+    var trainableIds: [IndexType] {get}
+    
     init()
     
     func K(_ X: MatrixT, _ Y: MatrixT) -> MatrixT
@@ -24,22 +29,41 @@ public protocol Kernel {
     func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT
     
     /// each kernel should know how to set it parameters, all combined in a single 1xP vector
-    func set_params(_ params: MatrixT)
+    mutating func setParams(_ params: MatrixT)
     
     /// return a vector of concatenated parameters
-    func get_params() -> MatrixT
+    func getParams() -> MatrixT
     
     /// return a reasonable initialisation for all parameters
-    func init_params() -> MatrixT
+    func initParams() -> MatrixT
     
     /// number of hyper parameters
-    var n_dims: Int {get}
+    var nDims: Int {get}
     
     /// parameters in log space
     //    var theta: MatrixT {get set}
     
     /// log prior
-    var log_prior: ScalarT {get}
+    var logPrior: ScalarT {get}
 }
 
-
+extension Kernel {
+    public var trainableIds: [IndexType] {
+        get {
+            var ids: [IndexType] = []
+            for t in trainables {
+                ids.append(contentsOf: parametersIds[t]!)
+            }
+            return ids
+        }
+    }
+    
+    public mutating func setParams(_ params: MatrixT) {
+        assert(parametersData.count == params.size)
+        parametersData[trainableIds] = params.grid
+    }
+    
+    public func getParams() -> MatrixT {
+        return MatrixT([parametersData[trainableIds]])
+    }
+}
