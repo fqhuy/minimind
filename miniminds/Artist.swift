@@ -9,13 +9,67 @@
 import UIKit
 import Surge
 
-class Artist: UIView {
+protocol CanAutoScale {
+    var x: [CGFloat] {get set}
+    var y: [CGFloat] {get set}
+    mutating func autoScale(_ keepRatio: Bool)
+}
+
+protocol ArtistProtocol {
+    var lineWidth: CGFloat {get set}
+    var edgeColor: UIColor {get set}
+    var fillColor: UIColor {get set}
+    var xScale: CGFloat {get set}
+    var yScale: CGFloat {get set}
+    var frame: CGRect {get set}
+    func drawInternal(_ rect: CGRect)
+    func autoCenter()
+}
+
+extension ArtistProtocol where Self: CanAutoScale {
+    mutating func autoScale(_ keepRatio: Bool = true) {
+        let minX = min(x.float)
+        let maxX = max(x.float)
+        let minY = min(y.float)
+        let maxY = max(y.float)
+        
+        xScale = frame.width / CGFloat(maxX - minX)
+        yScale = frame.height / CGFloat(maxY - minY) // 2
+        
+        if keepRatio {
+            xScale = min(xScale, yScale)
+            yScale = xScale
+        }
+    }
+}
+
+class Artist: UIView, ArtistProtocol, CanAutoScale {
+
     //MARK: Properties
     @IBInspectable var _lineWidth: CGFloat = 0.5
     @IBInspectable var edgeColor: UIColor = UIColor.green
     @IBInspectable var fillColor: UIColor = UIColor.white
     @IBInspectable var xScale: CGFloat = 1.0
     @IBInspectable var yScale: CGFloat = -1.0
+    var x: [CGFloat] {
+        get {
+            return [frame.minX, frame.maxX]
+        }
+        
+        set(val) {
+            
+        }
+    }
+    
+    var y: [CGFloat] {
+        get {
+            return [frame.minY, frame.maxY]
+        }
+        
+        set(val) {
+            
+        }
+    }
     
     public var lineWidth: CGFloat {
         get {
@@ -48,24 +102,41 @@ class Artist: UIView {
         
         context.restoreGState();
     }
+    
+    func scale(_ x: CGFloat, _ y: CGFloat) {
+        xScale = x
+        yScale = y
+    }
 
     func drawInternal(_ rect: CGRect) {
         fatalError("not implemented")
     }
     
-    func autoscale() {
-        fatalError("not implemented")
-    }
-    
-    func autocenter() {
+    func autoCenter() {
         fatalError("not implemented")
     }
 }
 
 @IBDesignable class Line2D: Artist {
     //MARK: Properties
-    var x: [CGFloat] = [0.0, 100.0, 200.0]
-    var y: [CGFloat] = [100.0, 400, 300.0]
+    var _x: [CGFloat] = [0.0, 100.0, 200.0]
+    var _y: [CGFloat] = [100.0, 400, 300.0]
+    override var x: [CGFloat] {
+        get {
+            return _x
+        }
+        set(val) {
+            _x = val
+        }
+    }
+    override var y: [CGFloat] {
+        get {
+            return _y
+        }
+        set(val) {
+            _y = val
+        }
+    }
     
     //MARK: Initialisations
     init(x: [CGFloat], y: [CGFloat], frame: CGRect) {
@@ -91,26 +162,34 @@ class Artist: UIView {
         path.lineWidth = lineWidth
         path.stroke()
     }
-    
-    override func autoscale() {
-        let minX = min(x.float)
-        let maxX = max(x.float)
-        let minY = min(y.float)
-        let maxY = max(y.float)
-        
-        xScale = frame.width / CGFloat(maxX - minX)
-        yScale = frame.height / CGFloat(maxY - minY) / 2
-    }
-    
-    override func autocenter() {
+
+    override func autoCenter() {
         
     }
 }
 
 @IBDesignable class PathCollection: Artist {
     //MARK: Properties
-    var x: [CGFloat] = [0.0, 100.0, 200.0]
-    var y: [CGFloat] = [100.0, 400, 300.0]
+    var _x: [CGFloat] = [0.0, 100.0, 200.0]
+    var _y: [CGFloat] = [100.0, 400, 300.0]
+    
+    override var x: [CGFloat] {
+        get {
+            return _x
+        }
+        set(val) {
+            _x = val
+        }
+    }
+    override var y: [CGFloat] {
+        get {
+            return _y
+        }
+        set(val) {
+            _y = val
+        }
+    }
+    
     @IBInspectable var _markerSize: CGFloat = 10.0
     
     public var markerSize: CGFloat {
@@ -145,17 +224,7 @@ class Artist: UIView {
         }
     }
     
-    override func autoscale() {
-        let minX = min(x.float)
-        let maxX = max(x.float)
-        let minY = min(y.float)
-        let maxY = max(y.float)
-        
-        xScale = frame.width / CGFloat(maxX - minX)
-        yScale = frame.height / CGFloat(maxY - minY) / 2
-    }
-    
-    override func autocenter() {
+    override func autoCenter() {
         
     }
 }

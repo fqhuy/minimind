@@ -162,6 +162,14 @@ public struct Matrix<T> {
         }
     }
     
+    public subscript(_ rows: [Int], _ column: Int) -> Matrix {
+        return self[rows, [column]]
+    }
+    
+    public subscript(_ row: Int, _ columns: [Int]) -> Matrix {
+        return self[[row], columns]
+    }
+    
     public subscript(_ frow: (Int) -> [Int], _ fcol: ((Int) -> [Int])) -> Matrix {
         get {
             let rows = frow(self.rows)
@@ -324,10 +332,11 @@ extension Matrix: CustomStringConvertible {
 //}
 
 //MARK: Matrix<ScalarType>
-
+//TODO: It is possible to move apply to the above extension. Might hurts performance though.
 public extension Matrix where T: ScalarType {
     
     // apply a function to reduce an axis to scalar
+    //TODO: apply<T2> might subsume this one
     public func apply(_ f: ([T]) -> T, _ axis: Int) -> Matrix {
         if axis == 0 {
             var m: Matrix = zeros(1, columns)
@@ -385,9 +394,11 @@ public extension Matrix where T: ScalarType {
         var re: Matrix<T> = self.zeros(rows, columns)
         switch axis {
         case 1: for c in 0..<columns {
+            assert(rows == arr.count, "incompatible shape. arr.count must be equal self.rows")
             re[0∶, c] = Matrix(rows, 1, f(self[column: c].grid, arr))
             }
         case 0: for r in 0..<rows {
+            assert(columns == arr.count, "incompatible shape. arr.count must be equal columns")
             re[r, 0∶] = Matrix(1, columns, f(self[r].grid, arr))
             }
         default :
@@ -579,6 +590,11 @@ public func |*<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x * y}, arr: rhs.grid, axis: 1)
 }
 
+infix operator |∘
+public func |∘<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x * y}, arr: rhs.grid, axis: 1)
+}
+
 infix operator |/
 public func |/<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x / y}, arr: rhs.grid, axis: 1)
@@ -601,12 +617,21 @@ public func .*<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x * y}, arr: rhs.grid, axis: 0)
 }
 
+infix operator .∘
+public func .∘<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x * y}, arr: rhs.grid, axis: 0)
+}
+
 infix operator ./
 public func ./<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     return lhs.apply(f: {(x: [T], y: [T]) -> [T] in x / y}, arr: rhs.grid, axis: 0)
 }
 
 //MARK: LINEAR ALGEBRA & MATH
+
+public func sign<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
+    return Matrix<T>(mat.rows, mat.columns, sign(mat.grid))
+}
 
 public func sqrt<T: FloatType>(_ mat: Matrix<T>) -> Matrix<T> {
     return Matrix<T>(mat.rows, mat.columns, sqrt(mat.grid))
@@ -671,7 +696,7 @@ public func reduce_prod<T: ScalarType>(_ mat: Matrix<T>,_ axis: Int = -1) -> Mat
 //MARK: ACCESS
 
 public func diag<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
-    var dmat = Matrix<T>(rows: 1, columns: mat.columns, repeatedValue: T.zero)
+    var dmat: Matrix<T> = zeros(1, mat.columns)
     for i in 0..<mat.columns {
         dmat[0, i] = mat[i, i]
     }

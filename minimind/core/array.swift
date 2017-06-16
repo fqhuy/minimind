@@ -118,8 +118,16 @@ public func / <T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] / rhs }
 }
 
+//public func ⋅<T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
+//    dot
+//}
+
 
 //MARK: Math
+public func sign<T: ScalarType>(_ arr: [T]) -> [T] {
+    return arr.map{ $0 >= T.zero ? T.one : -T.one }
+}
+
 public func sqrt<T: FloatingPoint>(_ arr: [T]) -> [T] {
     return arr.map{ sqrt($0) }
 }
@@ -167,6 +175,10 @@ public func argmin<T: HasComparisonOps>(_ arr: [T]) -> IndexType {
 }
 
 //MARK: Creators
+public func concatenate<T>(_ arrays: [T]) -> [T] {
+    
+}
+
 public func randArray(n: Int) -> [Float] {
     return (0..<n).map{x in Randoms.randomFloat(0.0, 1.0)}
 }

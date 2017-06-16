@@ -30,7 +30,6 @@ public protocol Classifier {
     
 }
 
-
 extension BaseEstimator {
     public func get_params() -> [String:Any] {
         return [:]

@@ -241,7 +241,7 @@ public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A"
     }
     
     var u: Matrix<Float> = Matrix()
-    if jobu == "S" {
+    if jobu == "A" {
         u = zeros(Int(_ldu), Int(m))
     }
     else if jobu == "S" {

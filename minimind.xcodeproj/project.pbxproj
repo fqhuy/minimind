@@ -66,6 +66,8 @@
 		368962641EF1101F009134A3 /* core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962621EF10F0A009134A3 /* core.swift */; };
 		368962661EF2C045009134A3 /* arrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962651EF2C045009134A3 /* arrayTests.swift */; };
 		368962681EF2C153009134A3 /* metricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962671EF2C153009134A3 /* metricsTests.swift */; };
+		3689626C1EF3CE00009134A3 /* decompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689626B1EF3CE00009134A3 /* decompositionTests.swift */; };
+		3689626E1EF3D448009134A3 /* decompositionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689626D1EF3D448009134A3 /* decompositionUITests.swift */; };
 		36B2CB161EE322C3001751D3 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B2CB0D1EE322C3001751D3 /* minimind.framework */; };
 		36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B2CB1A1EE322C3001751D3 /* minimind_macTests.swift */; };
 		36B2CB1D1EE322C3001751D3 /* minimind mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B2CB0F1EE322C3001751D3 /* minimind mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -178,6 +180,8 @@
 		368962621EF10F0A009134A3 /* core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = core.swift; sourceTree = "<group>"; };
 		368962651EF2C045009134A3 /* arrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = arrayTests.swift; sourceTree = "<group>"; };
 		368962671EF2C153009134A3 /* metricsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = metricsTests.swift; sourceTree = "<group>"; };
+		3689626B1EF3CE00009134A3 /* decompositionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = decompositionTests.swift; sourceTree = "<group>"; };
+		3689626D1EF3D448009134A3 /* decompositionUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = decompositionUITests.swift; sourceTree = "<group>"; };
 		36B2CB0D1EE322C3001751D3 /* minimind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = minimind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B2CB0F1EE322C3001751D3 /* minimind mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "minimind mac.h"; sourceTree = "<group>"; };
 		36B2CB101EE322C3001751D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -274,6 +278,7 @@
 			children = (
 				363DDCB51EE4AF02003607B4 /* minimindsUITests.swift */,
 				363DDCB71EE4AF02003607B4 /* Info.plist */,
+				3689626D1EF3D448009134A3 /* decompositionUITests.swift */,
 			);
 			path = minimindsUITests;
 			sourceTree = "<group>";
@@ -338,6 +343,7 @@
 				368962371EEED366009134A3 /* clusterTests.swift */,
 				368962651EF2C045009134A3 /* arrayTests.swift */,
 				368962671EF2C153009134A3 /* metricsTests.swift */,
+				3689626B1EF3CE00009134A3 /* decompositionTests.swift */,
 			);
 			path = minimindTests;
 			sourceTree = "<group>";
@@ -756,6 +762,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				363DDCB61EE4AF02003607B4 /* minimindsUITests.swift in Sources */,
+				3689626E1EF3D448009134A3 /* decompositionUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -801,6 +808,7 @@
 				368962341EEEC1A5009134A3 /* matrixTests.swift in Sources */,
 				368962681EF2C153009134A3 /* metricsTests.swift in Sources */,
 				368962661EF2C045009134A3 /* arrayTests.swift in Sources */,
+				3689626C1EF3CE00009134A3 /* decompositionTests.swift in Sources */,
 				3689622E1EEE90C7009134A3 /* minimindTestArray.swift in Sources */,
 				367E89201C963D2600C96392 /* minimindTests.swift in Sources */,
 				368962381EEED366009134A3 /* clusterTests.swift in Sources */,

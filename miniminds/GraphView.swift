@@ -7,11 +7,40 @@
 //
 
 import UIKit
+import minimind
 
 @IBDesignable class GraphView: Artist {
+    
+    override var x: [CGFloat] {
+        get{
+            var xx: [CGFloat] = []
+            for item in items {
+                xx.append(contentsOf: item.x)
+            }
+            return xx
+        }
+        set(val) {
+            
+        }
+    }
+
+    override var y: [CGFloat] {
+        get{
+            var yy: [CGFloat] = []
+            for item in items {
+                yy.append(contentsOf: item.x)
+            }
+            return yy
+        }
+        set(val) {
+            
+        }
+    }
+    
     private var items: [Artist] = [] {
         willSet(newItems) {
             for item in items {
+                
                 item.removeFromSuperview()
             }
         }
@@ -54,7 +83,7 @@ import UIKit
     override func drawInternal(_ rect: CGRect) {
         
         let path = UIBezierPath()
-        
+        path.lineWidth = lineWidth
         path.move(to: CGPoint(x: 0.0, y: 0.0))
         path.addLine(to: CGPoint(x: 0.0, y: frame.height))
         path.move(to: CGPoint(x: 0.0, y: 0.0))
@@ -63,9 +92,24 @@ import UIKit
 
     }
     
-    override func autoscale() {
+    func autoScaleAll(_ keepRatio: Bool = true) {
+//        autoScale(keepRatio)
+//        let minX = min(x.float)
+//        let maxX = max(x.float)
+//        let minY = min(y.float)
+//        let maxY = max(y.float)
+//        
+//        xScale = frame.width / CGFloat(maxX - minX)
+//        yScale = frame.height / CGFloat(maxY - minY) // 2
+//        
+//        if keepRatio {
+//            xScale = min(xScale, yScale)
+//            yScale = xScale
+//        }
+        
         for item in self.items {
-            item.autoscale()
+            item.scale(xScale, yScale)
+            
         }
     }
 }

@@ -38,6 +38,12 @@ public func checkMatrices<T>(_ lhs: Matrix<T>, _ rhs: Matrix<T>, _ mode: String)
     let (lr, lc) = lhs.shape
     let (rr, rc) = rhs.shape
     switch mode {
+    case "rows=cols":
+        assert(lhs.columns == rhs.rows)
+    case "rows=rows":
+        assert(lhs.rows == rhs.rows)
+    case "cols=cols":
+        assert(lhs.columns == rhs.columns)
     case "same":
         assert(lhs.shape == rhs.shape)
     case "transpose":
@@ -55,6 +61,7 @@ public func checkMatrices<T>(_ mats: [Matrix<T>], _ mode: String ) {
     let (r, c) = mats[0].shape
     
     switch mode {
+        
         case "sameRows":
             assert(all( (0..<mats.count).map{ mats[$0].rows == r } ), "matrices's rows are not euqal")
         case "same":

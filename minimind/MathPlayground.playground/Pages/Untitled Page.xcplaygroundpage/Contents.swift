@@ -9,25 +9,8 @@ var str = "Hello, playground"
 
 let v1: [Float] = [0.1, 0.3, 0.5, 0.9]
 let v2: [Float] = [0.0, 0.2, 0.4, 1.2]
+100
 
-let v3: [Bool] = [true, true, false]
-let v4: [Bool] = [false, true, false]
-
-func foo<T: ScalarType>(_ x: T, _ y: T) -> T {
-    print("ScalarType")
-    return x + y
-}
-
-func foo(_ x: Bool, _ y: Bool) -> Bool {
-    print("Just Bool")
-    return true
-}
-
-foo(10, 10)
-foo(true, false)
-
-
-let A = Matrix<String>([["a", "b"],["x", "y"]])
-print(A)
-print(transpose(A))
-
+let v = [v1, v2, v1]
+let cv = v.reduce([], {x, y in x ∪ y})
+print(cv)

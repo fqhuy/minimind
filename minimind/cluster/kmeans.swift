@@ -10,7 +10,7 @@ import Foundation
 
 //typealias NumericType = Float
 
-class KMeans {
+class KMeans: BaseEstimator {
     typealias ScalarT = Float
     typealias MatrixT = Matrix<ScalarT>
     
@@ -68,6 +68,13 @@ class KMeans {
         
         clusterCenters = bestCenters
         self.labels = bestLabels
+    }
+    
+    public func predict(_ Xstar: MatrixT) -> Matrix<IndexType> {
+        let CSq = (clusterCenters ∘ clusterCenters).sum(1)
+        let dists = euclideanDistances(X: Xstar, Y: clusterCenters, YNormSquared: CSq, squared: true, XNormSquared: nil)
+        let lbls = argmin(dists, 1)
+        return lbls
     }
     
     static func kMeansPlusPlus(_ X: MatrixT, _ XSquaredNorm: MatrixT, _ nClusters: Int, _ nTrials: Int?) -> MatrixT {

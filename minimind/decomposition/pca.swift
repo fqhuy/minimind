@@ -8,9 +8,9 @@
 
 import Foundation
 
-class PCA: BaseEstimator {
-    typealias ScalarT = Float
-    typealias MatrixT = Matrix<Float>
+public class PCA: BaseEstimator {
+    public typealias ScalarT = Float
+    public typealias MatrixT = Matrix<Float>
     
     public var mean: MatrixT
     public var nComponents: Int
@@ -31,23 +31,30 @@ class PCA: BaseEstimator {
     public func fit(_ X: MatrixT) {
         let (N, D) = X.shape
         let Xmean = X.mean(0)
-        var S: MatrixT = zeros(D, D)
+        let XX = (X .- Xmean)
         
-        for r in 0..<N {
-            S += (X[r] - Xmean) * (X[r] - Xmean)′
-        }
+//        PRML, directly work on S
+//        var S: MatrixT = zeros(D, D)
+//        S = XX * XX′
+//        S /= Float(N)
+//        let (evals, evecs) = eigh(S, "L")
         
-        S /= Float(N)
-        let (evals, evecs) = eigh(S, "L")
+        // SVD(XX) ~ EIGH(S)
+        let (u, evals, vt) = svd(XX, "S", "S")
         
-        self.components = evecs[0∶D, 0∶nComponents].t
-        self.explained_variance = evals[0, 0∶]
+        // Sign corrections
+        let maxAbsVals = argmax(abs(u), 0)
+        let signs = sign(diag(u[maxAbsVals.grid, 0∶D]))
+//        let U = u .* signs
+        let V = vt |* signs′
+        
+        self.components = V[0∶nComponents, 0∶D] // V[0∶D, 0∶nComponents].t
+        self.explained_variance = (evals[0, 0∶] ∘ evals[0, 0∶]) / Float(N) // evals
         self.mean = Xmean
-        
     }
     
-    public func predict(_ Y: Matrix<Float>) -> Matrix<Float> {
-        checkMatrices(components, Y, "sameRows")
-        return self.components * Y
+    public func predict(_ Xstar: Matrix<Float>) -> Matrix<Float> {
+        checkMatrices(components, Xstar, "cols=cols")
+        return Xstar * self.components′
     }
 }

@@ -41,7 +41,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
         let kern = RBF(variance: 300.0, lengthscale: 1000.0)
-        let gp = GaussianProcessRegressor<Float, RBF>(kernel: kern, alpha: 1.0)
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
         gp.fit(X, Y, maxiters: 1000)
         
         print(gp.kernel.get_params())
@@ -55,21 +55,34 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         _ = graph.plot(x: Xstar.grid.cgFloat, y: Mu.grid.cgFloat, c: UIColor.red, s: 3.0)
         _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 10.0)
         
-        graph.autoscale()
+        graph.autoScale()
     }
     
     func visualiseMixtureOfGaussians() {
         let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
-        let mean1 = Matrix<Float>([[-2.0, 0.0]])
-        let mean2 = Matrix<Float>([[3.0, 0.0]])
+        let mean1 = Matrix<Float>([[-5.0, 0.0]])
+        let mean2 = Matrix<Float>([[5.0, 0.0]])
+        let mean3 = Matrix<Float>([[0.0, 5.0]])
         
         let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(50)
         let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(50)
+        let X3 = MultivariateNormal(mean: mean3, cov: cov).rvs(50)
         
-        let X = vstack([X1, X2])
+        let X = vstack([X1, X2, X3])
         
-        _ = graph.scatter(x: X[column: 0].grid.cgFloat, y: X[column: 1].grid.cgFloat, c: UIColor.green, s: 10.0)
-        graph.autoscale()
+        let A: Matrix<Float> = randMatrix(2, 15)
+        let Y = X * A + 0.01 * randMatrix(150, 15)
+        
+        let pca = PCA(2)
+        pca.fit(Y)
+        let Xpred = pca.predict(Y)
+        
+        _ = graph.scatter(x: Xpred[∶50, 0].grid.cgFloat, y: Xpred[∶50, 1].grid.cgFloat, c: UIColor.green, s: 10.0)
+        _ = graph.scatter(x: Xpred[50∶100, 0].grid.cgFloat, y: Xpred[50∶100, 1].grid.cgFloat, c: UIColor.red, s: 10.0)
+        _ = graph.scatter(x: Xpred[100∶, 0].grid.cgFloat, y: Xpred[100∶, 1].grid.cgFloat, c: UIColor.blue, s: 10.0)
+        
+        graph.autoScale(true)
+        graph.autoScaleAll(true)
     }
     
     override func viewDidLoad() {
