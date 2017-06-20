@@ -40,11 +40,11 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 300.0, lengthscale: 1000.0)
+        let kern = RBF(variance: 300.0, lengthscale: 1000.0, X: X)
         let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
         gp.fit(X, Y, maxiters: 1000)
         
-        print(gp.kernel.get_params())
+        print(gp.kernel.getParams())
         
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
@@ -85,10 +85,19 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         graph.autoScaleAll(true)
     }
     
+    func testImage2D() {
+        var A: Matrix<Float> = randMatrix(20, 20)
+        A = A ⊗ ones(3, 3)
+        
+        _ = graph.imshow(A, "bicubic", "jet")
+        graph.autoScale()
+        graph.autoScaleAll()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        visualiseMixtureOfGaussians()
+        testImage2D()
+//        visualiseMixtureOfGaussians()
     }
 
     override func didReceiveMemoryWarning() {

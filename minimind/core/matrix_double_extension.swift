@@ -210,7 +210,34 @@ public postfix func ′ (value: Matrix<Double>) -> Matrix<Double> {
     return transpose(value)
 }
 
+public func ** (_ mat: Matrix<Double>, _ e: Double) -> Matrix<Double> {
+    let newgrid: [Double] = mat.grid.map{ pow($0, e) }
+    return Matrix<Double>( mat.rows, mat.columns, newgrid)
+}
+
+//MARK: MATH FUNCTIONS
+
+/// compute the norm of an matrix
+/// Parameter mat: Matrix
+/// Parameter ord: order of the norm, can be F, f, E, e for Frobenius, I, i for Infinity, M, m for Max
+public func norm(_ mat: Matrix<Double>, _ ord: String) -> Double {
+    var n = __CLPK_integer(mat.columns)
+    var m = __CLPK_integer(mat.rows)
+    var a = mat
+    var norm = ascii(ord)
+    var work = [__CLPK_doublereal](repeatElement(0.0, count: Int(m)))
+    
+    let re = dlange_(&norm, &m, &n, &(a.grid), &m, &work)
+    return Double(re)
+}
+
+public func log(_ mat: Matrix<Double>) -> Matrix<Double> {
+    return Matrix<Double>(mat.rows, mat.columns, log(mat.grid))
+}
+
+
 //MARK: CREATORS
 public func randMatrix(_ rows: Int,_ columns: Int) -> Matrix<Double> {
     return Matrix<Double>(rows, columns, randArray(n: rows * columns))
 }
+

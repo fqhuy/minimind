@@ -13,8 +13,8 @@ public protocol BaseEstimator {
     associatedtype ScalarT
     typealias MatrixT = Matrix<ScalarT>
     
-    func get_params() -> [String:Any]
-    func set_params(params: [String:Any])
+    func getParams() -> [String:Any]
+    func setParams(params: [String:Any])
 }
 
 public protocol Regressor {
@@ -31,11 +31,11 @@ public protocol Classifier {
 }
 
 extension BaseEstimator {
-    public func get_params() -> [String:Any] {
+    public func getParams() -> [String:Any] {
         return [:]
     }
     
-    public func set_params(params: [String:Any]) {
+    public func setParams(params: [String:Any]) {
         
     }
 }

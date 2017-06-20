@@ -62,6 +62,13 @@ class matrixTests: XCTestCase {
         XCTAssert(all(argmax(z, 1) == re2))
     }
     
+    func testConvolution() {
+        let A: Matrix<Float> = randMatrix(10, 10)
+        let k: Matrix<Float> = Matrix([[-1.0, 1.0, -1.0]])
+        
+        print(conv(A, k))
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measure {

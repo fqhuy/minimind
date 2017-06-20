@@ -106,7 +106,6 @@ public func +<T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] + rhs }
 }
 
-
 public func * <T: ScalarType>(lhs: T, rhs: [T]) -> [T] {
     return rhs.map{ lhs * $0 }
 }
@@ -131,11 +130,6 @@ public func / <T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
 public func / <T: ScalarType>(lhs: [T], rhs: T) -> [T] {
     return (0..<lhs.count).map{ lhs[$0] / rhs }
 }
-
-//public func ⋅<T: ScalarType>(lhs: [T], rhs: [T]) -> [T] {
-//    dot
-//}
-
 
 //MARK: Math
 public func sign<T: ScalarType>(_ arr: [T]) -> [T] {
@@ -166,6 +160,16 @@ public func sum<T: ScalarType>(_ arr: [T]) -> T {
     return arr.reduce(T.zero, {x,y in x + y})
 }
 
+public func cumsum<T: ScalarType>(_ arr: [T]) -> [T] {
+    var tmp = T.zero
+    var re: [T] = []
+    for i in 0..<arr.count {
+        tmp += arr[i]
+        re.append(tmp)
+    }
+    return re
+}
+
 public func prod<T: ScalarType>(_ arr: [T]) -> T {
     return arr.reduce(T.zero, {x,y in x * y})
 }
@@ -189,10 +193,14 @@ public func argmin<T: HasComparisonOps>(_ arr: [T]) -> IndexType {
 }
 
 //MARK: Creators
-public func concatenate<T>(_ arrays: [T]) -> [T] {
+public func flatten<T>(_ array: [[T]]) -> [T] {
+    return concatenate(array)
+}
+
+public func concatenate<T>(_ arrays: [[T]]) -> [T] {
     var re: [T] = []
     for array in arrays {
-        re.append(array)
+        re.append(contentsOf: array)
     }
     return re
 }
@@ -214,18 +222,26 @@ public func randArray(n: Int) -> [Int] {
 }
 
 public func arange(_ minValue: Float, _ maxValue: Float, _ step: Float) -> [Float] {
-    let n: Int = Int(floorf((maxValue - minValue) / step))
+    let n: Int = Int(ceilf((maxValue - minValue) / step))
     return (0..<n).map{ Float($0) * step + minValue }
 }
 
 public func arange(_ minValue: Double, _ maxValue: Double, _ step: Double) -> [Double] {
-    let n: Int = Int(floor((maxValue - minValue) / step))
+    let n: Int = Int(ceil((maxValue - minValue) / step))
     return (0..<n).map{ Double($0) * step + minValue }
 }
 
 public func arange(_ minValue: Int, _ maxValue: Int, _ step: Int) -> [Int] {
     let n: Int = Int((maxValue - minValue) / step)
     return (0..<n).map{ $0 * step + minValue }
+}
+
+public func linspace(_ from: Float, _ to: Float, _ n: Int) -> [Float] {
+    return arange(from, to + 0.1, (to - from) / Float(n))
+}
+
+public func linspace(_ from: Double, _ to: Double, _ n: Int) -> [Double] {
+    return arange(from, to + 0.1, (to - from) / Double(n))
 }
 
 infix operator ∷
@@ -353,6 +369,14 @@ extension Array {
         self[i1] = self[i2]
         self[i2] = tmp
     }
+}
+
+public func searchsorted<T: ScalarType>(_ arr1: [T], _ arr2: [T]) -> [IndexType] {
+    var re: [Int] = []
+    for t in 0..<arr2.count {
+        re.append(binarysearch(arr1, arr2[t]))
+    }
+    return re
 }
 
 public func binarysearch<T: ScalarType>(_ arr: [T], _ t: T) -> Int {

@@ -24,14 +24,24 @@ public func ascii(_ c: String) -> Int8 {
     return vals[keys.index(of: c)!] // Int8(D[c]!)
 }
 
-
-
 public func len<T>(_ arr: [T]) -> Int {
     return arr.count
 }
 
 public func len<T>(_ mat: Matrix<T>) -> Int {
     return mat.rows
+}
+
+public func meshgrid<T: ScalarType>(_ x: [T], _ y: [T]) -> (Matrix<T>, Matrix<T>) {
+    var X: Matrix<T> = zeros(len(y), len(x))
+    for r in 0..<len(y) {
+        X[r] = Matrix([x])
+    }
+    var Y: Matrix<T> = zeros(len(y), len(x))
+    for c in 0..<len(x) {
+        Y[column: c] = Matrix([y]).t
+    }
+    return (X, Y)
 }
 
 public func checkMatrices<T>(_ lhs: Matrix<T>, _ rhs: Matrix<T>, _ mode: String) {

@@ -80,6 +80,12 @@ import minimind
         return coll
     }
     
+    public func imshow(_ x: Matrix<Float>, _ interpolation: String = "nearest", _ cmap: String = "blues") -> Image2D {
+        let im = Image2D(x, interpolation, cmap, self.bounds)
+        self.items.append(im)
+        return im 
+    }
+    
     override func drawInternal(_ rect: CGRect) {
         
         let path = UIBezierPath()

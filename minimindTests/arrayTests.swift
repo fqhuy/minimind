@@ -21,6 +21,10 @@ class arrayTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
+    
+    func testArrange() {
+        let v: [Float] = arange(-2.0, 2.1, 2.0 / 3.0)
+    }
 
     func testMath() {
         XCTAssert(all(a.cumsum() == [0.0, 1.0, 3.0, 6.0]))

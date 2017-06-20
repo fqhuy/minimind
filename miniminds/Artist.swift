@@ -7,11 +7,11 @@
 //
 
 import UIKit
-import Surge
+import minimind
 
 protocol CanAutoScale {
-    var x: [CGFloat] {get set}
-    var y: [CGFloat] {get set}
+    var x: [CGFloat] {get}
+    var y: [CGFloat] {get}
     mutating func autoScale(_ keepRatio: Bool)
 }
 
@@ -50,7 +50,22 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     @IBInspectable var edgeColor: UIColor = UIColor.green
     @IBInspectable var fillColor: UIColor = UIColor.white
     @IBInspectable var xScale: CGFloat = 1.0
-    @IBInspectable var yScale: CGFloat = -1.0
+    @IBInspectable var yScale: CGFloat = 1.0
+    
+    var xScaleFactor: CGFloat = 1.0
+    var yScaleFactor: CGFloat = -1.0
+    var xOrigin: CGFloat {
+        get {
+            return frame.width / 2.0
+        }
+    }
+    
+    var yOrigin: CGFloat {
+        get {
+            return frame.height / 2.0
+        }
+    }
+    
     var x: [CGFloat] {
         get {
             return [frame.minX, frame.maxX]
@@ -95,8 +110,8 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
         
         context.saveGState();
 
-        context.translateBy(x: rect.width / 2.0, y: rect.height / 2.0);
-        context.scaleBy(x: xScale, y: -yScale);
+        context.translateBy(x: xOrigin, y: yOrigin);
+        context.scaleBy(x: xScaleFactor * xScale, y: yScaleFactor * yScale);
         
         drawInternal(rect)
         
@@ -116,6 +131,7 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
         fatalError("not implemented")
     }
 }
+
 
 @IBDesignable class Line2D: Artist {
     //MARK: Properties
@@ -226,5 +242,169 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     
     override func autoCenter() {
         
+    }
+}
+
+@IBDesignable class Image2D: Artist {
+    var _x: [CGFloat] = [0.0, 100.0, 200.0]
+    var _y: [CGFloat] = [100.0, 400, 300.0]
+    var mat: Matrix<Float> = Matrix()
+    var cmap: ColorMap = ColorMap()
+    
+    override var xOrigin: CGFloat {
+        get {
+            return 0.0
+        }
+    }
+    
+    override var yOrigin: CGFloat {
+        get {
+            return 0.0
+        }
+    }
+    
+    var rows: Int {
+        get {
+            return mat.rows
+        }
+    }
+
+    var cols: Int {
+        get {
+            return mat.columns
+        }
+    }
+    
+    var pixWidth: CGFloat {
+        get {
+            return CGFloat(Float(frame.width) / Float(mat.columns))
+        }
+    }
+    var pixHeight: CGFloat {
+        get {
+            return CGFloat(Float(frame.height) / Float(mat.rows))
+        }
+    }
+
+    
+    override var x: [CGFloat] {
+        get {
+            return linspace(Float(0.0), Float(frame.width), self.mat.columns).cgFloat
+        }
+        set(val) {
+            _x = val
+        }
+    }
+    override var y: [CGFloat] {
+        get {
+            return linspace(Float(0.0), Float(frame.height), self.mat.rows).cgFloat
+        }
+        set(val) {
+            _y = val
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    public init(_ mat: Matrix<Float>, _ interpolation: String="bicubic", _ cmap: String = "blues", _ frame: CGRect) {
+        super.init(frame: frame)
+        self.mat = normalize(mat)
+        switch interpolation {
+            case "bicubic":
+            self.mat = bicubicInterpolation(self.mat, 4)
+            default: break
+        }
+        self.cmap = ColorMap.getColorMap(cmap)
+        self.edgeColor = UIColor.clear
+        yScaleFactor = 1.0
+    }
+    
+    func bicubicInterpolation(_ mat: Matrix<Float>, _ factor: Int = 3) -> Matrix<Float> {
+        func bicubic(_ x: Float, _ a: Float = -0.5) -> Float {
+            if abs(x) <= 1 {
+                return (a + 2.0) * powf(abs(x),3.0) - (a + 3.0) * powf(abs(x),2.0) + 1
+            } else if (1 < abs(x)) && (abs(x) <= 2) {
+                return a * powf(abs(x),3.0) - 5.0 * a * powf(abs(x),2.0) + 8.0 * a * abs(x) - 4.0 * a
+            }
+            else {
+                return 0.0
+            }
+        }
+        var A = mat
+        let K = Matrix([arange(-2.0, 2.0, 2.0 / Float(factor)).map{ bicubic($0) }])
+        A = minimind.conv(A, K)
+        return A
+    }
+    
+    func normalize(_ mat: Matrix<Float>) -> Matrix<Float> {
+        var newmat = mat - minimind.min(mat)
+        newmat = newmat * (1.0 / minimind.max(newmat))
+        newmat = clip(newmat, 0.0, 1.0)
+        return newmat
+    }
+    
+    override func drawInternal(_ rect: CGRect) {
+        edgeColor.setStroke()
+        for r in 0..<rows {
+            for c in 0..<cols {
+                let pixel = UIBezierPath(rect: CGRect(x: x[r], y: y[c], width: pixWidth, height: pixHeight))
+                let color = cmap.toUIColor(mat[r, c])
+                color.setFill()
+                pixel.fill()
+            }
+        }
+        
+    }
+}
+
+@IBDesignable class Contour: Artist {
+    //MARK: Properties
+    var _x: [CGFloat] = [0.0, 100.0, 200.0]
+    var _y: [CGFloat] = [100.0, 400, 300.0]
+    
+    override var x: [CGFloat] {
+        get {
+            return _x
+        }
+        set(val) {
+            _x = val
+        }
+    }
+    override var y: [CGFloat] {
+        get {
+            return _y
+        }
+        set(val) {
+            _y = val
+        }
+    }
+    
+    var z: [CGFloat] = [0.0, 100.0, 100.0, 0.0, 100.0, 100.0]
+    var nLevels: Int = 3
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+
+    init(x: [CGFloat], y: [CGFloat], z: [CGFloat], nLevels: Int, frame: CGRect) {
+        super.init(frame: frame)
+        self.x = x
+        self.y = y
+        self.z = z
+        self.nLevels = nLevels
+    }
+    
+    override func drawInternal(_ rect: CGRect) {
+        fillColor.setFill()
+        edgeColor.setStroke()
+        
+        let (X, Y) = minimind.meshgrid(x.float, y.float)
+        let Z = Matrix(len(x), len(y), z.float)
+        
+        for i in 0..<nLevels {
+            
+        }
     }
 }

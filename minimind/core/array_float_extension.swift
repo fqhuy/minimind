@@ -33,16 +33,6 @@ public extension Array where Element == Float {
     }
 }
 
-//MARK: Search & Sort
-
-public func searchsorted(_ arr1: [Float], _ arr2: [Float]) -> [Int] {
-    var re: [Int] = []
-    for t in 0..<arr2.count {
-        re.append(binarysearch(arr1, arr2[t]))
-    }
-    return re
-}
-
 //MARK: ARITHMETIC
 
 public func std(_ arr: [Float]) -> Float {
@@ -52,12 +42,3 @@ public func std(_ arr: [Float]) -> Float {
     return s
 }
 
-public func cumsum(_ arr: [Float]) -> [Float] {
-    var tmp = Float(0.0)
-    var re: [Float] = []
-    for i in 0..<arr.count {
-        tmp += arr[i]
-        re.append(tmp)
-    }
-    return re
-}

@@ -352,23 +352,6 @@ public postfix func ′ (value: Matrix<Float>) -> Matrix<Float> {
     return transpose(value)
 }
 
-infix operator ⊗
-//Kronecker product
-public func ⊗ (lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
-    var mat: Matrix<Float> = zeros(lhs.rows * rhs.rows, lhs.columns * rhs.columns)
-    for lr in 0..<lhs.rows {
-        for lc in 0..<lhs.columns {
-            for rr in 0..<rhs.rows {
-                for rc in 0..<rhs.columns {
-                    mat[lr * rhs.rows + rr, lc * rhs.columns + rc] = lhs[lr, lc] * rhs[rr, rc]
-                }
-            }
-        }
-        
-    }
-    return mat
-}
-
 infix operator **
 public func ** (_ mat: Matrix<Float>, _ e: Float) -> Matrix<Float> {
     let newgrid: [Float] = mat.grid.map{ powf($0, e) }
@@ -399,3 +382,4 @@ public func log(_ mat: Matrix<Float>) -> Matrix<Float> {
 public func randMatrix(_ rows: Int,_ columns: Int) -> Matrix<Float> {
     return Matrix<Float>(rows, columns, randArray(n: rows * columns))
 }
+

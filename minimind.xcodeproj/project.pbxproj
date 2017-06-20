@@ -90,6 +90,9 @@
 		36E368DA1EE295C80026F5DB /* distributions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E368D91EE295C80026F5DB /* distributions.swift */; };
 		36E619871EDF5FFA00B12612 /* rbf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619861EDF5FFA00B12612 /* rbf.swift */; };
 		36E619891EE156FD00B12612 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619881EE156FD00B12612 /* util.swift */; };
+		36ED05521EF7F4D600955522 /* line_search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05511EF7F4D600955522 /* line_search.swift */; };
+		36ED05541EF9112000955522 /* ColorMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05531EF9112000955522 /* ColorMap.swift */; };
+		36ED05561EF91DFE00955522 /* convolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05551EF91DFE00955522 /* convolution.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -130,8 +133,8 @@
 
 /* Begin PBXFileReference section */
 		3617FA001EDB1FCC0087C682 /* pairwise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pairwise.swift; sourceTree = "<group>"; };
-		3617FA021EDB225F0087C682 /* scg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = scg.swift; sourceTree = "<group>"; };
-		3617FA041EDB226E0087C682 /* optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = optimization.swift; sourceTree = "<group>"; };
+		3617FA021EDB225F0087C682 /* scg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = scg.swift; path = core/scg.swift; sourceTree = "<group>"; };
+		3617FA041EDB226E0087C682 /* optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = optimization.swift; path = core/optimization.swift; sourceTree = "<group>"; };
 		3617FA061EDC23860087C682 /* matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = matrix.swift; sourceTree = "<group>"; };
 		3617FA0A1EDD973C0087C682 /* array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = array.swift; sourceTree = "<group>"; };
 		363DDC9B1EE4AF02003607B4 /* miniminds.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = miniminds.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -197,6 +200,9 @@
 		36E368D91EE295C80026F5DB /* distributions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = distributions.swift; sourceTree = "<group>"; };
 		36E619861EDF5FFA00B12612 /* rbf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = rbf.swift; path = covariance/rbf.swift; sourceTree = "<group>"; };
 		36E619881EE156FD00B12612 /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
+		36ED05511EF7F4D600955522 /* line_search.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = line_search.swift; sourceTree = "<group>"; };
+		36ED05531EF9112000955522 /* ColorMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorMap.swift; sourceTree = "<group>"; };
+		36ED05551EF91DFE00955522 /* convolution.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = convolution.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -269,6 +275,7 @@
 				363DDCC71EE56B54003607B4 /* GraphModel.swift */,
 				363DDCCB1EE58024003607B4 /* Artist.swift */,
 				3670FD9A1EEAA6B200AC07F2 /* Utils.swift */,
+				36ED05531EF9112000955522 /* ColorMap.swift */,
 			);
 			path = miniminds;
 			sourceTree = "<group>";
@@ -315,15 +322,12 @@
 		367E89121C963D2600C96392 /* minimind */ = {
 			isa = PBXGroup;
 			children = (
+				36ED05501EF5142800955522 /* optimisation */,
 				3689622A1EEC4188009134A3 /* cluster */,
 				368962271EEBE22C009134A3 /* decomposition */,
 				36DFA3E81D3FC30F005CBBC0 /* core */,
 				367E89301C96586200C96392 /* covariance */,
 				367E892F1C9656A800C96392 /* metrics */,
-				367E892E1C96542400C96392 /* neural_network */,
-				367E892D1C96541500C96392 /* datasets */,
-				367E892C1C96540A00C96392 /* preprocessing */,
-				367E892B1C96540500C96392 /* utils */,
 				367E892A1C9653C200C96392 /* gaussian_process */,
 				367E89131C963D2600C96392 /* minimind.h */,
 				367E89151C963D2600C96392 /* Info.plist */,
@@ -354,34 +358,6 @@
 				36DFA3EB1D3FC570005CBBC0 /* gaussian_process.swift */,
 			);
 			path = gaussian_process;
-			sourceTree = "<group>";
-		};
-		367E892B1C96540500C96392 /* utils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = utils;
-			sourceTree = "<group>";
-		};
-		367E892C1C96540A00C96392 /* preprocessing */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = preprocessing;
-			sourceTree = "<group>";
-		};
-		367E892D1C96541500C96392 /* datasets */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = datasets;
-			sourceTree = "<group>";
-		};
-		367E892E1C96542400C96392 /* neural_network */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = neural_network;
 			sourceTree = "<group>";
 		};
 		367E892F1C9656A800C96392 /* metrics */ = {
@@ -455,6 +431,7 @@
 		36DFA3E81D3FC30F005CBBC0 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				36ED05551EF91DFE00955522 /* convolution.swift */,
 				3689623B1EEF2E15009134A3 /* array_double_extension.swift */,
 				3670FD9C1EEBC8BB00AC07F2 /* arithmetic.swift */,
 				3670FD9D1EEBC8BB00AC07F2 /* auxiliary.swift */,
@@ -464,8 +441,6 @@
 				3670FDA11EEBC8BB00AC07F2 /* trigonometric.swift */,
 				36C3CEFC1EDECCA600CE1E42 /* random.swift */,
 				36DFA3E91D3FC336005CBBC0 /* base_estimator.swift */,
-				3617FA021EDB225F0087C682 /* scg.swift */,
-				3617FA041EDB226E0087C682 /* optimization.swift */,
 				3617FA061EDC23860087C682 /* matrix.swift */,
 				3617FA0A1EDD973C0087C682 /* array.swift */,
 				36E619881EE156FD00B12612 /* util.swift */,
@@ -479,6 +454,16 @@
 				368962621EF10F0A009134A3 /* core.swift */,
 			);
 			path = core;
+			sourceTree = "<group>";
+		};
+		36ED05501EF5142800955522 /* optimisation */ = {
+			isa = PBXGroup;
+			children = (
+				3617FA021EDB225F0087C682 /* scg.swift */,
+				3617FA041EDB226E0087C682 /* optimization.swift */,
+				36ED05511EF7F4D600955522 /* line_search.swift */,
+			);
+			name = optimisation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -753,6 +738,7 @@
 				3670FD9B1EEAA6B200AC07F2 /* Utils.swift in Sources */,
 				363DDCA01EE4AF02003607B4 /* ViewController.swift in Sources */,
 				363DDC9E1EE4AF02003607B4 /* AppDelegate.swift in Sources */,
+				36ED05541EF9112000955522 /* ColorMap.swift in Sources */,
 				363DDCBF1EE4AF47003607B4 /* GraphView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -776,6 +762,7 @@
 				3670FDAD1EEBD06400AC07F2 /* matrix_double_extension.swift in Sources */,
 				368962291EEBE247009134A3 /* pca.swift in Sources */,
 				3670FDA31EEBC8BB00AC07F2 /* auxiliary.swift in Sources */,
+				36ED05561EF91DFE00955522 /* convolution.swift in Sources */,
 				368962631EF10F0A009134A3 /* core.swift in Sources */,
 				3670FDAF1EEBD07400AC07F2 /* matrix_bool_extension.swift in Sources */,
 				3670FDA91EEBCD5400AC07F2 /* kernel.swift in Sources */,
@@ -791,6 +778,7 @@
 				3670FDA21EEBC8BB00AC07F2 /* arithmetic.swift in Sources */,
 				3617FA0B1EDD973C0087C682 /* array.swift in Sources */,
 				36E368DA1EE295C80026F5DB /* distributions.swift in Sources */,
+				36ED05521EF7F4D600955522 /* line_search.swift in Sources */,
 				36E619871EDF5FFA00B12612 /* rbf.swift in Sources */,
 				3689623A1EEED815009134A3 /* array_int_extension.swift in Sources */,
 				3689623C1EEF2E15009134A3 /* array_double_extension.swift in Sources */,

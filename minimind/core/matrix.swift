@@ -81,17 +81,9 @@ public struct Matrix<T> {
     public init(_ data: [[Element]]) {
         precondition(data.count > 0)
         precondition(all(data.map{ $0.count } == data[0].count) , "all dimensions in data must be equal")
-        let m: Int = data.count
-        let n: Int = data[0].count
-        
-        
-        let repeatedValue: Element = data[0][0]
-        
-        self.init(rows: m, columns: n, repeatedValue: repeatedValue)
-        
-        for (i, row) in data.enumerated() {
-            _grid.replaceSubrange(i*n..<i*n+Swift.min(m, row.count), with: row)
-        }
+        rows = data.count
+        columns = data[0].count
+        _grid = flatten(data)
     }
     
     public subscript(row: Int, column: Int) -> Element {
@@ -518,6 +510,21 @@ public func div<T: ScalarType>(_ x: T, y: Matrix<T>) -> Matrix<T> {
     return Matrix<T>( y.rows, y.columns, (0..<y.grid.count).map{ i in x / y.grid[i] } )
 }
 
+public func kron<T: ScalarType>(_ x: Matrix<T>, _ y: Matrix<T>) -> Matrix<T> {
+    var mat: Matrix<T> = zeros(x.rows * y.rows, x.columns * y.columns)
+    for lr in 0..<x.rows {
+        for lc in 0..<x.columns {
+            for rr in 0..<y.rows {
+                for rc in 0..<y.columns {
+                    mat[lr * y.rows + rr, lc * y.columns + rc] = x[lr, lc] * x[rr, rc]
+                }
+            }
+        }
+        
+    }
+    return mat
+}
+
 public func +<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
     return add(x, y: y)
 }
@@ -572,6 +579,23 @@ public func ∘<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
     var newmat = lhs
     newmat.grid = lhs.grid * rhs.grid
     return newmat
+}
+
+infix operator ⊗
+//Kronecker product
+public func ⊗ <T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
+    var mat: Matrix<T> = zeros(lhs.rows * rhs.rows, lhs.columns * rhs.columns)
+    for lr in 0..<lhs.rows {
+        for lc in 0..<lhs.columns {
+            for rr in 0..<rhs.rows {
+                for rc in 0..<rhs.columns {
+                    mat[lr * rhs.rows + rr, lc * rhs.columns + rc] = lhs[lr, lc] * rhs[rr, rc]
+                }
+            }
+        }
+        
+    }
+    return mat
 }
 
 // Columns wise operators
