@@ -27,30 +27,44 @@ public class ColorMap {
     public static func getColorMap(_ s: String) -> ColorMap {
         switch s {
         case "blues": return Blues()
-        case "jet": return Jet()
+        case "cool": return Cool()
+        case "luce": return Luce()
         default: return Blues()
         }
     }
 }
 
-public class Blues: ColorMap {
-    public typealias Element = Float
+public class ColorMap2: ColorMap {
     var from: Matrix<Float> = Matrix([[1.0, 1.0, 1.0]])
-    var to: Matrix<Float> = Matrix([[0.0, 0.0, 1.0]])
-    
+    var to: Matrix<Float> =  Matrix([[0.0, 0.0, 0.0]])
+
     public override func toRGB(_ e: Float) -> [Float] {
         let v: Matrix<Float> = (to - from) * e + from
         return v.grid
     }
 }
 
-public class Jet: ColorMap {
-    public typealias Element = Float
-    var from: Matrix<Float> = Matrix([[1.0, 0.0, 0.0]])
-    var to: Matrix<Float> = Matrix([[0.0, 0.0, 1.0]])
-    
-    public override func toRGB(_ e: Float) -> [Float] {
-        let v: Matrix<Float> = (to - from) * e + from
-        return v.grid
+public class Blues: ColorMap2 {
+    public override init() {
+        super.init()
+        from = Matrix([[1.0, 0.0, 0.0]])
+        to = Matrix([[0.0, 0.0, 1.0]])
     }
 }
+
+public class Cool: ColorMap2 {
+    public override init() {
+        super.init()
+        to = Matrix([[1.0, 0.7372549, 0.96470588]])
+        from = Matrix([[ 0.01960784,  0.12941176,  0.45490196]])
+    }
+}
+
+public class Luce: ColorMap2 {
+    public override init() {
+        super.init()
+        to = Matrix([[ 1.0        ,  0.78039216,  0.2627451 ]])
+        from = Matrix([[ 0.01960784,  0.12941176,  0.45490196]])
+    }
+}
+

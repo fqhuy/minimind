@@ -40,7 +40,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 300.0, lengthscale: 1000.0, X: X)
+        let kern = RBF(variance: log(300.0), lengthscale: log(1000.0), X: X, trainables: ["logVariance", "logLengthscale"])
         let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
         gp.fit(X, Y, maxiters: 1000)
         
@@ -55,14 +55,14 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         _ = graph.plot(x: Xstar.grid.cgFloat, y: Mu.grid.cgFloat, c: UIColor.red, s: 3.0)
         _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 10.0)
         
-        graph.autoScale()
+        graph.autoScaleAll()
     }
     
-    func visualiseMixtureOfGaussians() {
+    func visualisePCA() {
         let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
         let mean1 = Matrix<Float>([[-5.0, 0.0]])
         let mean2 = Matrix<Float>([[5.0, 0.0]])
-        let mean3 = Matrix<Float>([[0.0, 5.0]])
+        let mean3 = Matrix<Float>([[0.0, 10.0]])
         
         let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(50)
         let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(50)
@@ -81,23 +81,93 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         _ = graph.scatter(x: Xpred[50∶100, 0].grid.cgFloat, y: Xpred[50∶100, 1].grid.cgFloat, c: UIColor.red, s: 10.0)
         _ = graph.scatter(x: Xpred[100∶, 0].grid.cgFloat, y: Xpred[100∶, 1].grid.cgFloat, c: UIColor.blue, s: 10.0)
         
-        graph.autoScale(true)
         graph.autoScaleAll(true)
+    }
+    
+    func visualiseGaussian() {
+        let sigma = Matrix<Float>([[1.0, -0.1],[2.2, 5.0]])
+        let mu = Matrix<Float>([[0.0, 0.0]])
+        
+        let n = 10
+        let (X, Y) = meshgrid(linspace(Float(-3.0), Float(3.0), n), linspace(Float(-3.0), Float(3.0), n))
+        let XX: Matrix<Float> = hstack([X.reshape([-1, 1]), Y.reshape([-1, 1])])
+        let Z = MultivariateNormal(mean: mu, cov: sigma).pdf(XX).reshape([n, n])
+        
+        _ = graph.imshow(Z, "bicubic", "luce")
+        
+        graph.autoScaleAll()
+
+    }
+    
+    class  Rosenbrock: ObjectiveFunction {
+        public typealias ScalarT = Float
+        public typealias MatrixT = Matrix<ScalarT>
+        
+        func compute(_ x: Matrix<Float>) -> Float {
+            return 100.0 * powf(x[0, 1] - powf(x[0, 0], 2), 2) + powf(1.0 - x[0, 1], 2)
+        }
+        
+        func gradient(_ x: Matrix<Float>) -> Matrix<Float> {
+            let gX1 = -400.0 * x[0, 0] * (x[0, 1] - powf(x[0, 0], 2)) - 2.0 * (1.0 - x[0, 0])
+            let gX2 = 200.0 * x[0, 0] * (x[0, 1] - powf(x[0, 0], 2))
+            return Matrix<Float>([[gX1,  gX2]])
+        }
+        
+        func hessian(_ x: Matrix<Float>) -> Matrix<Float> {
+            let h11 = 1200.0 * powf(x[0, 0], 2) - 400.0 * x[0, 1] + 2.0
+            let h12 = -400.0 * x[0, 0]
+            return Matrix<Float>([[ h11, h12], [-400.0 * x[0, 0], 200.0 ] ])
+        }
+    }
+    
+    func testRosenbrock() {
+        let rb = Rosenbrock()
+        let n = 20
+        
+        let (X, Y) = meshgrid(linspace(Float(-1.0), Float(5.0), n), linspace(Float(-1.0), Float(5.0), n))
+        let XX: Matrix<Float> = hstack([X.reshape([-1, 1]), Y.reshape([-1, 1])])
+        var ZZ: Matrix<Float> = zeros(XX.rows, 1)
+        for i in 0..<XX.rows {
+            let z = rb.compute(XX[i])
+            ZZ[i, 0] = z
+        }
+//        _ = graph.imshow(ZZ.reshape([n, n]), "nearest", "luce")
+
+        
+        let optimizer = NewtonOptimizer(objective: rb, stepLength: 0.000001, initX: Matrix<Float>([[20.0, 20.0]]), maxIters: 200)
+//        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: Matrix<Float>([[20.0, 20.0]]), maxiters: 200)
+        let (x, fvals, iters) = optimizer.optimize(verbose: true)
+        
+        var xx: [Float] = []
+        var yy: [Float] = []
+        for i in 0..<optimizer.Xs.count {
+            xx.append(optimizer.Xs[i][0, 0])
+            yy.append(optimizer.Xs[i][0, 1])
+        }
+        
+        xx = xx - mean(xx)
+        yy = yy - mean(yy)
+        graph.plot(x: xx.cgFloat, y: yy.cgFloat, c: UIColor.green, s: 3.0)
+        
+        print (optimizer.Xs)
+        graph.autoScaleAll()
+
     }
     
     func testImage2D() {
         var A: Matrix<Float> = randMatrix(20, 20)
-        A = A ⊗ ones(3, 3)
-        
-        _ = graph.imshow(A, "bicubic", "jet")
-        graph.autoScale()
+        _ = graph.imshow(A, "bicubic", "luce")
         graph.autoScaleAll()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        testImage2D()
+//        testRosenbrock()
+//        testImage2D()
 //        visualiseMixtureOfGaussians()
+        visualiseGaussian()
+//        visualise1DRegression()
+//        visualisePCA()
     }
 
     override func didReceiveMemoryWarning() {

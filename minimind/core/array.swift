@@ -171,7 +171,7 @@ public func cumsum<T: ScalarType>(_ arr: [T]) -> [T] {
 }
 
 public func prod<T: ScalarType>(_ arr: [T]) -> T {
-    return arr.reduce(T.zero, {x,y in x * y})
+    return arr.reduce(T.one, {x,y in x * y})
 }
 
 public func max<T: HasComparisonOps>(_ arr: [T]) -> T {
@@ -222,12 +222,12 @@ public func randArray(n: Int) -> [Int] {
 }
 
 public func arange(_ minValue: Float, _ maxValue: Float, _ step: Float) -> [Float] {
-    let n: Int = Int(ceilf((maxValue - minValue) / step))
+    let n: Int = Int(floorf((maxValue - minValue) / step))
     return (0..<n).map{ Float($0) * step + minValue }
 }
 
 public func arange(_ minValue: Double, _ maxValue: Double, _ step: Double) -> [Double] {
-    let n: Int = Int(ceil((maxValue - minValue) / step))
+    let n: Int = Int(floor((maxValue - minValue) / step))
     return (0..<n).map{ Double($0) * step + minValue }
 }
 
@@ -237,11 +237,11 @@ public func arange(_ minValue: Int, _ maxValue: Int, _ step: Int) -> [Int] {
 }
 
 public func linspace(_ from: Float, _ to: Float, _ n: Int) -> [Float] {
-    return arange(from, to + 0.1, (to - from) / Float(n))
+    return arange(from, to, (to - from) / Float(n))
 }
 
 public func linspace(_ from: Double, _ to: Double, _ n: Int) -> [Double] {
-    return arange(from, to + 0.1, (to - from) / Double(n))
+    return arange(from, to, (to - from) / Double(n))
 }
 
 infix operator ∷

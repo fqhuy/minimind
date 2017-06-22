@@ -28,7 +28,7 @@ import minimind
         get{
             var yy: [CGFloat] = []
             for item in items {
-                yy.append(contentsOf: item.x)
+                yy.append(contentsOf: item.y)
             }
             return yy
         }
@@ -87,7 +87,6 @@ import minimind
     }
     
     override func drawInternal(_ rect: CGRect) {
-        
         let path = UIBezierPath()
         path.lineWidth = lineWidth
         path.move(to: CGPoint(x: 0.0, y: 0.0))
@@ -99,20 +98,7 @@ import minimind
     }
     
     func autoScaleAll(_ keepRatio: Bool = true) {
-//        autoScale(keepRatio)
-//        let minX = min(x.float)
-//        let maxX = max(x.float)
-//        let minY = min(y.float)
-//        let maxY = max(y.float)
-//        
-//        xScale = frame.width / CGFloat(maxX - minX)
-//        yScale = frame.height / CGFloat(maxY - minY) // 2
-//        
-//        if keepRatio {
-//            xScale = min(xScale, yScale)
-//            yScale = xScale
-//        }
-        
+        self.autoScale()
         for item in self.items {
             item.scale(xScale, yScale)
             

@@ -22,19 +22,19 @@ public class RBF: Kernel {
     
     public var variance: ScalarT {
         get {
-            return parametersData[parametersIds["variance"]!][0]
+            return exp(logVariance)
         }
         set(val) {
-            parametersData[parametersIds["variance"]!] = [val]
+            logVariance = exp(val)
         }
     }
     
     public var lengthscale: ScalarT {
         get {
-            return parametersData[parametersIds["lengthscale"]!][0]
+            return exp(logLengthscale)
         }
         set(val) {
-            parametersData[parametersIds["lengthscale"]!] = [val]
+            logLengthscale = exp(val)
         }
     }
     
@@ -46,19 +46,19 @@ public class RBF: Kernel {
     
     public var logVariance: ScalarT {
         get {
-            return log(variance)
+            return parametersData[parametersIds["logVariance"]!][0]
         }
         set(val) {
-            variance = exp(val)
+            parametersData[parametersIds["logVariance"]!] = [val]
         }
     }
     
     public var logLengthscale: ScalarT {
         get {
-            return log(lengthscale)
+            return parametersData[parametersIds["logLengthscale"]!][0]
         }
         set(val) {
-            lengthscale = exp(val)
+            parametersData[parametersIds["logLengthscale"]!] = [val]
         }
     }
     
@@ -71,21 +71,21 @@ public class RBF: Kernel {
     required public init() {
         X = MatrixT()
         parametersData = zeros(n: 2)
-        parametersIds = ["variance": [0], "lengthscale": [1]]
+        parametersIds = ["logVariance": [0], "logLengthscale": [1]]
         variance = 100.0
         lengthscale = 100.0
     }
     
-    public convenience init(variance: ScalarT, lengthscale: ScalarT, X: MatrixT, trainables: [String] = [], capacity: Int = 10000) {
+    public convenience init(variance: ScalarT, lengthscale: ScalarT, X: MatrixT, trainables: [String] = ["variance"], capacity: Int = 10000) {
         self.init()
         self.trainables = trainables
         parametersData = []
         parametersData.reserveCapacity(capacity)
         
-        parametersIds["variance"] = [parametersData.count]
+        parametersIds["logVariance"] = [parametersData.count]
         parametersData.append(variance)
         
-        parametersIds["lengthscale"] = [parametersData.count]
+        parametersIds["logLengthscale"] = [parametersData.count]
         parametersData.append(lengthscale)
         
         parametersIds["X"] = arange(parametersData.count, parametersData.count + X.size, 1)
@@ -95,7 +95,12 @@ public class RBF: Kernel {
     }
     
     public func initParams() -> MatrixT {
-        return MatrixT([[logVariance, logLengthscale] ∪ self.X.grid])
+//        return MatrixT([[logVariance, logLengthscale] ∪ self.X.grid])
+        var params: [Float] = []
+        for t in trainableIds {
+            params.append(parametersData[t])
+        }
+        return MatrixT([params])
     }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {
@@ -114,19 +119,19 @@ public class RBF: Kernel {
     
     public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
         let (N, D) = X.shape
-        var d: MatrixT =  zeros(1, parametersData.count) // zeros(1, 2 + D * N)
+        var d: MatrixT =  zeros(1, trainableIds.count) // zeros(1, 2 + D * N)
         let r = scaledDist(X, Y)
         let Kr = K(r: r)
         let dLdr = dKdr(r: r) ∘ dLdK
         
         // variance
-        if trainables.contains("variance") {
-            d[0, parametersIds["variance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
+        if trainables.contains("logVariance") {
+            d[0, parametersIds["logVariance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
         }
         
         // lengthscale
-        if trainables.contains("lengthscale") {
-            d[0, parametersIds["lengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
+        if trainables.contains("logLengthscale") {
+            d[0, parametersIds["logLengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
         }
         
         // gradient wrt X
@@ -142,7 +147,7 @@ public class RBF: Kernel {
         }
         return d
     }
-    
+     
     public func dist(_ X: MatrixT, _ Y: MatrixT) -> MatrixT {
         let xx = reduce_sum(X ∘ X, 1)
         let yy = reduce_sum(Y ∘ Y, 1)

@@ -15,6 +15,7 @@ public protocol ObjectiveFunction {
     
      func compute(_ x: MatrixT) -> ScalarT
      func gradient(_ x: MatrixT) -> MatrixT
+    func hessian(_ x: MatrixT) -> MatrixT
 }
 
 
@@ -23,5 +24,5 @@ public protocol Optimizer {
     typealias MatrixT = Matrix<ScalarT>
     
      func optimize(verbose: Bool) -> (MatrixT, [Float], Int)
-     func get_cost() -> Double
+     func getCost() -> Double
 }

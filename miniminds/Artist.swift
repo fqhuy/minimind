@@ -15,7 +15,7 @@ protocol CanAutoScale {
     mutating func autoScale(_ keepRatio: Bool)
 }
 
-protocol ArtistProtocol {
+protocol ArtistProtocol: class {
     var lineWidth: CGFloat {get set}
     var edgeColor: UIColor {get set}
     var fillColor: UIColor {get set}
@@ -27,7 +27,7 @@ protocol ArtistProtocol {
 }
 
 extension ArtistProtocol where Self: CanAutoScale {
-    mutating func autoScale(_ keepRatio: Bool = true) {
+    func autoScale(_ keepRatio: Bool = true) {
         let minX = min(x.float)
         let maxX = max(x.float)
         let minY = min(y.float)
@@ -54,17 +54,9 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     
     var xScaleFactor: CGFloat = 1.0
     var yScaleFactor: CGFloat = -1.0
-    var xOrigin: CGFloat {
-        get {
-            return frame.width / 2.0
-        }
-    }
-    
-    var yOrigin: CGFloat {
-        get {
-            return frame.height / 2.0
-        }
-    }
+    var xOrigin: CGFloat = 0
+    var yOrigin: CGFloat = 0
+
     
     var x: [CGFloat] {
         get {
@@ -98,6 +90,8 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = UIColor.clear
+        self.xOrigin = frame.width / 2.0
+        yOrigin = frame.height / 2.0
 
     }
     
@@ -128,7 +122,8 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     }
     
     func autoCenter() {
-        fatalError("not implemented")
+        self.xOrigin = CGFloat(mean(x.float))
+        self.yOrigin = CGFloat(mean(y.float))
     }
 }
 
@@ -219,7 +214,6 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     
     init(x: [CGFloat], y: [CGFloat], frame: CGRect) {
         super.init(frame: frame)
-//        self.backgroundColor = UIColor.gray
         self.x = x
         self.y = y
     }
@@ -250,18 +244,7 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     var _y: [CGFloat] = [100.0, 400, 300.0]
     var mat: Matrix<Float> = Matrix()
     var cmap: ColorMap = ColorMap()
-    
-    override var xOrigin: CGFloat {
-        get {
-            return 0.0
-        }
-    }
-    
-    override var yOrigin: CGFloat {
-        get {
-            return 0.0
-        }
-    }
+    var resamplingFactor: Int = 3
     
     var rows: Int {
         get {
@@ -310,15 +293,27 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
     
     public init(_ mat: Matrix<Float>, _ interpolation: String="bicubic", _ cmap: String = "blues", _ frame: CGRect) {
         super.init(frame: frame)
-        self.mat = normalize(mat)
+        
         switch interpolation {
             case "bicubic":
-            self.mat = bicubicInterpolation(self.mat, 4)
+            var C: Matrix<Float> = zeros(Int(mat.rows * resamplingFactor), Int(mat.columns * resamplingFactor))
+            for r in 0..<mat.rows {
+                for c in 0..<mat.columns {
+                    C[r * resamplingFactor, c * resamplingFactor] = mat[r, c]
+                }
+            }
+                
+            self.mat = bicubicInterpolation(C, resamplingFactor + 3)
+            case "nearest":
+            self.mat = mat
             default: break
         }
+        self.mat = normalize(self.mat)
         self.cmap = ColorMap.getColorMap(cmap)
         self.edgeColor = UIColor.clear
         yScaleFactor = 1.0
+        xOrigin = 0.0
+        yOrigin = 0.0
     }
     
     func bicubicInterpolation(_ mat: Matrix<Float>, _ factor: Int = 3) -> Matrix<Float> {
@@ -333,7 +328,8 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
             }
         }
         var A = mat
-        let K = Matrix([arange(-2.0, 2.0, 2.0 / Float(factor)).map{ bicubic($0) }])
+        let K = Matrix([arange(-2.0, 2.0, 2.0 / Float(factor)).map{ bicubic($0) }]) //
+//        let K = Matrix<Float>([[0.333, 0.666, 1.0, 0.666, 0.333]]) //
         A = minimind.conv(A, K)
         return A
     }

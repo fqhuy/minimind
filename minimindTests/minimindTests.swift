@@ -46,35 +46,6 @@ class minimindTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
-    func testSCG() {
-        class Quad: ObjectiveFunction {
-            typealias ScalarT = Float
-            typealias MatrixT = Matrix<ScalarT>
-            
-            public var a: ScalarT
-            public var b: ScalarT
-            public var c: ScalarT
-            
-            public init(_ a: ScalarT, _ b: ScalarT, _ c: ScalarT) {
-                self.a = a
-                self.b = b
-                self.c = c
-            }
-            
-            public func compute(_ x: MatrixT) -> ScalarT {
-                return a * x[0, 0] * x[0,0] + b * x[0,0] + c
-            }
-            
-            public func gradient(_ x: MatrixT) -> MatrixT {
-                return MatrixT([[2 * a * x[0,0] + b]])
-            }
-        }
-        
-        var scg = SCG(objective: Quad(2.0, -3.0, 5.0), learning_rate: 0.01, init_x: Matrix<Float>([[5.0]]), maxiters: 200)
-        scg.optimize(verbose: true)
-
-    }
-    
     func testDist(){
         let N = 40
         let Nf = 10
@@ -154,10 +125,10 @@ class minimindTests: XCTestCase {
         let y = Matrix<Float>([[0.21198747,  0.0883193,   0.4570866,   0.17492527,  0.03589,     0.06420726,
             0.19189653,  0.03121346]]).t
         
-        let kern = RBF(variance: 250, lengthscale: 1000.0, X: X)
+        let kern = RBF(variance: log(250), lengthscale: log(1000.0), X: X, trainables: ["logLengthscale", "logVariance"])
         let gpr = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
         
-        gpr.fit(X, y, maxiters: 500)
+        gpr.fit(X, y, maxiters: 250)
         
         print(gpr.kernel.K(X, X))
         

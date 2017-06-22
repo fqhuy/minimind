@@ -1,4 +1,4 @@
-//
+
 //  gaussian_process.swift
 //  minimind
 //
@@ -174,5 +174,9 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
 //        let dLdK = tmp - cho_solve(alpha, eye(N))
         
         return kernel.gradient(Xtrain, Xtrain, dLdK)
+    }
+    
+    public func hessian(_ x: Matrix<Float>) -> Matrix<Float> {
+        return Matrix<Float>()
     }
 }

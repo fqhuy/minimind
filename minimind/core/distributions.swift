@@ -98,8 +98,9 @@ extension MultivariateNormal where T == Float {
 //    }
     
     public func pdf(_ x: MatrixT) -> MatrixT {
+        precondition(x.columns == mean.size && x.rows > 0, "incompatible X")
         let invCov = inv(cov)
-        let r = x - mean
+        let r = x .- mean
         let D = T(mean.size)
         return Float(1.0) / sqrt(pow(2.0 * T.pi, D) * det(cov)) * diag(exp(-0.5 * r * invCov * r.t ))
     }

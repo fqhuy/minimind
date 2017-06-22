@@ -59,7 +59,7 @@ extension Kernel {
     }
     
     public mutating func setParams(_ params: MatrixT) {
-        assert(parametersData.count == params.size)
+        precondition(trainableIds.count == params.size)
         parametersData[trainableIds] = params.grid
     }
     

@@ -16,6 +16,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
     typealias T = ScalarT
     var objective: F
     var init_x: MatrixT
+    public var Xs: [MatrixT] = []
     var maxiters: Int
     var verbose: Bool = false
     
@@ -63,6 +64,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
         var x = self.init_x
         var xnew: MatrixT
         var fnew: T = 0.0
+        Xs.append(x)
         while iteration < self.maxiters {
             if success {
                 mu = (d * gradnew.t)[0, 0]
@@ -102,6 +104,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
                 success = true
                 nsuccess += 1
                 x = xnew
+                Xs.append(x)
                 fnow = fnew
             } else {
                 success = false
@@ -165,7 +168,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
         return (x, flog, function_eval)
     }
     
-    public func get_cost() -> Double {
+    public func getCost() -> Double {
         return 0.0
     }
 }

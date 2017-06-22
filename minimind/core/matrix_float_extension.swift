@@ -271,15 +271,15 @@ public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A"
 
 
 public func logdet(_ mat: Matrix<Float>) -> Float {
-    //    let L = cholesky(mat, "L")
-    let L = ldlt(mat, "L")
+    let L = cholesky(mat, "L")
+//    let L = ldlt(mat, "L")
     return (2.0 * reduce_sum(log(diag(L))))[0,0]
 }
 
 public func det(_ mat: Matrix<Float>) -> Float {
-    //    let L = cholesky(mat, "L")
-    let L = ldlt(mat, "L")
-    return  powf(reduce_prod(diag(L))[0, 0], 2)
+    let L = cholesky(mat, "L")
+//    let L = ldlt(mat, "L")
+    return  powf(reduce_prod(diag(L))[0, 0], 2.0)
 }
 
 public func solve_triangular(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = "L", _ trans: String = "N") -> Matrix<Float> {
