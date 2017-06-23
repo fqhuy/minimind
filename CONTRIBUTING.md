@@ -1,0 +1,1 @@
+I am supposed to write a long and detailed guideline on how to contribute to this project here but let's make it brief for now: TESTING TESTING and MORE TESTING. 80% of the code I have written so far has no unit test. You are welcome to add more unit tests to either mimimindTests (for iOS) and/or minimind macTests (for MacOS).
