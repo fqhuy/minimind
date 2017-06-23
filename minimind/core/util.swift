@@ -14,6 +14,20 @@ extension Character {
     }
 }
 
+public func pow<T: ScalarType>(_ val: T, _ e: Int) -> T {
+    switch e {
+    case 0:
+        return T.one
+    case 1:
+        return val
+    case 2: return val * val
+    case 3: return val * val * val
+    case 4: return val * val * val * val
+    default:
+        return T.zero
+    }
+}
+
 public func ascii(_ c: String) -> Int8 {
     let keys = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
                 "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",

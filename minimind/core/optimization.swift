@@ -10,19 +10,21 @@ import Foundation
 //import Surge
 
 public protocol ObjectiveFunction {
-    associatedtype ScalarT: ScalarType
+    associatedtype ScalarT: BinaryFloatingPoint
     typealias MatrixT = Matrix<ScalarT>
-    
-     func compute(_ x: MatrixT) -> ScalarT
-     func gradient(_ x: MatrixT) -> MatrixT
+    func compute(_ x: MatrixT) -> ScalarT
+    func gradient(_ x: MatrixT) -> MatrixT
     func hessian(_ x: MatrixT) -> MatrixT
 }
 
 
-public protocol Optimizer {
+public protocol Optimizer: class {
+    associatedtype ObjectiveFunctionT: ObjectiveFunction
     associatedtype ScalarT: ScalarType
     typealias MatrixT = Matrix<ScalarT>
     
-     func optimize(verbose: Bool) -> (MatrixT, [Float], Int)
-     func getCost() -> Double
+    var objective: ObjectiveFunctionT {get set}
+    
+    func optimize(verbose: Bool) -> (MatrixT, [Float], Int)
+    func getCost() -> Double
 }

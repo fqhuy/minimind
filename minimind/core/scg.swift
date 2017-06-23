@@ -10,11 +10,11 @@ import Foundation
 //import Surge
 
 public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
+    public typealias ObjectiveFunctionT = F
     public typealias ScalarT = Float
-//    typealias MatrixT = Matrix<ScalarT>
-    
+
     typealias T = ScalarT
-    var objective: F
+    public var objective: F
     var init_x: MatrixT
     public var Xs: [MatrixT] = []
     var maxiters: Int
