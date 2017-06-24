@@ -37,6 +37,7 @@
 		367E891B1C963D2600C96392 /* minimind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89101C963D2600C96392 /* minimind.framework */; };
 		367E89201C963D2600C96392 /* minimindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E891F1C963D2600C96392 /* minimindTests.swift */; };
 		367E89BD1C96BB4B00C96392 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BC1C96BB4B00C96392 /* Accelerate.framework */; };
+		36816BCA1EFD32500091DE53 /* trust_region.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36816BC91EFD32500091DE53 /* trust_region.swift */; };
 		368962291EEBE247009134A3 /* pca.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962281EEBE247009134A3 /* pca.swift */; };
 		3689622C1EEC41AD009134A3 /* kmeans.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622B1EEC41AD009134A3 /* kmeans.swift */; };
 		3689622E1EEE90C7009134A3 /* minimindTestArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622D1EEE90C7009134A3 /* minimindTestArray.swift */; };
@@ -173,6 +174,7 @@
 		367E89211C963D2600C96392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		367E89631C96AF3C00C96392 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		367E89BC1C96BB4B00C96392 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		36816BC91EFD32500091DE53 /* trust_region.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = trust_region.swift; path = optimisation/trust_region.swift; sourceTree = "<group>"; };
 		368962281EEBE247009134A3 /* pca.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = pca.swift; path = decomposition/pca.swift; sourceTree = "<group>"; };
 		3689622B1EEC41AD009134A3 /* kmeans.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = kmeans.swift; path = cluster/kmeans.swift; sourceTree = "<group>"; };
 		3689622D1EEE90C7009134A3 /* minimindTestArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = minimindTestArray.swift; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 				3617FA041EDB226E0087C682 /* optimization.swift */,
 				36ED05511EF7F4D600955522 /* line_search.swift */,
 				36ED05591EFBE23600955522 /* cg.swift */,
+				36816BC91EFD32500091DE53 /* trust_region.swift */,
 			);
 			name = optimisation;
 			sourceTree = "<group>";
@@ -780,6 +783,7 @@
 				36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */,
 				36ED055A1EFBE23600955522 /* cg.swift in Sources */,
 				3689622C1EEC41AD009134A3 /* kmeans.swift in Sources */,
+				36816BCA1EFD32500091DE53 /* trust_region.swift in Sources */,
 				3670FDA51EEBC8BB00AC07F2 /* hyperbolic.swift in Sources */,
 				36DFA3EC1D3FC570005CBBC0 /* gaussian_process.swift in Sources */,
 				3670FDA21EEBC8BB00AC07F2 /* arithmetic.swift in Sources */,

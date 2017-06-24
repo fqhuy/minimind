@@ -13,7 +13,9 @@ public typealias IntType = Integer
 public typealias IndexType = Int 
 
 //MARK: Can ScalaType be SignedNumber ?
+
 public typealias ScalarType = HasSign & HasZero & HasOne & HasArithmeticOps & HasComparisonOps
+public typealias FloatingPointScalarType = ScalarType & BinaryFloatingPoint
 
 public protocol HasSign {
     prefix static func -(x: Self) -> Self
@@ -59,6 +61,25 @@ public protocol HasComparisonOps {
     static func >= (lhs: Self, rhs: Self) -> Bool
     static func <= (lhs: Self, rhs: Self) -> Bool
     static func == (lhs: Self, rhs: Self) -> Bool
+}
+
+//extension ScalarType where Self: BinaryFloatingPoint {
+//    
+//}
+
+extension BinaryFloatingPoint where Self: ScalarType {
+
+    public static var zero: Self {
+        get {
+            return 0.0
+        }
+    }
+    
+    public static var one: Self {
+        get {
+            return 1.0
+        }
+    }
 }
 
 extension Float: ScalarType  {

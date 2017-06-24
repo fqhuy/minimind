@@ -11,9 +11,12 @@ import Foundation
 public protocol LineSearchOptimizer: Optimizer {
     var currentPosition: MatrixT {get set}
     var currentSearchDirection: MatrixT {get set}
+    /// constant for Wolfe sufficient decrease condiion
     var c1: ScalarT {get set}
+    /// constant for Wolfe curvature condition
     var c2: ScalarT {get set}
     var stepLength: ScalarT {get set}
+    var nStepLengthTrials: Int {get set}
 
     
     func checkSufficientDecrease(stepLength: ScalarT) -> Bool
@@ -21,13 +24,31 @@ public protocol LineSearchOptimizer: Optimizer {
     func interpolateStepLength(stepLength: ScalarT) -> ScalarT
 }
 
-public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == ScalarT {
+public extension LineSearchOptimizer {
+
+    /// objective w.r.t stepLength
     func phi(_ stepLength: ScalarT) -> ScalarT {
         return objective.compute(currentPosition + stepLength * currentSearchDirection)
     }
     
+    /// derivative of objective w.r.t stepLength
     func dPhi(_ stepLength: ScalarT = 0.0) -> ScalarT {
         return (objective.gradient(currentPosition + stepLength * currentSearchDirection) * currentSearchDirection.t)[0,0]
+    }
+    
+    /// Wolfe condition 1
+    func checkSufficientDecrease(stepLength: ScalarT) -> Bool {
+        return phi(stepLength) <= phi(0.0) + c1 * stepLength * dPhi(0)
+    }
+    
+    /// Wolfe condition 2
+    func checkCurvatureCondition(stepLength: ScalarT) -> Bool {
+        return dPhi(stepLength) >= c2 * dPhi(0)
+    }
+    
+    /// strong Wolfe condition 2
+    func checkStrongCurvatureCondition(stepLength: ScalarT) -> Bool {
+        return abs(dPhi(stepLength)) <= abs(c2 * dPhi(0))
     }
     
     func cubicInterpolate(_ alphaLo: ScalarT, _ alphaHi: ScalarT) -> ScalarT {
@@ -57,7 +78,6 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == ScalarT
             return re
         }
         
-        
         var alpha0 = stepLength
         if checkSufficientDecrease(stepLength: alpha0) {
             return alpha0
@@ -71,8 +91,8 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == ScalarT
         }
         alpha1 = checkAlpha(alpha1, alpha0)
         
-        var trial = 0
-        while trial < 100 {
+        var i = 0
+        while i < nStepLengthTrials {
             // cubic interpolant
             let alpha2 = cubicInterpolate(alpha1, alpha0)
             if checkSufficientDecrease(stepLength: alpha2) {
@@ -82,59 +102,54 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == ScalarT
             alpha0 = alpha1
             alpha1 = checkAlpha(alpha2, alpha1)
             
-            trial += 1
+            i += 1
         }
         return stepLength
     }
     
-    func checkSufficientDecrease(stepLength: ScalarT) -> Bool {
-        let x = currentPosition
-        let p = currentSearchDirection
-        return objective.compute(x + stepLength * p) <= objective.compute(x) + c1 * stepLength * (objective.gradient(x) * p.t)[0, 0]
-    }
-    
-    func checkCurvatureCondition(stepLength: ScalarT) -> Bool {
-        let x = currentPosition
-        let p = currentSearchDirection
-        return (objective.gradient(x + stepLength * p) * p.t)[0,0] >= c2 * (objective.gradient(x) * p.t)[0, 0]
-    }
-    
-    func lineSearch() -> ScalarT {
+    /// compute a reasonable stepLength based on current position & gradient
+    public func lineSearch(_ alphaMax: ScalarT = 100) -> ScalarT {
         let alpha0: ScalarT = 0.0
-        let alphaMax: ScalarT = 100
-        var alpha: ScalarT = ScalarT(arc4random_uniform(100))
-        var oldAlpha: ScalarT = alpha
+        //var alpha: ScalarT = rand(0, alphaMax)
+        var alpha: ScalarT = interpolateStepLength(stepLength: alphaMax)
+        var oldAlpha: ScalarT = alpha0
         var i: Int = 0
-        while i < 100 {
+        while i < nStepLengthTrials {
             let ø = phi(alpha)
-            if (ø > phi(0) + c1 * alpha * dPhi()) || (phi(alpha) > phi(oldAlpha) && i > 1) {
-                let alphaStar = zoom(alpha: alpha, oldAlpha: oldAlpha)
-                return alphaStar
+            // decrease condition
+            if (ø > phi(0) + c1 * alpha * dPhi()) || (phi(alpha) >= phi(oldAlpha) && i > 1) {
+                return zoom(alphaLo: oldAlpha, alphaHi: alpha)
             }
             let π = dPhi(alpha)
+            // strong curvature condition
             if abs(π) <= -c2 * dPhi(0) {
                 return alpha
             }
             
             if π >= 0 {
-                return zoom(alpha: alpha, oldAlpha: oldAlpha)
+                return zoom(alphaLo: alpha, alphaHi: oldAlpha)
             }
             oldAlpha = alpha
-            alpha = ScalarT(arc4random_uniform(100))
+            
+            // N.O book says we can either do this or use interpolateStepLength.
+            alpha += (alphaMax - alpha) * 0.25
+            // alpha = interpolateStepLength(stepLength: alpha)
             i += 1
         }
         return alpha
     }
     
-    func zoom(alpha: ScalarT, oldAlpha: ScalarT) -> ScalarT {
-        var alphaLo: ScalarT = 0.0
-        var alphaHi: ScalarT = 10.0
-        var trial = 0
-        while trial < 100 {
-            let alpha = interpolateStepLength(stepLength: alphaLo)
+    func zoom(alphaLo: ScalarT, alphaHi: ScalarT) -> ScalarT {
+        precondition(alphaLo < alphaHi)
+        var alphaL = alphaLo
+        var alphaH = alphaHi
+        var i = 0
+        var alpha = alphaH
+        while i < nStepLengthTrials {
+            alpha = cubicInterpolate(alphaLo, alphaHi)
             let ø = phi(alpha)
-            if ø > phi(0) + c1 * alpha * dPhi(0) || ø >= phi(alphaLo) {
-                alphaHi = alpha
+            if ø > phi(0) + c1 * alpha * dPhi(0) || ø >= phi(alphaL) {
+                alphaH = alpha
             } else {
                 let π = dPhi(alpha)
                 if abs(π) <= -c2 * dPhi(0) {
@@ -142,12 +157,12 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == ScalarT
                 }
                 
                 if π * (alphaHi - alphaLo) >= 0 {
-                    alphaHi = alphaLo
+                    alphaH = alphaL
                 }
                 
-                alphaLo = alphaHi
+                alphaL = alpha
             }
-            trial += 1
+            i += 1
         }
         return alpha
     }
@@ -158,40 +173,43 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     public typealias ScalarT = Float
     
     public var stepLength: Float = 1.0
-    public var currentPosition: Matrix<Float>
-    public var currentSearchDirection: Matrix<Float>
+    public var currentPosition: MatrixT
+    public var currentSearchDirection: MatrixT
     public var maxIters = 100
-    public var initX: Matrix<Float>
+    public var nStepLengthTrials = 100
+    public var initX: MatrixT
     public var objective: F
-    public var Xs: [Matrix<Float>] = []
-    public var c1: Float = 0.0001
-    public var c2: Float = 0.0001
+    public var Xs: [MatrixT] = []
+    // 0 < c1 < c2 < 1
+    public var c1: ScalarT = 0.0001
+    public var c2: ScalarT = 0.001
     
-    public init(objective: F, stepLength: ScalarT, initX: Matrix<Float>, maxIters: Int) {
+    public init(objective: F, stepLength: ScalarT, initX: MatrixT, maxIters: Int) {
         self.stepLength = stepLength
-        self.currentSearchDirection = Matrix<Float>()
+        self.currentSearchDirection = Matrix()
         self.currentPosition = initX
         self.initX = initX
         self.maxIters = maxIters
         self.objective = objective
     }
     
-    public func optimize(verbose: Bool) -> (Matrix<Float>, [Float], Int) {
-        var currentX = initX
+    public func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
+        currentPosition = initX
         var iter = 0
         var currentF: Float = 0.0
         var Fs: [Float] = []
         
         while iter < maxIters {
-            Xs.append(currentX)
-            currentF = objective.compute(currentX)
+            Xs.append(currentPosition)
+            currentF = objective.compute(currentPosition)
             Fs.append(currentF)
-            let H = objective.hessian(currentX)
+            let H = objective.hessian(currentPosition)
 //            let L = cholesky(H, "L")
+            let G = objective.gradient(currentPosition)
             
-            let G = objective.gradient(currentX)
-            
-            currentX = currentX - stepLength * transpose(inv(H) * G.t) // * G  //
+            stepLength = lineSearch(1.0)
+            currentSearchDirection = transpose(inv(H) * G.t)
+            currentPosition = currentPosition - stepLength * currentSearchDirection // * G  //
             iter += 1
             
             if verbose {
@@ -199,8 +217,8 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             }
             
         }
-        Xs.append(currentX)
-        return (currentX, Fs, iter)
+        Xs.append(currentPosition)
+        return (currentPosition, Fs, iter)
     }
     
     public func getCost() -> Double {
@@ -208,3 +226,48 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     }
 
 }
+
+public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> where F.ScalarT == Float {
+    public typealias ObjectiveFunctionT = F
+    public typealias ScalarT = Float
+    
+    var H: MatrixT
+    var epsilon: ScalarT
+    
+    public init(objective: F, stepLength: ScalarT, initX: MatrixT, initH: MatrixT, epsilon: ScalarT, maxIters: Int) {
+        H = initH
+        self.epsilon = epsilon
+        super.init(objective: objective, stepLength: stepLength, initX: initX, maxIters: maxIters)
+
+    }
+    
+    public override func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
+        var k = 0
+        var g = objective.gradient(currentPosition)
+        var oldG = g
+        var oldPosition = currentPosition
+        let I: MatrixT = eye(H.rows)
+        while norm(g) > epsilon {
+            currentSearchDirection = -H * g
+            stepLength = lineSearch(1.0)
+            currentPosition = currentPosition + stepLength * currentSearchDirection
+            g = objective.gradient(currentPosition)
+            let sk = currentPosition - oldPosition
+            let yk = g - oldG
+            
+            let rhok = (1.0 / (yk * sk.t))[0, 0]
+            
+            //BFGS
+            let v = (I - rhok * sk.t * yk)
+            H = v * H * v.t + rhok * sk.t * sk
+            
+            oldG = g
+            oldPosition = currentPosition
+            k += 1
+        }
+        
+        return (currentPosition, [0.0], k)
+    }
+}
+
+

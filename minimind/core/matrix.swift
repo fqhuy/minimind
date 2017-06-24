@@ -411,53 +411,6 @@ public extension Matrix where T: ScalarType {
 
 //MARK: OPERATORS
 
-
-//public func ==<T: Equatable>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<Bool> {
-//    precondition(lhs.shape == rhs.shape, "Can't compare matrices with different shapes")
-//    var mat =  Matrix<Bool>(rows: lhs.rows, columns: lhs.columns,repeatedValue: true)
-//    for r in 0..<lhs.rows {
-//        for c in 0..<lhs.columns {
-//            mat[r, c] = lhs[r, c] == rhs[r, c]
-//        }
-//    }
-//    return mat
-//}
-
-
-//public func +(lhs: Matrix<Float>, rhs: Matrix<Float>) -> Matrix<Float> {
-//    var mat = lhs
-//    if lhs.shape == rhs.shape{
-//        mat = add(lhs, y: rhs)
-//    } else if (lhs.rows == rhs.rows) && (rhs.columns == 1) {
-//        for col in 0..<lhs.columns {
-//            mat[column: col] = lhs[column: col] + rhs[column: 0]
-//        }
-//    } else if (lhs.columns == rhs.columns) && (rhs.rows == 1) {
-//        for row in 0..<lhs.rows {
-//            mat[row] = lhs[row] + rhs[0]
-//        }
-//    } else {
-//        fatalError("incompatible matrix shapes")
-//    }
-//    return mat
-//}
-
-//public func * <T: FloatType>(lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-//    var newmat = lhs
-//    newmat.grid = newmat.grid * rhs
-//    return newmat
-//}
-//
-//public func /<T: FloatType> (lhs: Matrix<T>, rhs: T) -> Matrix<T> {
-//    var newmat = lhs
-//    newmat.grid = newmat.grid / rhs
-//    return newmat
-//}
-//
-//public func div (mat: Matrix<Float>, scalar: Float) -> Matrix<Float> {
-//    return mat / scalar 
-//}
-
 public func add<T: ScalarType>(_ x: Matrix<T>, y: Matrix<T>) -> Matrix<T> {
     checkMatrices(x, y, "same")
     return Matrix<T>( x.rows, x.columns, (0..<x.grid.count).map{ i in x.grid[i] + y.grid[i] } )
@@ -652,6 +605,27 @@ public func ./<T: ScalarType>(lhs: Matrix<T>, rhs: Matrix<T>) -> Matrix<T> {
 }
 
 //MARK: LINEAR ALGEBRA & MATH
+public func norm<T: FloatingPointScalarType>(_ mat: Matrix<T>, _ ord: String = "fro", p: T = 2, q: T = 1) -> T {
+    switch ord {
+    case "fro", "euclidean" :
+        return sqrt(trace(mat * mat.t))
+    default:
+        return sqrt(trace(mat * mat.t))
+//        var val = 0.0
+//        let o = Int(ord)!
+//        
+//        for r in 0..<mat.rows {
+//            var cval = 0.0
+//            for c in 0..<mat.columns {
+//                cval += pow(abs(mat[r, c]), p)
+//            }
+//            cval = pow(cval, q / p)
+//            val += cval
+//        }
+//        val = pow(val, 1.0 / q)
+//        return val
+    }
+}
 
 public func sign<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
     return Matrix<T>(mat.rows, mat.columns, sign(mat.grid))

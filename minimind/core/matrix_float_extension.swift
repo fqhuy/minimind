@@ -312,6 +312,17 @@ public func cho_solve(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = 
     return bb
 }
 
+public func cho_factor(_ mat: Matrix<Float>, uplo: String = "L") -> Matrix<Float> {
+    precondition(mat.rows == mat.columns, "Matrix must be square")
+    var L = mat
+    var _uplo: Int8 = ascii(uplo)
+    var n: __CLPK_integer = __CLPK_integer(mat.rows)
+    var info: __CLPK_integer = 0
+    spotrf_(&_uplo, &n, &(L.grid), &n, &info )
+    
+    return L
+}
+
 public func eigh(_ mat: Matrix<Float>, _ uplo: String) -> (Matrix<Float>, Matrix<Float>) {
     var A = mat
     var uplo: Int8 = ascii(uplo)
