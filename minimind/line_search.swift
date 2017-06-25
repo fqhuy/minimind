@@ -19,36 +19,36 @@ public protocol LineSearchOptimizer: Optimizer {
     var nStepLengthTrials: Int {get set}
 
     
-    func checkSufficientDecrease(stepLength: ScalarT) -> Bool
-    func checkCurvatureCondition(stepLength: ScalarT) -> Bool
-    func interpolateStepLength(stepLength: ScalarT) -> ScalarT
+    func checkSufficientDecrease(alpha: ScalarT) -> Bool
+    func checkCurvatureCondition(alpha: ScalarT) -> Bool
+    func interpolateStepLength(alpha: ScalarT) -> ScalarT
 }
 
-public extension LineSearchOptimizer {
+public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
 
     /// objective w.r.t stepLength
-    func phi(_ stepLength: ScalarT) -> ScalarT {
-        return objective.compute(currentPosition + stepLength * currentSearchDirection)
+    func phi(_ alpha: ScalarT) -> ScalarT {
+        return objective.compute(currentPosition + alpha * currentSearchDirection)
     }
     
     /// derivative of objective w.r.t stepLength
-    func dPhi(_ stepLength: ScalarT = 0.0) -> ScalarT {
-        return (objective.gradient(currentPosition + stepLength * currentSearchDirection) * currentSearchDirection.t)[0,0]
+    func dPhi(_ alpha: ScalarT = 0.0) -> ScalarT {
+        return (objective.gradient(currentPosition + alpha * currentSearchDirection) * currentSearchDirection.t)[0,0]
     }
     
     /// Wolfe condition 1
-    func checkSufficientDecrease(stepLength: ScalarT) -> Bool {
-        return phi(stepLength) <= phi(0.0) + c1 * stepLength * dPhi(0)
+    func checkSufficientDecrease(alpha: ScalarT) -> Bool {
+        return phi(alpha) <= phi(0.0) + c1 * alpha * dPhi(0)
     }
     
     /// Wolfe condition 2
-    func checkCurvatureCondition(stepLength: ScalarT) -> Bool {
-        return dPhi(stepLength) >= c2 * dPhi(0)
+    func checkCurvatureCondition(alpha: ScalarT) -> Bool {
+        return dPhi(alpha) >= c2 * dPhi(0)
     }
     
     /// strong Wolfe condition 2
-    func checkStrongCurvatureCondition(stepLength: ScalarT) -> Bool {
-        return abs(dPhi(stepLength)) <= abs(c2 * dPhi(0))
+    func checkStrongCurvatureCondition(alpha: ScalarT) -> Bool {
+        return abs(dPhi(alpha)) <= abs(c2 * dPhi(0))
     }
     
     func cubicInterpolate(_ alphaLo: ScalarT, _ alphaHi: ScalarT) -> ScalarT {
@@ -68,25 +68,25 @@ public extension LineSearchOptimizer {
         return nom / denom
     }
     
-    func interpolateStepLength(stepLength: ScalarT = 1.0) -> ScalarT {
-        func checkAlpha(_ anew: ScalarT, _ aold: ScalarT) -> ScalarT {
-            var re = anew
-            //TODO: Magic numbers here
-            if (abs(anew - aold) < 1e-5) || (anew < aold - 0.8 * aold) {
-                re = aold / 2.0
-            }
-            return re
+    func checkAlpha(_ anew: ScalarT, _ aold: ScalarT) -> ScalarT {
+        var re = anew
+        //TODO: Magic numbers here
+        if (abs(anew - aold) < 1e-5) || (anew < aold / 2.0) {
+            re = aold / 2.0
         }
-        
-        var alpha0 = stepLength
-        if checkSufficientDecrease(stepLength: alpha0) {
+        return re
+    }
+    
+    func interpolateStepLength(alpha: ScalarT = 1.0) -> ScalarT {
+        var alpha0 = alpha
+        if checkSufficientDecrease(alpha: alpha0) {
             return alpha0
         }
         alpha0 = checkAlpha(alpha0, 0.0)
         
         // quadratic interpolant
         var alpha1 = quadraticInterpolate(0.0, alpha0)
-        if checkSufficientDecrease(stepLength: alpha1) {
+        if checkSufficientDecrease(alpha: alpha1) {
             return alpha1
         }
         alpha1 = checkAlpha(alpha1, alpha0)
@@ -95,7 +95,7 @@ public extension LineSearchOptimizer {
         while i < nStepLengthTrials {
             // cubic interpolant
             let alpha2 = cubicInterpolate(alpha1, alpha0)
-            if checkSufficientDecrease(stepLength: alpha2) {
+            if checkSufficientDecrease(alpha: alpha2) {
                 return alpha2
             }
             // reset alpha low and alpha high and repeat
@@ -104,20 +104,44 @@ public extension LineSearchOptimizer {
             
             i += 1
         }
-        return stepLength
+        return alpha
+    }
+    
+    public func backTrackingSearch(_ initAlpha: ScalarT = 1.0) -> ScalarT {
+        let rho: ScalarT = 0.9
+        let c: ScalarT = 0.1
+        var i = 0
+        var alpha = initAlpha
+        while i < 100 {
+//            let phiAlpha = phi(alpha)
+//            let phi0 = phi(0)
+//            let dPhi0 = dPhi(0)
+//            let p = currentSearchDirection
+//            let rhs = phi0 + c * alpha * dPhi0
+//            if phiAlpha <= rhs {
+            if  phi(alpha) <= phi(0) + c * alpha * dPhi(0)  {
+                break
+            }
+            
+            let oldAlpha = alpha
+            alpha = rho * alpha
+            
+            alpha = checkAlpha(alpha, oldAlpha)
+            i += 1
+        }
+        return alpha
     }
     
     /// compute a reasonable stepLength based on current position & gradient
-    public func lineSearch(_ alphaMax: ScalarT = 100) -> ScalarT {
+    public func lineSearch(_ alphaMax: ScalarT = 1.0) -> ScalarT {
         let alpha0: ScalarT = 0.0
-        //var alpha: ScalarT = rand(0, alphaMax)
-        var alpha: ScalarT = interpolateStepLength(stepLength: alphaMax)
+        var alpha: ScalarT = interpolateStepLength(alpha: alphaMax)
         var oldAlpha: ScalarT = alpha0
         var i: Int = 0
         while i < nStepLengthTrials {
             let ø = phi(alpha)
             // decrease condition
-            if (ø > phi(0) + c1 * alpha * dPhi()) || (phi(alpha) >= phi(oldAlpha) && i > 1) {
+            if (ø > phi(0) + c1 * alpha * dPhi(0)) || (phi(alpha) >= phi(oldAlpha) && i > 1) {
                 return zoom(alphaLo: oldAlpha, alphaHi: alpha)
             }
             let π = dPhi(alpha)
@@ -139,7 +163,7 @@ public extension LineSearchOptimizer {
         return alpha
     }
     
-    func zoom(alphaLo: ScalarT, alphaHi: ScalarT) -> ScalarT {
+    public func zoom(alphaLo: ScalarT, alphaHi: ScalarT) -> ScalarT {
         precondition(alphaLo < alphaHi)
         var alphaL = alphaLo
         var alphaH = alphaHi
@@ -173,6 +197,7 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     public typealias ScalarT = Float
     
     public var stepLength: Float = 1.0
+    public var initStepLength: Float = 1.0
     public var currentPosition: MatrixT
     public var currentSearchDirection: MatrixT
     public var maxIters = 100
@@ -187,10 +212,11 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     public init(objective: F, stepLength: ScalarT, initX: MatrixT, maxIters: Int) {
         self.stepLength = stepLength
         self.currentSearchDirection = Matrix()
-        self.currentPosition = initX
         self.initX = initX
         self.maxIters = maxIters
         self.objective = objective
+        self.currentPosition = initX
+        self.initStepLength = stepLength
     }
     
     public func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
@@ -198,22 +224,24 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
         var iter = 0
         var currentF: Float = 0.0
         var Fs: [Float] = []
-        
+
         while iter < maxIters {
             Xs.append(currentPosition)
             currentF = objective.compute(currentPosition)
             Fs.append(currentF)
             let H = objective.hessian(currentPosition)
-//            let L = cholesky(H, "L")
+            let L = cho_factor(H, uplo: "L")
             let G = objective.gradient(currentPosition)
             
-            stepLength = lineSearch(1.0)
-            currentSearchDirection = transpose(inv(H) * G.t)
-            currentPosition = currentPosition - stepLength * currentSearchDirection // * G  //
+            currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)
+            stepLength = backTrackingSearch(initStepLength)
+            //  stepLength = lineSearch(1.0)
+            
+            currentPosition = currentPosition + stepLength * currentSearchDirection // * G  //
             iter += 1
             
             if verbose {
-                print("iter: ", iter, ", f: ", currentF)
+                print("iter: ", iter, ", f: ", currentF, ", alpha: ", stepLength)
             }
             
         }

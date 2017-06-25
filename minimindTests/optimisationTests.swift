@@ -19,7 +19,7 @@ class  Rosenbrock: ObjectiveFunction {
     
     func gradient(_ x: Matrix<Float>) -> Matrix<Float> {
         let gX1 = -400.0 * x[0, 0] * (x[0, 1] - powf(x[0, 0], 2)) - 2.0 * (1.0 - x[0, 0])
-        let gX2 = 200.0 * x[0, 0] * (x[0, 1] - powf(x[0, 0], 2))
+        let gX2 = 200.0 * (x[0, 1] - powf(x[0, 0], 2))
         return Matrix<Float>([[gX1,  gX2]])
     }
     
@@ -70,26 +70,24 @@ class optimisationTests: XCTestCase {
     }
 
     func testRosenbrock() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
         let rb = Rosenbrock()
-        let optimizer = NewtonOptimizer(objective: rb, stepLength: 0.000001, initX: Matrix<Float>([[10.0, 10.0]]), maxIters: 200)
-        let (x, fvals, iters) = optimizer.optimize(verbose: true)
+        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[5.2, 1.2]]), maxIters: 200)
+        let (x, _, _) = optimizer.optimize(verbose: true)
         
-//        var scg = SCG(objective: rb, learning_rate: 0.001, init_x: Matrix<Float>([[10.0, 10.0]]), maxiters: 200)
-//        let (x, fvals, iters) = scg.optimize(verbose: true)
-        print(optimizer.Xs)
+//        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: Matrix<Float>([[-1.2, 1.0]]), maxiters: 100)
+//        let (x, _, _) = optimizer.optimize(verbose: true)
+        print(x)
     }
 
     func testSCG() {
         let scg = SCG(objective: Quad(2.0, -3.0, 5.0), learning_rate: 0.01, init_x: Matrix<Float>([[5.0]]), maxiters: 200)
-        let (x, fvals, iters) = scg.optimize(verbose: true)
+        let (x, _, _) = scg.optimize(verbose: true)
         print(x)
     }
     
     func testNewton() {
-        let optimizer = NewtonOptimizer(objective: Quad(2.0, -3.0, 5.0), stepLength: 1.0, initX: Matrix<Float>([[10.0]]), maxIters: 4)
-        let (x, fvals, iters) = optimizer.optimize(verbose: true)
+        let optimizer = NewtonOptimizer(objective: Quad(2.0, -3.0, 5.0), stepLength: 5.0, initX: Matrix<Float>([[10.0]]), maxIters: 100)
+        let (x, _, _) = optimizer.optimize(verbose: true)
         print(x)
     }
     
