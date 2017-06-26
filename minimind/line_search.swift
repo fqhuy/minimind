@@ -208,9 +208,10 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     // 0 < c1 < c2 < 1
     public var c1: ScalarT = 0.0001
     public var c2: ScalarT = 0.001
+    public var alphaMax: ScalarT
     public var fTol: Float = 1e-5
     
-    public init(objective: F, stepLength: ScalarT, initX: MatrixT?, maxIters: Int, fTol: ScalarT = 1e-5) {
+    public init(objective: F, stepLength: ScalarT, initX: MatrixT?, maxIters: Int, fTol: ScalarT = 1e-5, alphaMax: ScalarT = 1.0) {
         self.stepLength = stepLength
         self.currentSearchDirection = Matrix()
         
@@ -224,6 +225,7 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
         self.currentPosition = self.initX
         self.initStepLength = stepLength
         self.fTol = fTol
+        self.alphaMax = alphaMax
     }
     
     public func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
@@ -243,8 +245,8 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)
-//            stepLength = backTrackingSearch(initStepLength)
-            stepLength = lineSearch(1.0)
+            stepLength = backTrackingSearch(initStepLength)
+//            stepLength = lineSearch(1.0)
             
             currentPosition = currentPosition + stepLength * currentSearchDirection // * G  //
             iter += 1
@@ -272,17 +274,18 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
     public typealias ObjectiveFunctionT = F
     public typealias ScalarT = Float
     
-    var H: MatrixT
-    var gTol: ScalarT
+    public var H: MatrixT
+    public var gTol: ScalarT
+
     
-    public init(objective: F, stepLength: ScalarT, initX: MatrixT?, initH: MatrixT?, gTol: ScalarT, maxIters: Int, fTol: ScalarT = 1e-5) {
+    public init(objective: F, stepLength: ScalarT, initX: MatrixT?, initH: MatrixT?, gTol: ScalarT, maxIters: Int, fTol: ScalarT = 1e-5, alphaMax: ScalarT=1.0) {
         if initH == nil {
             H = eye(objective.dims)
         } else {
             H = initH!
         }
         self.gTol = gTol
-        super.init(objective: objective, stepLength: stepLength, initX: initX, maxIters: maxIters, fTol: fTol)
+        super.init(objective: objective, stepLength: stepLength, initX: initX, maxIters: maxIters, fTol: fTol, alphaMax: alphaMax)
 
     }
     
@@ -297,7 +300,8 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
  
         while norm(g, "F") > gTol || k < maxIters {
             currentSearchDirection = -transpose(H * g.t)
-            stepLength = lineSearch(1.0)
+            stepLength = lineSearch(alphaMax)
+//            stepLength = backTrackingSearch(alphaMax)
             currentPosition = currentPosition + stepLength * currentSearchDirection
             
             oldF = currentF

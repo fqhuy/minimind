@@ -103,6 +103,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         public typealias ScalarT = Float
         public typealias MatrixT = Matrix<ScalarT>
         
+        public var dims: Int = 2
+        
         func compute(_ x: Matrix<Float>) -> Float {
             return 100.0 * powf(x[0, 1] - powf(x[0, 0], 2), 2) + powf(1.0 - x[0, 1], 2)
         }
@@ -162,11 +164,11 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        testRosenbrock()
+//        testRosenbrock()
 //        testImage2D()
 //        visualiseMixtureOfGaussians()
 //        visualiseGaussian()
-//        visualise1DRegression()
+        visualise1DRegression()
 //        visualisePCA()
     }
 
