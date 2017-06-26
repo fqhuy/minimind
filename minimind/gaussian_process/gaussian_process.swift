@@ -79,9 +79,10 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         
         let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
-        let scg = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
+        let opt = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
+//        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters)
         
-        let (x, _, _) = scg.optimize(verbose: verbose)
+        let (x, _, _) = opt.optimize(verbose: verbose)
         
         kernel.setParams(x)
     }
@@ -115,22 +116,19 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     public init(_ kernel: KernelT, _ noise: MatrixT, _ X: MatrixT, _ y: MatrixT) {
         self.kernel = kernel
         self.noise = noise
-        dims = X.columns
+        dims = kernel.nDims
         Xtrain = X
         ytrain = y
     }
     
     public func compute(_ x: MatrixT) -> ScalarT {
-        
         kernel.setParams(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
         let N = Float(Xtrain.rows)
-//        let D = Float(Xtrain.columns)
         
-        let L = cholesky(C, "L")
-//        let L = ldlt(C, "L")
-//        let alpha = solve_triangular(L, ytrain, "L")
+//        let L = cholesky(C, "L")
+        let L = cho_factor(C, "L")
         let alpha = cho_solve(L, ytrain, "L")
         
         // same as 0.5 * tr(alpha.t * alpha)
@@ -143,36 +141,30 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     }
     
     public func gradient(_ x: MatrixT) -> MatrixT {
-//        let tmp = kernel.get_params()
         kernel.setParams(x)
         
         let C = kernel.K(Xtrain, Xtrain) + noise
-//        let N = Xtrain.rows
+        let N = Xtrain.rows
         
-//        direct way
+//        DIRECT GRADIENT
         let Cinv = inv(C)
         let D = Float(Xtrain.columns)
         let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
         
-        // Fast
+        // ANOTHER WAY
 //        let L = cholesky(C, "L")
-////        let L = ldlt(C, "L")
-////        let B = solve_triangular(L, solve_triangular(L.t, ytrain, "U"), "L")
-//        let B = solve_triangular(L, solve_triangular(L.t, ytrain, "U"), "L")
-//        
+//        var B = cho_solve(L.t, ytrain, "U")
+//        B = cho_solve(L, B, "L")
 //        let D = ScalarT(Xtrain.columns)
-//        
-//        // WEIRD! BUT THIS IS HOW IT WORKS
-//        let iL = inv(L, "U")
-//        
-//        // TODO: possibly wrong
+//        let iL = inv(L, "L")
 //        let t1 = -(B * transpose(B) )
 //        let t2 = D * (iL * transpose(iL) )
 //        let dLdK = t1 + t2 // -(B * B.t) + D * (iL * iL.t)
 
+         // ANOTHER WAY
 //        let alpha = cholesky(C, "L")
-//        var tmp = alpha * alpha.t
-//        let dLdK = tmp - cho_solve(alpha, eye(N))
+//        let tmp = alpha * alpha.t
+//        let dLdK = tmp - cho_solve(alpha, eye(N), "L")
         
         return kernel.gradient(Xtrain, Xtrain, dLdK)
     }

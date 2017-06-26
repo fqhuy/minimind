@@ -312,7 +312,7 @@ public func cho_solve(_ A: Matrix<Float>, _ b: Matrix<Float>, _  uplo: String = 
     return bb
 }
 
-public func cho_factor(_ mat: Matrix<Float>, uplo: String = "L") -> Matrix<Float> {
+public func cho_factor(_ mat: Matrix<Float>, _ uplo: String = "L") -> Matrix<Float> {
     precondition(mat.rows == mat.columns, "Matrix must be square")
     var L = mat
     var _uplo: Int8 = ascii(uplo)

@@ -126,33 +126,35 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let rb = Rosenbrock()
         let n = 20
         
-        let (X, Y) = meshgrid(linspace(Float(-1.0), Float(5.0), n), linspace(Float(-1.0), Float(5.0), n))
+        let (X, Y) = meshgrid(linspace(Float(0.0), Float(2.0), n), linspace(Float(0.0), Float(2.0), n))
         let XX: Matrix<Float> = hstack([X.reshape([-1, 1]), Y.reshape([-1, 1])])
         var ZZ: Matrix<Float> = zeros(XX.rows, 1)
         for i in 0..<XX.rows {
             let z = rb.compute(XX[i])
             ZZ[i, 0] = z
         }
-//        _ = graph.imshow(ZZ.reshape([n, n]), "nearest", "luce")
+        _ = graph.imshow(ZZ.reshape([n, n]).t, "bicubic", "luce")
+        graph.xOrigin = 0.0
+        graph.yOrigin = 0.0
+        graph.autoScaleAll()
 
         
-        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[1.5, 1.5]]), maxIters: 200)
-//        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: Matrix<Float>([[20.0, 20.0]]), maxiters: 200)
-        let (x, fvals, iters) = optimizer.optimize(verbose: true)
-        
-        var xx: [Float] = []
-        var yy: [Float] = []
-        for i in 0..<optimizer.Xs.count {
-            xx.append(optimizer.Xs[i][0, 0])
-            yy.append(optimizer.Xs[i][0, 1])
-        }
-        
-        xx = xx - mean(xx)
-        yy = yy - mean(yy)
-        graph.plot(x: xx.cgFloat, y: yy.cgFloat, c: UIColor.green, s: 3.0)
-        
-        print (optimizer.Xs)
-        graph.autoScaleAll()
+//        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[1.5, 1.5]]), maxIters: 200)
+//        let (x, fvals, iters) = optimizer.optimize(verbose: true)
+//        
+//        var xx: [Float] = []
+//        var yy: [Float] = []
+//        for i in 0..<optimizer.Xs.count {
+//            xx.append(optimizer.Xs[i][0, 0])
+//            yy.append(optimizer.Xs[i][0, 1])
+//        }
+//        
+//        xx = xx - mean(xx)
+//        yy = yy - mean(yy)
+//        graph.plot(x: xx.cgFloat, y: yy.cgFloat, c: UIColor.green, s: 3.0)
+//        
+//        print (optimizer.Xs)
+//        graph.autoScaleAll()
 
     }
     
@@ -164,11 +166,11 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        testRosenbrock()
+        testRosenbrock()
 //        testImage2D()
 //        visualiseMixtureOfGaussians()
 //        visualiseGaussian()
-        visualise1DRegression()
+//        visualise1DRegression()
 //        visualisePCA()
     }
 

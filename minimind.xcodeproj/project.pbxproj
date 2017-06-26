@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		36000AAD1F01152400F3484C /* gpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAC1F01152400F3484C /* gpTests.swift */; };
 		3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA001EDB1FCC0087C682 /* pairwise.swift */; };
 		3617FA031EDB225F0087C682 /* scg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA021EDB225F0087C682 /* scg.swift */; };
 		3617FA051EDB226E0087C682 /* optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA041EDB226E0087C682 /* optimization.swift */; };
@@ -135,6 +136,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		36000AAC1F01152400F3484C /* gpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = gpTests.swift; sourceTree = "<group>"; };
 		3617FA001EDB1FCC0087C682 /* pairwise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pairwise.swift; sourceTree = "<group>"; };
 		3617FA021EDB225F0087C682 /* scg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = scg.swift; path = core/scg.swift; sourceTree = "<group>"; };
 		3617FA041EDB226E0087C682 /* optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = optimization.swift; path = core/optimization.swift; sourceTree = "<group>"; };
@@ -355,6 +357,7 @@
 				368962671EF2C153009134A3 /* metricsTests.swift */,
 				3689626B1EF3CE00009134A3 /* decompositionTests.swift */,
 				36ED05571EFA280E00955522 /* optimisationTests.swift */,
+				36000AAC1F01152400F3484C /* gpTests.swift */,
 			);
 			path = minimindTests;
 			sourceTree = "<group>";
@@ -808,6 +811,7 @@
 				368962681EF2C153009134A3 /* metricsTests.swift in Sources */,
 				368962661EF2C045009134A3 /* arrayTests.swift in Sources */,
 				3689626C1EF3CE00009134A3 /* decompositionTests.swift in Sources */,
+				36000AAD1F01152400F3484C /* gpTests.swift in Sources */,
 				3689622E1EEE90C7009134A3 /* minimindTestArray.swift in Sources */,
 				36ED05581EFA280E00955522 /* optimisationTests.swift in Sources */,
 				367E89201C963D2600C96392 /* minimindTests.swift in Sources */,

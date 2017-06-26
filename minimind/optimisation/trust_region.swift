@@ -86,7 +86,7 @@ extension TrustRegionOptimizer where ObjectiveFunctionT.ScalarT == Float {
         let g = objective.gradient(currentPosition)
         
         for _ in 0..<5 {
-            let R = cho_factor(hessianApproximate + lamda * I, uplo: "U")
+            let R = cho_factor(hessianApproximate + lamda * I, "U")
             let pl = cho_solve(R, -g, "U")
             let ql = cho_solve(R.t, pl, "L")
             
@@ -95,7 +95,7 @@ extension TrustRegionOptimizer where ObjectiveFunctionT.ScalarT == Float {
             lamda = lamda + pow(npl / nql, 2) * ((npl - currentDelta) / currentDelta)
         }
         
-        let R = cho_factor(hessianApproximate + lamda * I, uplo: "U")
+        let R = cho_factor(hessianApproximate + lamda * I, "U")
         let p = cho_solve(R, -g)
         return p
     }

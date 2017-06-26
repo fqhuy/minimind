@@ -241,7 +241,7 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             currentF = objective.compute(currentPosition)
             Fs.append(currentF)
             let H = objective.hessian(currentPosition)
-            let L = cho_factor(H, uplo: "L")
+            let L = cho_factor(H, "L")
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)

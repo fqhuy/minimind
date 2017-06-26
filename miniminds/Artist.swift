@@ -34,7 +34,7 @@ extension ArtistProtocol where Self: CanAutoScale {
         let maxY = max(y.float)
         
         xScale = frame.width / CGFloat(maxX - minX)
-        yScale = frame.height / CGFloat(maxY - minY) / 2
+        yScale = frame.height / CGFloat(maxY - minY) // 2
         
         if keepRatio {
             xScale = min(xScale, yScale)
@@ -269,7 +269,6 @@ class Artist: UIView, ArtistProtocol, CanAutoScale {
         }
     }
 
-    
     override var x: [CGFloat] {
         get {
             return linspace(Float(0.0), Float(frame.width), self.mat.columns).cgFloat

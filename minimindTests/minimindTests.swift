@@ -20,31 +20,7 @@ class minimindTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-    
-    func testGaussianProcessRegressor() {
-        let N = 8
-        let P = 2
-        
-        var X: Matrix<Float> = randMatrix(N, P + 1) * 10.0
-        X[column: 0] = ones(N, 1) // [Float](repeating: 1.0, count: N)
-        var XX: Matrix<Float> = zeros(N, P)
-        for i in 1..<P+1 {
-            XX[column: i - 1] = X[column: i]
-        }
-        
-        let A: Matrix<Float> = randMatrix(P + 1, 1)
-        let y: Matrix<Float> = X * A + 0.01 * randMatrix(N, 1)
-        
-        let kern = RBF(variance: 1.1, lengthscale: 1.0, X: XX)
-        let gpr = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.01)
-        gpr.fit(XX, y)
-        
-        let Xstar: Matrix<Float> = randMatrix(5, P)
-        let (Mu, Sigma) = gpr.predict(Xstar)
-        
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
+
     
     func testDist(){
         let N = 40

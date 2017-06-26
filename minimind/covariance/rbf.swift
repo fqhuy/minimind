@@ -38,12 +38,6 @@ public class RBF: Kernel {
         }
     }
     
-    public var nDims: Int {
-        get {
-            return parametersIds.count
-        }
-    }
-    
     public var logVariance: ScalarT {
         get {
             return parametersData[parametersIds["logVariance"]!][0]
@@ -68,6 +62,12 @@ public class RBF: Kernel {
         }
     }
     
+    public var nDims: Int {
+        get {
+            return trainableIds.count
+        }
+    }
+    
     required public init() {
         X = MatrixT()
         parametersData = zeros(n: 2)
@@ -76,17 +76,17 @@ public class RBF: Kernel {
         lengthscale = 100.0
     }
     
-    public convenience init(variance: ScalarT, lengthscale: ScalarT, X: MatrixT, trainables: [String] = ["variance"], capacity: Int = 10000) {
+    public convenience init(variance: ScalarT, lengthscale: ScalarT, X: MatrixT, trainables: [String] = ["logVariance"], capacity: Int = 10000) {
         self.init()
         self.trainables = trainables
         parametersData = []
         parametersData.reserveCapacity(capacity)
         
         parametersIds["logVariance"] = [parametersData.count]
-        parametersData.append(variance)
+        parametersData.append(log(variance))
         
         parametersIds["logLengthscale"] = [parametersData.count]
-        parametersData.append(lengthscale)
+        parametersData.append(log(lengthscale))
         
         parametersIds["X"] = arange(parametersData.count, parametersData.count + X.size, 1)
         parametersData.append(contentsOf: X.grid)
@@ -102,6 +102,10 @@ public class RBF: Kernel {
         }
         return MatrixT([params])
     }
+    
+//    public func getParams() -> MatrixT {
+//        return MatrixT([[logVariance, logLengthscale]])
+//    }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {
         let dist = scaledDist(X, Y)
@@ -120,18 +124,21 @@ public class RBF: Kernel {
     public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
         let (N, D) = X.shape
         var d: MatrixT =  zeros(1, trainableIds.count) // zeros(1, 2 + D * N)
+        var dGrid: [ScalarT] = []
         let r = scaledDist(X, Y)
         let Kr = K(r: r)
         let dLdr = dKdr(r: r) ∘ dLdK
         
         // variance
         if trainables.contains("logVariance") {
-            d[0, parametersIds["logVariance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
+//            d[0, parametersIds["logVariance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
+            dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance)
         }
         
         // lengthscale
         if trainables.contains("logLengthscale") {
-            d[0, parametersIds["logLengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
+//            d[0, parametersIds["logLengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
+            dGrid.append(-0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0])
         }
         
         // gradient wrt X
@@ -143,9 +150,10 @@ public class RBF: Kernel {
                 grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
             }
         
-            d[[0], parametersIds["X"]!] = grad.reshape([1, -1])
+//            d[[0], parametersIds["X"]!] = grad.reshape([1, -1])
+            dGrid.append(contentsOf: grad.grid)
         }
-        return d
+        return MatrixT([dGrid])
     }
      
     public func dist(_ X: MatrixT, _ Y: MatrixT) -> MatrixT {
