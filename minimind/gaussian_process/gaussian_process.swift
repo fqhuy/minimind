@@ -106,7 +106,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     public typealias MatrixT = Matrix<ScalarT>
     public typealias KernelT = K
     
-
+    public var dims: Int
     public var kernel: KernelT
     public var noise: MatrixT
     public var Xtrain: MatrixT
@@ -115,6 +115,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     public init(_ kernel: KernelT, _ noise: MatrixT, _ X: MatrixT, _ y: MatrixT) {
         self.kernel = kernel
         self.noise = noise
+        dims = X.columns
         Xtrain = X
         ytrain = y
     }

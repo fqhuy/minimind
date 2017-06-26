@@ -12,6 +12,9 @@ import Foundation
 public protocol ObjectiveFunction {
     associatedtype ScalarT: FloatingPointScalarType
     typealias MatrixT = Matrix<ScalarT>
+    
+    var dims: Int {get}
+    
     func compute(_ x: MatrixT) -> ScalarT
     func gradient(_ x: MatrixT) -> MatrixT
     func hessian(_ x: MatrixT) -> MatrixT

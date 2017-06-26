@@ -109,7 +109,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         func gradient(_ x: Matrix<Float>) -> Matrix<Float> {
             let gX1 = -400.0 * x[0, 0] * (x[0, 1] - powf(x[0, 0], 2)) - 2.0 * (1.0 - x[0, 0])
-            let gX2 = 200.0 * x[0, 0] * (x[0, 1] - powf(x[0, 0], 2))
+            let gX2 = 200.0 * (x[0, 1] - powf(x[0, 0], 2))
             return Matrix<Float>([[gX1,  gX2]])
         }
         
@@ -134,7 +134,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
 //        _ = graph.imshow(ZZ.reshape([n, n]), "nearest", "luce")
 
         
-        let optimizer = NewtonOptimizer(objective: rb, stepLength: 0.000001, initX: Matrix<Float>([[20.0, 20.0]]), maxIters: 200)
+        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[1.5, 1.5]]), maxIters: 200)
 //        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: Matrix<Float>([[20.0, 20.0]]), maxiters: 200)
         let (x, fvals, iters) = optimizer.optimize(verbose: true)
         
@@ -162,10 +162,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        testRosenbrock()
+        testRosenbrock()
 //        testImage2D()
 //        visualiseMixtureOfGaussians()
-        visualiseGaussian()
+//        visualiseGaussian()
 //        visualise1DRegression()
 //        visualisePCA()
     }

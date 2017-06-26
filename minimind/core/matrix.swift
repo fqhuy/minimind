@@ -611,19 +611,6 @@ public func norm<T: FloatingPointScalarType>(_ mat: Matrix<T>, _ ord: String = "
         return sqrt(trace(mat * mat.t))
     default:
         return sqrt(trace(mat * mat.t))
-//        var val = 0.0
-//        let o = Int(ord)!
-//        
-//        for r in 0..<mat.rows {
-//            var cval = 0.0
-//            for c in 0..<mat.columns {
-//                cval += pow(abs(mat[r, c]), p)
-//            }
-//            cval = pow(cval, q / p)
-//            val += cval
-//        }
-//        val = pow(val, 1.0 / q)
-//        return val
     }
 }
 

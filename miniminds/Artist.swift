@@ -34,7 +34,7 @@ extension ArtistProtocol where Self: CanAutoScale {
         let maxY = max(y.float)
         
         xScale = frame.width / CGFloat(maxX - minX)
-        yScale = frame.height / CGFloat(maxY - minY) // 2
+        yScale = frame.height / CGFloat(maxY - minY) / 2
         
         if keepRatio {
             xScale = min(xScale, yScale)

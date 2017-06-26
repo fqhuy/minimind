@@ -12,6 +12,7 @@ import XCTest
 class  Rosenbrock: ObjectiveFunction {
     public typealias ScalarT = Float
     public typealias MatrixT = Matrix<ScalarT>
+    public var dims: Int = 2
     
     func compute(_ x: Matrix<Float>) -> Float {
         return 100.0 * powf(x[0, 1] - powf(x[0, 0], 2), 2) + powf(1.0 - x[0, 1], 2)
@@ -37,6 +38,7 @@ class Quad: ObjectiveFunction {
     public var a: ScalarT
     public var b: ScalarT
     public var c: ScalarT
+    public var dims: Int = 1
     
     public init(_ a: ScalarT, _ b: ScalarT, _ c: ScalarT) {
         self.a = a
@@ -71,7 +73,7 @@ class optimisationTests: XCTestCase {
 
     func testRosenbrock() {
         let rb = Rosenbrock()
-        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[5.2, 1.2]]), maxIters: 200)
+        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[1.2, 1.2]]), maxIters: 200)
         let (x, _, _) = optimizer.optimize(verbose: true)
         
 //        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: Matrix<Float>([[-1.2, 1.0]]), maxiters: 100)
@@ -87,6 +89,14 @@ class optimisationTests: XCTestCase {
     
     func testNewton() {
         let optimizer = NewtonOptimizer(objective: Quad(2.0, -3.0, 5.0), stepLength: 5.0, initX: Matrix<Float>([[10.0]]), maxIters: 100)
+        let (x, _, _) = optimizer.optimize(verbose: true)
+        print(x)
+    }
+    
+    func testBFGS() {
+        let rb = Rosenbrock()
+        let x0 = Matrix<Float>([[-1.2, 1.2]])
+        let optimizer = QuasiNewtonOptimizer(objective: rb, stepLength: 1.0, initX: x0, initH: inv(rb.hessian(x0)), gTol: 1e-5, maxIters: 200, fTol: 1e-8)
         let (x, _, _) = optimizer.optimize(verbose: true)
         print(x)
     }

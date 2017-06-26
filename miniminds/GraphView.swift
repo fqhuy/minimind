@@ -98,7 +98,7 @@ import minimind
     }
     
     func autoScaleAll(_ keepRatio: Bool = true) {
-        self.autoScale()
+        self.autoScale(keepRatio)
         for item in self.items {
             item.scale(xScale, yScale)
             

@@ -17,12 +17,15 @@ public protocol LineSearchOptimizer: Optimizer {
     var c2: ScalarT {get set}
     var stepLength: ScalarT {get set}
     var nStepLengthTrials: Int {get set}
+    var fTol: ScalarT {get set}
 
     
     func checkSufficientDecrease(alpha: ScalarT) -> Bool
     func checkCurvatureCondition(alpha: ScalarT) -> Bool
     func interpolateStepLength(alpha: ScalarT) -> ScalarT
 }
+
+//MARK: Extension and subclass needs the same constraint to work correctly!!
 
 public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
 
@@ -65,7 +68,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     func quadraticInterpolate(_ alphaLo: ScalarT, _ alphaHi: ScalarT) -> ScalarT {
         let nom = (dPhi(alphaLo) * alphaHi * alphaHi)
         let denom = (2.0 * phi(alphaHi) - phi(alphaLo) - dPhi(alphaLo) * alphaHi )
-        return nom / denom
+        return -nom / denom
     }
     
     func checkAlpha(_ anew: ScalarT, _ aold: ScalarT) -> ScalarT {
@@ -82,7 +85,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         if checkSufficientDecrease(alpha: alpha0) {
             return alpha0
         }
-        alpha0 = checkAlpha(alpha0, 0.0)
+        alpha0 = checkAlpha(0.0, alpha0)
         
         // quadratic interpolant
         var alpha1 = quadraticInterpolate(0.0, alpha0)
@@ -109,17 +112,11 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     
     public func backTrackingSearch(_ initAlpha: ScalarT = 1.0) -> ScalarT {
         let rho: ScalarT = 0.9
-        let c: ScalarT = 0.1
         var i = 0
         var alpha = initAlpha
-        while i < 100 {
-//            let phiAlpha = phi(alpha)
-//            let phi0 = phi(0)
-//            let dPhi0 = dPhi(0)
-//            let p = currentSearchDirection
-//            let rhs = phi0 + c * alpha * dPhi0
-//            if phiAlpha <= rhs {
-            if  phi(alpha) <= phi(0) + c * alpha * dPhi(0)  {
+        while i < nStepLengthTrials {
+            //if  phi(alpha) <= phi(0) + c * alpha * dPhi(0)  {
+            if checkSufficientDecrease(alpha: alpha) {
                 break
             }
             
@@ -137,7 +134,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         let alpha0: ScalarT = 0.0
         var alpha: ScalarT = interpolateStepLength(alpha: alphaMax)
         var oldAlpha: ScalarT = alpha0
-        var i: Int = 0
+        var i: Int = 1
         while i < nStepLengthTrials {
             let ø = phi(alpha)
             // decrease condition
@@ -164,13 +161,16 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     }
     
     public func zoom(alphaLo: ScalarT, alphaHi: ScalarT) -> ScalarT {
-        precondition(alphaLo < alphaHi)
+//        precondition(alphaLo < alphaHi)
         var alphaL = alphaLo
         var alphaH = alphaHi
         var i = 0
         var alpha = alphaH
         while i < nStepLengthTrials {
-            alpha = cubicInterpolate(alphaLo, alphaHi)
+            // quadraticInterpolate(min(alphaLo, alphaHi), max(alphaLo, alphaHi))
+            // cubicInterpolate(min(alphaLo, alphaHi), max(alphaLo, alphaHi))
+            // interpolateStepLength(alpha: min(alphaLo, alphaHi))
+            alpha = quadraticInterpolate(min(alphaLo, alphaHi), max(alphaLo, alphaHi))
             let ø = phi(alpha)
             if ø > phi(0) + c1 * alpha * dPhi(0) || ø >= phi(alphaL) {
                 alphaH = alpha
@@ -208,25 +208,34 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     // 0 < c1 < c2 < 1
     public var c1: ScalarT = 0.0001
     public var c2: ScalarT = 0.001
+    public var fTol: Float = 1e-5
     
-    public init(objective: F, stepLength: ScalarT, initX: MatrixT, maxIters: Int) {
+    public init(objective: F, stepLength: ScalarT, initX: MatrixT?, maxIters: Int, fTol: ScalarT = 1e-5) {
         self.stepLength = stepLength
         self.currentSearchDirection = Matrix()
-        self.initX = initX
+        
+        if initX == nil {
+            self.initX = zeros(1, objective.dims)
+        } else {
+            self.initX = initX!
+        }
         self.maxIters = maxIters
         self.objective = objective
-        self.currentPosition = initX
+        self.currentPosition = self.initX
         self.initStepLength = stepLength
+        self.fTol = fTol
     }
     
     public func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
         currentPosition = initX
         var iter = 0
         var currentF: Float = 0.0
+        var oldF: Float = 0.0
         var Fs: [Float] = []
 
         while iter < maxIters {
             Xs.append(currentPosition)
+            oldF = currentF
             currentF = objective.compute(currentPosition)
             Fs.append(currentF)
             let H = objective.hessian(currentPosition)
@@ -234,8 +243,8 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)
-            stepLength = backTrackingSearch(initStepLength)
-            //  stepLength = lineSearch(1.0)
+//            stepLength = backTrackingSearch(initStepLength)
+            stepLength = lineSearch(1.0)
             
             currentPosition = currentPosition + stepLength * currentSearchDirection // * G  //
             iter += 1
@@ -244,6 +253,10 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
                 print("iter: ", iter, ", f: ", currentF, ", alpha: ", stepLength)
             }
             
+            if abs(oldF - currentF) < fTol {
+                print("converged by relative function reduction!")
+                break
+            }
         }
         Xs.append(currentPosition)
         return (currentPosition, Fs, iter)
@@ -260,12 +273,16 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
     public typealias ScalarT = Float
     
     var H: MatrixT
-    var epsilon: ScalarT
+    var gTol: ScalarT
     
-    public init(objective: F, stepLength: ScalarT, initX: MatrixT, initH: MatrixT, epsilon: ScalarT, maxIters: Int) {
-        H = initH
-        self.epsilon = epsilon
-        super.init(objective: objective, stepLength: stepLength, initX: initX, maxIters: maxIters)
+    public init(objective: F, stepLength: ScalarT, initX: MatrixT?, initH: MatrixT?, gTol: ScalarT, maxIters: Int, fTol: ScalarT = 1e-5) {
+        if initH == nil {
+            H = eye(objective.dims)
+        } else {
+            H = initH!
+        }
+        self.gTol = gTol
+        super.init(objective: objective, stepLength: stepLength, initX: initX, maxIters: maxIters, fTol: fTol)
 
     }
     
@@ -275,10 +292,17 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
         var oldG = g
         var oldPosition = currentPosition
         let I: MatrixT = eye(H.rows)
-        while norm(g) > epsilon {
-            currentSearchDirection = -H * g
+        var currentF: ScalarT = objective.compute(currentPosition)
+        var oldF: ScalarT = currentF
+ 
+        while norm(g, "F") > gTol || k < maxIters {
+            currentSearchDirection = -transpose(H * g.t)
             stepLength = lineSearch(1.0)
             currentPosition = currentPosition + stepLength * currentSearchDirection
+            
+            oldF = currentF
+            currentF = objective.compute(currentPosition)
+            
             g = objective.gradient(currentPosition)
             let sk = currentPosition - oldPosition
             let yk = g - oldG
@@ -288,6 +312,15 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             //BFGS
             let v = (I - rhok * sk.t * yk)
             H = v * H * v.t + rhok * sk.t * sk
+            
+            if verbose == true {
+                print("iter: ", k, ", f: ", currentF, ", alpha: ", stepLength)
+            }
+            
+            if abs(oldF - currentF) < fTol {
+                print("converged by relative function reduction!")
+                break
+            }
             
             oldG = g
             oldPosition = currentPosition
