@@ -95,8 +95,8 @@ class optimisationTests: XCTestCase {
     
     func testBFGS() {
         let rb = Rosenbrock()
-        let x0 = Matrix<Float>([[-1.2, 1.2]])
-        let initH: Matrix<Float> =  inv(rb.hessian(x0)) // Matrix([[1.0, 0.0],[0.0, 1.0]]) //
+        let x0 = Matrix<Float>([[1.2, 1.2]])
+        let initH: Matrix<Float> =   inv(rb.hessian(x0)) // Matrix([[1.0, 0.0],[0.0, 1.0]]) //
         let optimizer = QuasiNewtonOptimizer(objective: rb, stepLength: 1.0, initX: x0, initH: initH, gTol: 1e-5, maxIters: 200, fTol: 1e-8, alphaMax: 2.0)
         let (x, _, _) = optimizer.optimize(verbose: true)
         print(x)

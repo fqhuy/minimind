@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		36000AAD1F01152400F3484C /* gpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAC1F01152400F3484C /* gpTests.swift */; };
+		36000AAF1F024FC200F3484C /* error_handling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAE1F024FC200F3484C /* error_handling.swift */; };
 		3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA001EDB1FCC0087C682 /* pairwise.swift */; };
 		3617FA031EDB225F0087C682 /* scg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA021EDB225F0087C682 /* scg.swift */; };
 		3617FA051EDB226E0087C682 /* optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA041EDB226E0087C682 /* optimization.swift */; };
@@ -137,6 +138,7 @@
 
 /* Begin PBXFileReference section */
 		36000AAC1F01152400F3484C /* gpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = gpTests.swift; sourceTree = "<group>"; };
+		36000AAE1F024FC200F3484C /* error_handling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = error_handling.swift; sourceTree = "<group>"; };
 		3617FA001EDB1FCC0087C682 /* pairwise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pairwise.swift; sourceTree = "<group>"; };
 		3617FA021EDB225F0087C682 /* scg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = scg.swift; path = core/scg.swift; sourceTree = "<group>"; };
 		3617FA041EDB226E0087C682 /* optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = optimization.swift; path = core/optimization.swift; sourceTree = "<group>"; };
@@ -462,6 +464,7 @@
 				368962351EEEC2F1009134A3 /* matrix_int_extension.swift */,
 				368962391EEED815009134A3 /* array_int_extension.swift */,
 				368962621EF10F0A009134A3 /* core.swift */,
+				36000AAE1F024FC200F3484C /* error_handling.swift */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -769,6 +772,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3617FA051EDB226E0087C682 /* optimization.swift in Sources */,
+				36000AAF1F024FC200F3484C /* error_handling.swift in Sources */,
 				3617FA071EDC23860087C682 /* matrix.swift in Sources */,
 				3670FDA41EEBC8BB00AC07F2 /* exponential.swift in Sources */,
 				3670FDAD1EEBD06400AC07F2 /* matrix_double_extension.swift in Sources */,

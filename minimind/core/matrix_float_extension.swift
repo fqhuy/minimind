@@ -193,7 +193,7 @@ public func inv(_ mat: Matrix<Float>, _ uplo: String) -> Matrix<Float> {
     }
 }
 
-public func cholesky(_ mat: Matrix<Float>, _ uplo: String = "U") -> Matrix<Float> {
+public func cholesky(_ mat: Matrix<Float>, _ uplo: String = "U") throws -> Matrix<Float> {
     precondition(mat.rows == mat.columns, "Matrix must be square")
     var L = mat
     var _uplo: Int8 = ascii(uplo)
@@ -201,7 +201,11 @@ public func cholesky(_ mat: Matrix<Float>, _ uplo: String = "U") -> Matrix<Float
     var info: __CLPK_integer = 0
     spotrf_(&_uplo, &n, &(L.grid), &n, &info )
     
-    assert(info == 0, "Cholesky failed: " + String(info) )
+//    assert(info == 0, "Cholesky failed: " + String(info) )
+    if info != 0 {
+        throw MatrixError.notPSD
+    }
+    
     switch uplo {
     case "L":
         return triu(L).t
@@ -271,14 +275,12 @@ public func svd(_ mat: Matrix<Float>, _ jobu: String = "A", _ jobv: String = "A"
 
 
 public func logdet(_ mat: Matrix<Float>) -> Float {
-    let L = cholesky(mat, "L")
-//    let L = ldlt(mat, "L")
+    let L = try! cholesky(mat, "L")
     return (2.0 * reduce_sum(log(diag(L))))[0,0]
 }
 
 public func det(_ mat: Matrix<Float>) -> Float {
-    let L = cholesky(mat, "L")
-//    let L = ldlt(mat, "L")
+    let L = try! cholesky(mat, "L")
     return  powf(reduce_prod(diag(L))[0, 0], 2.0)
 }
 
