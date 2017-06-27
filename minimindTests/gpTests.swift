@@ -31,7 +31,7 @@ class gpTests: XCTestCase {
         
         let kern = RBF(variance: 400, lengthscale: 1000, X: X, trainables: ["logVariance", "logLengthscale"])
         let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 200)
+        gp.fit(X, Y, maxiters: 500)
         
         print(gp.kernel.getParams())
         

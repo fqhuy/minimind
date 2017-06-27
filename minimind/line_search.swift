@@ -170,18 +170,14 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
             // cubicInterpolate(min(alphaLo, alphaHi), max(alphaLo, alphaHi))
             
             // make sure the interpolated alpha isn't too close to the ends. N.O p62
-            var j = 0
-            repeat {
-                alpha = quadraticInterpolate(alphaL, alphaH)
+            alpha = quadraticInterpolate(alphaL, alphaH)
 
-                if abs(alpha - alphaL) > 1e-5 && abs(alpha - alphaH) > 1e-5 {
-                    break
-                } else {
-                    alpha = abs(alphaL - alphaH) / 2 + min(alphaL, alphaH)
-                }
-                j += 1
+            if abs(alpha - alphaL) > 1e-5 && abs(alpha - alphaH) > 1e-5 {
+                break
+            } else {
+                alpha = abs(alphaL - alphaH) / 2 + min(alphaL, alphaH)
+                break
             }
-            while j < 100
             
             let ø = phi(alpha)
             if (ø > phi(0) + c1 * alpha * dPhi(0)) || (ø >= phi(alphaL)) {
@@ -258,8 +254,8 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)
-            stepLength = backTrackingSearch(initStepLength)
-//            stepLength = lineSearch(1.0)
+//            stepLength = backTrackingSearch(initStepLength)
+            stepLength = lineSearch(initStepLength)
             
             currentPosition = currentPosition + stepLength * currentSearchDirection // * G  //
             iter += 1
@@ -293,7 +289,7 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
     
     public init(objective: F, stepLength: ScalarT, initX: MatrixT?, initH: MatrixT?, gTol: ScalarT, maxIters: Int, fTol: ScalarT = 1e-5, alphaMax: ScalarT=1.0) {
         if initH == nil {
-            H = eye(objective.dims)  // * 100.0
+            H = eye(objective.dims) // * 1000.0
         } else {
             H = initH!
         }
@@ -319,11 +315,12 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             currentSearchDirection = -transpose(H * g.t)
             
             if dPhi(0) >= 0 {
-                fatalError("not a descent direction")
+                if verbose {
+                    print("iter: ", k, ", f: ", currentF, ", alpha: ", stepLength, "Not a descent step!")
+                }
             }
             
             stepLength  = lineSearch(alphaMax)
-            
             currentPosition = currentPosition + stepLength * currentSearchDirection
             
             oldF = currentF
