@@ -9,6 +9,14 @@
 /* Begin PBXBuildFile section */
 		36000AAD1F01152400F3484C /* gpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAC1F01152400F3484C /* gpTests.swift */; };
 		36000AAF1F024FC200F3484C /* error_handling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAE1F024FC200F3484C /* error_handling.swift */; };
+		36000AB21F02600600F3484C /* cg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AB01F02600600F3484C /* cg.swift */; };
+		36000AB31F02600600F3484C /* line_search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AB11F02600600F3484C /* line_search.swift */; };
+		36161FAE1F0297B000F37A90 /* line_search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AB11F02600600F3484C /* line_search.swift */; };
+		36161FAF1F0297B300F37A90 /* cg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AB01F02600600F3484C /* cg.swift */; };
+		36161FB01F0297B800F37A90 /* trust_region.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36816BC91EFD32500091DE53 /* trust_region.swift */; };
+		36161FB11F0297D200F37A90 /* optimisationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05571EFA280E00955522 /* optimisationTests.swift */; };
+		36161FB21F0297D500F37A90 /* gpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAC1F01152400F3484C /* gpTests.swift */; };
+		36161FB31F02982500F37A90 /* error_handling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36000AAE1F024FC200F3484C /* error_handling.swift */; };
 		3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA001EDB1FCC0087C682 /* pairwise.swift */; };
 		3617FA031EDB225F0087C682 /* scg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA021EDB225F0087C682 /* scg.swift */; };
 		3617FA051EDB226E0087C682 /* optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA041EDB226E0087C682 /* optimization.swift */; };
@@ -93,11 +101,9 @@
 		36E368DA1EE295C80026F5DB /* distributions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E368D91EE295C80026F5DB /* distributions.swift */; };
 		36E619871EDF5FFA00B12612 /* rbf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619861EDF5FFA00B12612 /* rbf.swift */; };
 		36E619891EE156FD00B12612 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E619881EE156FD00B12612 /* util.swift */; };
-		36ED05521EF7F4D600955522 /* line_search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05511EF7F4D600955522 /* line_search.swift */; };
 		36ED05541EF9112000955522 /* ColorMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05531EF9112000955522 /* ColorMap.swift */; };
 		36ED05561EF91DFE00955522 /* convolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05551EF91DFE00955522 /* convolution.swift */; };
 		36ED05581EFA280E00955522 /* optimisationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05571EFA280E00955522 /* optimisationTests.swift */; };
-		36ED055A1EFBE23600955522 /* cg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED05591EFBE23600955522 /* cg.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +145,8 @@
 /* Begin PBXFileReference section */
 		36000AAC1F01152400F3484C /* gpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = gpTests.swift; sourceTree = "<group>"; };
 		36000AAE1F024FC200F3484C /* error_handling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = error_handling.swift; sourceTree = "<group>"; };
+		36000AB01F02600600F3484C /* cg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = cg.swift; path = optimisation/cg.swift; sourceTree = "<group>"; };
+		36000AB11F02600600F3484C /* line_search.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = line_search.swift; path = optimisation/line_search.swift; sourceTree = "<group>"; };
 		3617FA001EDB1FCC0087C682 /* pairwise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pairwise.swift; sourceTree = "<group>"; };
 		3617FA021EDB225F0087C682 /* scg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = scg.swift; path = core/scg.swift; sourceTree = "<group>"; };
 		3617FA041EDB226E0087C682 /* optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = optimization.swift; path = core/optimization.swift; sourceTree = "<group>"; };
@@ -208,11 +216,9 @@
 		36E368D91EE295C80026F5DB /* distributions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = distributions.swift; sourceTree = "<group>"; };
 		36E619861EDF5FFA00B12612 /* rbf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = rbf.swift; path = covariance/rbf.swift; sourceTree = "<group>"; };
 		36E619881EE156FD00B12612 /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
-		36ED05511EF7F4D600955522 /* line_search.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = line_search.swift; sourceTree = "<group>"; };
 		36ED05531EF9112000955522 /* ColorMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorMap.swift; sourceTree = "<group>"; };
 		36ED05551EF91DFE00955522 /* convolution.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = convolution.swift; sourceTree = "<group>"; };
 		36ED05571EFA280E00955522 /* optimisationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = optimisationTests.swift; sourceTree = "<group>"; };
-		36ED05591EFBE23600955522 /* cg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = cg.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -472,10 +478,10 @@
 		36ED05501EF5142800955522 /* optimisation */ = {
 			isa = PBXGroup;
 			children = (
+				36000AB01F02600600F3484C /* cg.swift */,
+				36000AB11F02600600F3484C /* line_search.swift */,
 				3617FA021EDB225F0087C682 /* scg.swift */,
 				3617FA041EDB226E0087C682 /* optimization.swift */,
-				36ED05511EF7F4D600955522 /* line_search.swift */,
-				36ED05591EFBE23600955522 /* cg.swift */,
 				36816BC91EFD32500091DE53 /* trust_region.swift */,
 			);
 			name = optimisation;
@@ -784,11 +790,11 @@
 				3670FDA91EEBCD5400AC07F2 /* kernel.swift in Sources */,
 				3670FDA61EEBC8BB00AC07F2 /* power.swift in Sources */,
 				36DFA3EA1D3FC336005CBBC0 /* base_estimator.swift in Sources */,
+				36000AB21F02600600F3484C /* cg.swift in Sources */,
 				36E619891EE156FD00B12612 /* util.swift in Sources */,
 				3617FA011EDB1FCC0087C682 /* pairwise.swift in Sources */,
 				3617FA031EDB225F0087C682 /* scg.swift in Sources */,
 				36C3CEFD1EDECCA600CE1E42 /* random.swift in Sources */,
-				36ED055A1EFBE23600955522 /* cg.swift in Sources */,
 				3689622C1EEC41AD009134A3 /* kmeans.swift in Sources */,
 				36816BCA1EFD32500091DE53 /* trust_region.swift in Sources */,
 				3670FDA51EEBC8BB00AC07F2 /* hyperbolic.swift in Sources */,
@@ -796,9 +802,9 @@
 				3670FDA21EEBC8BB00AC07F2 /* arithmetic.swift in Sources */,
 				3617FA0B1EDD973C0087C682 /* array.swift in Sources */,
 				36E368DA1EE295C80026F5DB /* distributions.swift in Sources */,
-				36ED05521EF7F4D600955522 /* line_search.swift in Sources */,
 				36E619871EDF5FFA00B12612 /* rbf.swift in Sources */,
 				3689623A1EEED815009134A3 /* array_int_extension.swift in Sources */,
+				36000AB31F02600600F3484C /* line_search.swift in Sources */,
 				3689623C1EEF2E15009134A3 /* array_double_extension.swift in Sources */,
 				3670FDA71EEBC8BB00AC07F2 /* trigonometric.swift in Sources */,
 				368962361EEEC2F1009134A3 /* matrix_int_extension.swift in Sources */,
@@ -834,6 +840,7 @@
 				36B2CB2C1EE323B0001751D3 /* distributions.swift in Sources */,
 				36B2CB2A1EE323B0001751D3 /* array.swift in Sources */,
 				368962641EF1101F009134A3 /* core.swift in Sources */,
+				36161FAF1F0297B300F37A90 /* cg.swift in Sources */,
 				36B2CB291EE323B0001751D3 /* matrix.swift in Sources */,
 				368962431EEFDC04009134A3 /* hyperbolic.swift in Sources */,
 				3689623D1EEFDBFA009134A3 /* array_double_extension.swift in Sources */,
@@ -844,15 +851,18 @@
 				368962481EEFDC04009134A3 /* matrix_bool_extension.swift in Sources */,
 				368962451EEFDC04009134A3 /* trigonometric.swift in Sources */,
 				368962401EEFDC04009134A3 /* arithmetic.swift in Sources */,
+				36161FB01F0297B800F37A90 /* trust_region.swift in Sources */,
 				368962441EEFDC04009134A3 /* power.swift in Sources */,
 				36B2CB271EE323B0001751D3 /* scg.swift in Sources */,
 				36B2CB281EE323B0001751D3 /* optimization.swift in Sources */,
 				36B2CB2F1EE323C3001751D3 /* pairwise.swift in Sources */,
+				36161FAE1F0297B000F37A90 /* line_search.swift in Sources */,
 				368962461EEFDC04009134A3 /* matrix_float_extension.swift in Sources */,
 				3689624C1EEFDC0E009134A3 /* kernel.swift in Sources */,
 				3689624B1EEFDC04009134A3 /* array_int_extension.swift in Sources */,
 				36B2CB251EE323B0001751D3 /* random.swift in Sources */,
 				3689624A1EEFDC04009134A3 /* matrix_int_extension.swift in Sources */,
+				36161FB31F02982500F37A90 /* error_handling.swift in Sources */,
 				368962491EEFDC04009134A3 /* array_float_extension.swift in Sources */,
 				368962421EEFDC04009134A3 /* exponential.swift in Sources */,
 			);
@@ -863,6 +873,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				36B2CB321EE323F2001751D3 /* minimindTests.swift in Sources */,
+				36161FB11F0297D200F37A90 /* optimisationTests.swift in Sources */,
+				36161FB21F0297D500F37A90 /* gpTests.swift in Sources */,
 				36B2CB1B1EE322C3001751D3 /* minimind_macTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

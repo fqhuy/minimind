@@ -80,7 +80,8 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
 //        let opt = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
-        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters)
+//        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 2.0, beta: 5.0)
+        let opt = SteepestDescentOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
         
         let (x, _, _) = opt.optimize(verbose: verbose)
         
@@ -152,7 +153,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
         let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
         
         // ANOTHER WAY
-//        let L = cholesky(C, "L")
+//        let L = try! cholesky(C, "L")
 //        var B = cho_solve(L.t, ytrain, "U")
 //        B = cho_solve(L, B, "L")
 //        let D = ScalarT(Xtrain.columns)
@@ -162,7 +163,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
 //        let dLdK = t1 + t2 // -(B * B.t) + D * (iL * iL.t)
 
          // ANOTHER WAY
-//        let alpha = cholesky(C, "L")
+//        let alpha = try! cholesky(C, "L")
 //        let tmp = alpha * alpha.t
 //        let dLdK = tmp - cho_solve(alpha, eye(N), "L")
         

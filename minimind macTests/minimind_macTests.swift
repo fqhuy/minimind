@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import minimind_mac
+@testable import minimind
 
 class minimind_macTests: XCTestCase {
     

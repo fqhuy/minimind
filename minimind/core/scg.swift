@@ -75,7 +75,6 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
                 kappa = (d * d.t)[0, 0]
                 sigma = sigma0 / sqrt(kappa)
                 
-                // FROM HERE
                 let xplus = x + sigma * d
                 let gplus = self.objective.gradient(xplus)
                 function_eval += 1

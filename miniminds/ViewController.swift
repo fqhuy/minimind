@@ -40,11 +40,11 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: log(300.0), lengthscale: log(1000.0), X: X, trainables: ["logVariance", "logLengthscale"])
+        let kern = RBF(variance: 400, lengthscale: 1000, X: X, trainables: ["logVariance", "logLengthscale"])
         let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 1000)
+        gp.fit(X, Y, maxiters: 100)
         
-        print(gp.kernel.getParams())
+        print(gp.kernel.variance, gp.kernel.lengthscale)
         
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
@@ -133,28 +133,33 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             let z = rb.compute(XX[i])
             ZZ[i, 0] = z
         }
-        _ = graph.imshow(ZZ.reshape([n, n]).t, "bicubic", "luce")
-        graph.xOrigin = 0.0
-        graph.yOrigin = 0.0
-        graph.autoScaleAll()
+//        _ = graph.imshow(ZZ.reshape([n, n]).t, "bicubic", "luce")
+//        graph.xOrigin = 0.0
+//        graph.yOrigin = 0.0
+//        graph.autoScaleAll()
 
         
-//        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[1.5, 1.5]]), maxIters: 200)
-//        let (x, fvals, iters) = optimizer.optimize(verbose: true)
-//        
-//        var xx: [Float] = []
-//        var yy: [Float] = []
-//        for i in 0..<optimizer.Xs.count {
-//            xx.append(optimizer.Xs[i][0, 0])
-//            yy.append(optimizer.Xs[i][0, 1])
-//        }
-//        
-//        xx = xx - mean(xx)
-//        yy = yy - mean(yy)
-//        graph.plot(x: xx.cgFloat, y: yy.cgFloat, c: UIColor.green, s: 3.0)
-//        
-//        print (optimizer.Xs)
-//        graph.autoScaleAll()
+
+        let x0 = Matrix<Float>([[-1.2, 1.0]])
+        let initH: Matrix<Float> =   inv(rb.hessian(x0)) // Matrix([[1.0, 0.0],[0.0, 1.0]]) //
+//        let optimizer = QuasiNewtonOptimizer(objective: rb, stepLength: 1.0, initX: x0, initH: nil, gTol: 1e-5, maxIters: 200, fTol: 1e-8, alphaMax: 2.0)
+                let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[-1.2, 1.0]]), maxIters: 200)
+//        let optimizer = SteepestDescentOptimizer(objective: rb, stepLength: 2.0, initX: Matrix<Float>([[-1.2, 1.0]]), maxIters: 500)
+        let (x, fvals, iters) = optimizer.optimize(verbose: true)
+        
+        var xx: [Float] = []
+        var yy: [Float] = []
+        for i in 0..<optimizer.Xs.count {
+            xx.append(optimizer.Xs[i][0, 0])
+            yy.append(optimizer.Xs[i][0, 1])
+        }
+        
+        xx = xx - mean(xx)
+        yy = yy - mean(yy)
+        graph.plot(x: xx.cgFloat, y: yy.cgFloat, c: UIColor.green, s: 3.0)
+        
+        print (optimizer.Xs)
+        graph.autoScaleAll()
 
     }
     
