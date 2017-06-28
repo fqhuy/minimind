@@ -46,18 +46,7 @@ public func len<T>(_ mat: Matrix<T>) -> Int {
     return mat.rows
 }
 
-public func meshgrid<T: ScalarType>(_ x: [T], _ y: [T]) -> (Matrix<T>, Matrix<T>) {
-    var X: Matrix<T> = zeros(len(y), len(x))
-    for r in 0..<len(y) {
-        X[r] = Matrix([x])
-    }
-    var Y: Matrix<T> = zeros(len(y), len(x))
-    for c in 0..<len(x) {
-        Y[column: c] = Matrix([y]).t
-    }
-    return (X, Y)
-}
-
+//MARK: checking matrix and array
 public func checkMatrices<T>(_ lhs: Matrix<T>, _ rhs: Matrix<T>, _ mode: String) {
     let (lr, lc) = lhs.shape
     let (rr, rc) = rhs.shape

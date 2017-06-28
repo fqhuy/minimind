@@ -63,21 +63,48 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         return re
     }
     
-    func cubicInterpolate(_ alpha0: ScalarT, _ alphaLo: ScalarT, _ alphaHi: ScalarT) -> ScalarT {
-        let A = MatrixT([[pow(alphaHi, 2), -pow(alphaLo, 2)],[-pow(alphaHi, 3), pow(alphaLo, 3)]])
-        let v = MatrixT([[phi(alphaLo) - phi(alpha0) - dPhi(alpha0) * alphaLo, phi(alphaHi) - phi(alpha0) - dPhi(alpha0) * alphaHi]])
-        let c = 1.0 / (pow(alphaHi, 2) * pow(alphaLo, 2) * (alphaLo - alphaHi))
-        let ab = c * A * v.t
-        let (a, b) = tuple(ab.grid)
+    //TODO: need to throw an error here
+    func cubicInterpolate(_ a: ScalarT, _ b: ScalarT, _ c: ScalarT) -> ScalarT? {
+//// Old impl. probably wrong
+//        let A = MatrixT([[pow(alphaHi, 2), -pow(alphaLo, 2)],[-pow(alphaHi, 3), pow(alphaLo, 3)]])
+//        let v = MatrixT([[phi(alphaLo) - phi(alpha0) - dPhi(alpha0) * alphaLo, phi(alphaHi) - phi(alpha0) - dPhi(alpha0) * alphaHi]])
+//        let c = 1.0 / (pow(alphaHi, 2) * pow(alphaLo, 2) * (alphaLo - alphaHi))
+//        let ab = c * A * v.t
+//        let (a, b) = tuple(ab.grid)
+//        
+//        let nom = -b * sqrt(b * b - 3 * a * dPhi(alpha0))
+//        return nom / (3.0 * a)
         
-        let nom = -b * sqrt(b * b - 3 * a * dPhi(alpha0))
-        return nom / (3.0 * a)
+        let db = b - a
+        let dc = c - a
+        let A = MatrixT([[pow(dc, 2), -pow(db, 2)],[-pow(dc, 3), pow(db, 3)]])
+        let v = MatrixT([[phi(b) - phi(a) - dPhi(a) * db, phi(c) - phi(a) - dPhi(a) * dc]])
+        
+        let C = 1.0 / (pow(dc, 2) * pow(db, 2) * (db - dc))
+        let ab = C * A * v.t
+        let (alpha, beta) = tuple(ab.grid)
+        
+        let R = beta * beta - 3 * alpha * dPhi(a)
+        if R < 0 || alpha == 0 {
+            return nil
+        }
+        
+        let nom = -beta + sqrt(R)
+        return a + nom / (3.0 * alpha)
     }
     
-    func quadraticInterpolate(_ alphaLo: ScalarT, _ alphaHi: ScalarT) -> ScalarT {
-        let nom = (dPhi(alphaLo) * alphaHi * alphaHi)
-        let denom = 2.0 * (phi(alphaHi) - phi(alphaLo) - dPhi(alphaLo) * alphaHi )
-        return -nom / denom
+    func quadraticInterpolate(_ a: ScalarT, _ b: ScalarT) -> ScalarT? {
+        // old impl., probably wrong
+        //        let nom = (dPhi(a) * b * b)
+        //        let denom = 2.0 * (phi(b) - phi(a) - dPhi(a) * b )
+        //        return -nom / denom
+        
+        let d = b - a
+        let denom = 2.0 * (phi(b) - phi(a) - dPhi(a) * d ) / (d * d)
+        if denom <= 0 || a == b {
+            return nil
+        }
+        return a - dPhi(a) / denom
     }
     
     func interpolateStepLength(alpha: ScalarT = 1.0) -> ScalarT {
@@ -88,7 +115,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
 //        alpha0 = checkAlpha(0.0, alpha0)
         
         // quadratic interpolant
-        var alpha1 = quadraticInterpolate(0.0, alpha0)
+        var alpha1 = quadraticInterpolate(0.0, alpha0)!
         alpha1 = checkAlpha(alpha1, alpha0)
         if checkSufficientDecrease(alpha: alpha1) {
             return alpha1
@@ -97,7 +124,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         var i = 0
         while i < nStepLengthTrials {
             // cubic interpolant
-            var alpha2 = cubicInterpolate(0.0, alpha1, alpha0)
+            var alpha2 = cubicInterpolate(0.0, alpha1, alpha0)!
             alpha2 = checkAlpha(alpha2, alpha1)
             if checkSufficientDecrease(alpha: alpha2) {
                 return alpha2
@@ -132,14 +159,20 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     
     /// compute a reasonable stepLength based on current position & gradient
     public func lineSearch(_ alphaMax: ScalarT = 1.0) -> ScalarT {
-        let alpha0: ScalarT = 0.0
-        var alpha: ScalarT = interpolateStepLength(alpha: alphaMax)
-        var oldAlpha: ScalarT = alpha0
+//        let alpha0: ScalarT = 0.0
+        
+        //TODO: could do better if we know phi from previous iteration
+        var alpha: ScalarT = 1.0 // interpolateStepLength(alpha: alphaMax)
+        var oldAlpha: ScalarT = 0.0
         var i: Int = 1
         while i < nStepLengthTrials {
+            if alpha == 0 {
+                break
+            }
+            
             let ø = phi(alpha)
             // decrease condition
-            if (ø > phi(0) + c1 * alpha * dPhi(0)) || (phi(alpha) >= phi(oldAlpha) && i > 1) {
+            if (ø > (phi(0) + c1 * alpha * dPhi(0))) || ((phi(alpha) >= phi(oldAlpha)) && (i > 1) ) {
                 return zoom(alphaLo: oldAlpha, alphaHi: alpha)
             }
             let π = dPhi(alpha)
@@ -154,32 +187,44 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
             oldAlpha = alpha
             
             // N.O book says we can either do this or use interpolateStepLength.
-            // alpha = interpolateStepLength(stepLength: alpha)
-            alpha += (alphaMax - alpha) * 0.2
+//            alpha += (alphaMax - alpha) * 0.2
+            alpha *= 2.0
             i += 1
         }
+        
         return alpha
     }
     
     public func zoom(alphaLo: ScalarT, alphaHi: ScalarT) -> ScalarT {
         var alphaL = alphaLo
         var alphaH = alphaHi
+        var alphaM: ScalarT = 0.0
+        
         var i = 0
         var alpha = alphaH
-        var oldAlpha = alpha
+        var dAlpha = alphaH - alphaL
+        
+        // constants from Scipy impl.
+        let deltaQ: ScalarT = 0.1
+//        let deltaC: ScalarT = 0.2
+//        var oldAlpha = alpha
         while i < nStepLengthTrials {
-            // cubicInterpolate(min(alphaLo, alphaHi), max(alphaLo, alphaHi))
+            dAlpha = alphaH - alphaL
+            
+            // do a quadratic interpolation, if fails, just do a bisection. 
+            // In Scipy, the order of trials is cubic -> quadratic -> bisection
+            let qAlpha = quadraticInterpolate(alphaL, alphaH)
             
             // make sure the interpolated alpha isn't too close to the ends. N.O p62
-            alpha = quadraticInterpolate(alphaL, alphaH)
-
-            //TODO: funny, if we break right here, everything seems to work
-            if abs(alpha - alphaL) > 1e-5 && abs(alpha - alphaH) > 1e-5 {
-                break
-                
-            } else {
-                alpha = abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
-                break
+            //TODO: funny, in the old impl [08c604acd543d0e352e1b5ad81ece6b221aaf038]. if we break right after this, everything seems to work
+            if qAlpha == nil {
+                alpha = (alphaL + alphaH) / 2.0
+            }
+            else {
+                alpha = qAlpha!
+                if abs(alpha - alphaL) < (deltaQ * dAlpha)  && abs(alpha - alphaH) < (deltaQ * dAlpha) {
+                    alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
+                }
             }
             
             let ø = phi(alpha)
@@ -189,9 +234,6 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
                 alphaH = alpha
             } else {
                 let π = dPhi(alpha)
-//                let C2 = self.c2
-//                let dPhi0 = dPhi(0)
-                
                 //Wolfe 2 condition
                 if abs(π) <= -c2 * dPhi(0) {
                     return alpha
@@ -204,7 +246,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
                 alphaL = alpha
             }
             i += 1
-            oldAlpha = alpha
+//            oldAlpha = alpha
         }
         return alpha
     }
@@ -228,7 +270,7 @@ public class SteepestDescentOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> 
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -G
-            stepLength = lineSearch(initStepLength) // backTrackingSearch(initStepLength) //
+            stepLength = backTrackingSearch(initStepLength) // lineSearch(initStepLength) // 
             
             currentPosition = currentPosition + stepLength * currentSearchDirection // * G  //
             iter += 1
@@ -300,8 +342,8 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)
-//            stepLength = backTrackingSearch(initStepLength)
-            stepLength = lineSearch(initStepLength)
+//            stepLength = backTrackingSearch(alphaMax)
+            stepLength = lineSearch(alphaMax)
             
             if dPhi(0) >= 0 || phi(0) < phi(stepLength) {
                 if verbose {
@@ -376,6 +418,10 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             currentSearchDirection = -transpose(H * g.t)
             stepLength = lineSearch(alphaMax)
             
+            if stepLength == 0 {
+                break
+            }
+            
             if dPhi(0) >= 0 || phi(0) < phi(stepLength) {
                 if verbose {
                     print("iter: ", k, ", f: ", currentF, ", alpha: ", stepLength, "Not a descent step!")
@@ -408,7 +454,7 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             }
             
             if abs(oldF - currentF) < fTol {
-                if nSameF > 10 {
+                if nSameF > 1 {
                     print("converged by relative function reduction!")
                     break
                 } else {

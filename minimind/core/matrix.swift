@@ -763,6 +763,18 @@ public func hstack<T>(_ mats: [Matrix<T>]) -> Matrix<T> {
 }
 
 //MARK: CREATORS
+public func meshgrid<T: ScalarType>(_ x: [T], _ y: [T]) -> (Matrix<T>, Matrix<T>) {
+    var X: Matrix<T> = zeros(len(y), len(x))
+    for r in 0..<len(y) {
+        X[r] = Matrix([x])
+    }
+    var Y: Matrix<T> = zeros(len(y), len(x))
+    for c in 0..<len(x) {
+        Y[column: c] = Matrix([y]).t
+    }
+    return (X, Y)
+}
+
 public func diagonal<T: ScalarType>(_ a: [T]) -> Matrix<T> {
     var m: Matrix<T> = zeros(a.count, a.count)
     for i in 0..<a.count {

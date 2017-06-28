@@ -181,3 +181,8 @@ extension Bool: ScalarType {
     }
 }
 
+//MARK: Scalar operators
+public func close<T: FloatingPointScalarType>(_ a: T, _ b: T, _ tol: T=1e-4) -> Bool {
+    return abs(a - b) < tol
+}
+

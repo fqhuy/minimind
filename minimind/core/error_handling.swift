@@ -15,6 +15,12 @@ enum MatrixError: Error {
     case notPD
 }
 
+enum ParameterError: Error {
+    case invalidParams
+    case negativeParams
+    case positiveParams
+    case infiniteParams
+}
 
 public func checkPSD(_ mat: Matrix<Float>) -> Bool {
     do {
