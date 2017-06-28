@@ -1,6 +1,6 @@
 # ![minimind](https://github.com/fqhuy/minimind/blob/master/doc/images/minimind128.png) minimind: A Minimalist Machine Learning Library written in Swift
 
-The main focus of this library is dimensionality reduction and multi-output regression. I aim to keep the interface as close to numpy/scikit-learn/matplotlib as possible. See playground files for examples. Some wrapper functions for Accelerate were borrowed from [Surge](https://github.com/mattt/Surge).
+The main focus of this library is **dimensionality reduction**, **manifold learning** and **multi-output regression**. Minimind allows fast mobile app prototyping by providing a friendly numpy-like interface and native performance on iOS and MacOS. See playground files for examples. Some wrapper functions for Accelerate were borrowed from [Surge](https://github.com/mattt/Surge).
 
 ## Learning A Predictive Distribution
 ![Predictive](https://github.com/fqhuy/minimind/blob/master/doc/images/regression.png)

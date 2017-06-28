@@ -64,7 +64,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     }
     
     //TODO: need to throw an error here
-    func cubicInterpolate(_ a: ScalarT, _ b: ScalarT, _ c: ScalarT) -> ScalarT? {
+    func cubicInterpolate(_ a: ScalarT, _ b: ScalarT, _ c: ScalarT) -> ScalarT {
 //// Old impl. probably wrong
 //        let A = MatrixT([[pow(alphaHi, 2), -pow(alphaLo, 2)],[-pow(alphaHi, 3), pow(alphaLo, 3)]])
 //        let v = MatrixT([[phi(alphaLo) - phi(alpha0) - dPhi(alpha0) * alphaLo, phi(alphaHi) - phi(alpha0) - dPhi(alpha0) * alphaHi]])
@@ -86,14 +86,14 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         
         let R = beta * beta - 3 * alpha * dPhi(a)
         if R < 0 || alpha == 0 {
-            return nil
+            return ScalarT.nan
         }
         
         let nom = -beta + sqrt(R)
         return a + nom / (3.0 * alpha)
     }
     
-    func quadraticInterpolate(_ a: ScalarT, _ b: ScalarT) -> ScalarT? {
+    func quadraticInterpolate(_ a: ScalarT, _ b: ScalarT) -> ScalarT {
         // old impl., probably wrong
         //        let nom = (dPhi(a) * b * b)
         //        let denom = 2.0 * (phi(b) - phi(a) - dPhi(a) * b )
@@ -102,7 +102,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         let d = b - a
         let denom = 2.0 * (phi(b) - phi(a) - dPhi(a) * d ) / (d * d)
         if denom <= 0 || a == b {
-            return nil
+            return ScalarT.nan
         }
         return a - dPhi(a) / denom
     }
@@ -115,7 +115,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
 //        alpha0 = checkAlpha(0.0, alpha0)
         
         // quadratic interpolant
-        var alpha1 = quadraticInterpolate(0.0, alpha0)!
+        var alpha1 = quadraticInterpolate(0.0, alpha0)
         alpha1 = checkAlpha(alpha1, alpha0)
         if checkSufficientDecrease(alpha: alpha1) {
             return alpha1
@@ -124,7 +124,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         var i = 0
         while i < nStepLengthTrials {
             // cubic interpolant
-            var alpha2 = cubicInterpolate(0.0, alpha1, alpha0)!
+            var alpha2 = cubicInterpolate(0.0, alpha1, alpha0)
             alpha2 = checkAlpha(alpha2, alpha1)
             if checkSufficientDecrease(alpha: alpha2) {
                 return alpha2
@@ -162,7 +162,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
 //        let alpha0: ScalarT = 0.0
         
         //TODO: could do better if we know phi from previous iteration
-        var alpha: ScalarT = 1.0 // interpolateStepLength(alpha: alphaMax)
+        var alpha: ScalarT = 1.0
         var oldAlpha: ScalarT = 0.0
         var i: Int = 1
         while i < nStepLengthTrials {
@@ -187,7 +187,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
             oldAlpha = alpha
             
             // N.O book says we can either do this or use interpolateStepLength.
-//            alpha += (alphaMax - alpha) * 0.2
+//            alpha += (alphaMax - alpha) * 0.5
             alpha *= 2.0
             i += 1
         }
@@ -206,31 +206,38 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         
         // constants from Scipy impl.
         let deltaQ: ScalarT = 0.1
-//        let deltaC: ScalarT = 0.2
-//        var oldAlpha = alpha
+        let deltaC: ScalarT = 0.2
         while i < nStepLengthTrials {
             dAlpha = alphaH - alphaL
+            let lBound = min(alphaL, alphaH)
+            let uBound = max(alphaL, alphaH)
+            // the order of trials is cubic -> quadratic -> bisection
             
-            // do a quadratic interpolation, if fails, just do a bisection. 
-            // In Scipy, the order of trials is cubic -> quadratic -> bisection
+            // make sure the interpolated alpha isn't too close to the alphaLo or alphaHi. N.O p62
+            // TODO: funny, in the old impl [08c604acd543d0e352e1b5ad81ece6b221aaf038].
+            // if we break right after this, everything seems to work
+            
+//            let cAlpha = cubicInterpolate(alphaL, alphaH, alphaM)
+//            alpha = lBound <= cAlpha && cAlpha <= uBound ? cAlpha : alphaL
+//            if abs(alpha - alphaL) < (deltaC * dAlpha)  || abs(alpha - alphaH) < (deltaC * dAlpha) {
+//                let qAlpha = quadraticInterpolate(alphaL, alphaH)
+//                alpha = lBound <= qAlpha && qAlpha <= uBound ? qAlpha : alphaL
+//                if abs(alpha - alphaL) < (deltaQ * dAlpha)  || abs(alpha - alphaH) < (deltaQ * dAlpha) {
+//                    alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
+//                }
+//            }
+            
             let qAlpha = quadraticInterpolate(alphaL, alphaH)
-            
-            // make sure the interpolated alpha isn't too close to the ends. N.O p62
-            //TODO: funny, in the old impl [08c604acd543d0e352e1b5ad81ece6b221aaf038]. if we break right after this, everything seems to work
-            if qAlpha == nil {
-                alpha = (alphaL + alphaH) / 2.0
-            }
-            else {
-                alpha = qAlpha!
-                if abs(alpha - alphaL) < (deltaQ * dAlpha)  && abs(alpha - alphaH) < (deltaQ * dAlpha) {
-                    alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
-                }
+            alpha = lBound <= qAlpha && qAlpha <= uBound ? qAlpha : alphaL
+            if abs(alpha - alphaL) < (deltaQ * dAlpha)  || abs(alpha - alphaH) < (deltaQ * dAlpha) {
+                alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
             }
             
             let ø = phi(alpha)
             // if alpha doesn't satisfy Wolfe 1 or alpha yields a higher function value
             // we narrow down the search range
             if (ø > (phi(0) + c1 * alpha * dPhi(0))) || (ø >= phi(alphaL)) {
+                alphaM = alphaH
                 alphaH = alpha
             } else {
                 let π = dPhi(alpha)
@@ -240,13 +247,15 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
                 }
                 
                 if π * (alphaH - alphaL) >= 0 {
+                    alphaM = alphaH
                     alphaH = alphaL
+                } else {
+                    alphaM = alphaL
                 }
                 
                 alphaL = alpha
             }
             i += 1
-//            oldAlpha = alpha
         }
         return alpha
     }
@@ -410,21 +419,23 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
         var oldF: ScalarT = currentF
         var nSameF = 0
         
+        let outputFmt = "iter: %d, f: %f, alpha: %f"
         if verbose == true {
-            print("iter: ", k, ", f: ", currentF, ", alpha: ", stepLength)
+            print(String(format: outputFmt, 0, currentF, stepLength))
         }
         Xs = [currentPosition]
         while norm(g, "F") > gTol && k < maxIters {
             currentSearchDirection = -transpose(H * g.t)
             stepLength = lineSearch(alphaMax)
             
-            if stepLength == 0 {
+            if stepLength <= 1e-9 || stepLength > 1e8 {
+                print(String(format: outputFmt, k, currentF, stepLength))
                 break
             }
             
             if dPhi(0) >= 0 || phi(0) < phi(stepLength) {
                 if verbose {
-                    print("iter: ", k, ", f: ", currentF, ", alpha: ", stepLength, "Not a descent step!")
+                    print("NOT A DESCENT STEP!")
                 }
             }
             
@@ -440,7 +451,9 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             
             // update H0 according N.O book p143 eq6.20
             if k == 0 && !flagInitH {
-                H = ((yk * sk.t) / (yk * yk.t))[0,0] * I
+                let a = (yk * sk.t)[0, 0]
+                let b =  (yk * yk.t)[0, 0]
+                H = (a / b) * I
             }
             
             let rhok = (1.0 / (yk * sk.t))[0, 0]
@@ -450,11 +463,11 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             H = v * H * v.t + rhok * sk.t * sk
             
             if verbose == true {
-                print("iter: ", k, ", f: ", currentF, ", alpha: ", stepLength)
+                print(String(format: outputFmt, k, currentF, stepLength))
             }
             
             if abs(oldF - currentF) < fTol {
-                if nSameF > 1 {
+                if nSameF > 5 {
                     print("converged by relative function reduction!")
                     break
                 } else {
