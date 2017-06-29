@@ -14,12 +14,21 @@ public class RBF: Kernel {
     public typealias ScalarT = Float
     public typealias MatrixT = Matrix<ScalarT>
     
-    public var X: MatrixT
     public var parametersData: [ScalarT]
     public var trainables: [String] = []
+    public var lockedParams: [String] = []
     public var parametersIds: [String:[IndexType]]
+    public var nFeatures: Int
+    public var nDataPoints: Int
     
-    
+    public var X: MatrixT {
+        get {
+            return MatrixT(nDataPoints, nFeatures, parametersData[parametersIds["X"]!])
+        }
+        set(val) {
+            parametersData[parametersIds["X"]!] = val.grid
+        }
+    }
     public var variance: ScalarT {
         get {
             return exp(logVariance)
@@ -69,16 +78,22 @@ public class RBF: Kernel {
     }
     
     required public init() {
-        X = MatrixT()
-        parametersData = zeros(n: 2)
-        parametersIds = ["logVariance": [0], "logLengthscale": [1]]
+        nFeatures = 0
+        nDataPoints = 0
+
+        parametersData = zeros(2)
+        parametersIds = ["logVariance": [0], "logLengthscale": [1], "X": []]
+        
         variance = 100.0
         lengthscale = 100.0
+        X = MatrixT()
     }
     
     public convenience init(variance: ScalarT, lengthscale: ScalarT, X: MatrixT, trainables: [String] = ["logVariance"], capacity: Int = 10000) {
         self.init()
         self.trainables = trainables
+        (nDataPoints, nFeatures) = X.shape
+        
         parametersData = []
         parametersData.reserveCapacity(capacity)
         
@@ -132,26 +147,39 @@ public class RBF: Kernel {
         // variance
         if trainables.contains("logVariance") {
 //            d[0, parametersIds["logVariance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
-            dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance)
+//            if lockedParams.contains("logVariance") {
+//                dGrid.append(0)
+//            } else {
+                dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance)
+//            }
         }
         
         // lengthscale
         if trainables.contains("logLengthscale") {
 //            d[0, parametersIds["logLengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
-            dGrid.append(-0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0])
+//            if lockedParams.contains("logLengthscale") {
+//                dGrid.append(0)
+//            } else {
+                dGrid.append(-0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0])
+//            }
         }
         
         // gradient wrt X
         if trainables.contains("X") {
-            var tmp = dLdr ∘ invDist(r)
-            tmp = tmp + tmp.t
-            var grad: MatrixT = zeros(N ,D)
-            for i in 0..<D {
-                grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
-            }
-        
-//            d[[0], parametersIds["X"]!] = grad.reshape([1, -1])
-            dGrid.append(contentsOf: grad.grid)
+//            if lockedParams.contains("X") {
+//                dGrid.append(contentsOf: zeros(N * D))
+//            } else {
+                var tmp = dLdr ∘ invDist(r)
+                tmp = tmp + tmp.t
+                var grad: MatrixT = zeros(N ,D)
+                for i in 0..<D {
+                    grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
+                }
+            
+    //            d[[0], parametersIds["X"]!] = grad.reshape([1, -1])
+                grad = grad / (lengthscale * lengthscale)
+                dGrid.append(contentsOf: grad.grid)
+//            }
         }
         return MatrixT([dGrid])
     }
@@ -185,6 +213,9 @@ public class RBF: Kernel {
             for c in 0..<dist.columns {
                 if dist[r, c] == 0 {
                     dist[r, c] = 1e10
+                }
+                else {
+                    dist[r, c] = 1.0 / dist[r, c]
                 }
             }
         }

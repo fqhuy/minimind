@@ -73,13 +73,12 @@ class optimisationTests: XCTestCase {
 
     func testRosenbrock() {
         let rb = Rosenbrock()
-        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: Matrix<Float>([[-2.2, 1.2]]), maxIters: 200, alphaMax: 1.0)
-//        let optimizer = SteepestDescentOptimizer(objective: rb, stepLength: 2.0, initX: Matrix<Float>([[2.2, 1.2]]), maxIters: 200)
+        let x0 = Matrix<Float>([[0.0, 2.0]])
+        let optimizer = NewtonOptimizer(objective: rb, stepLength: 1.0, initX: x0, maxIters: 200, alphaMax: 1.0)
+//        let optimizer = SteepestDescentOptimizer(objective: rb, stepLength: 1.0, initX: x0, maxIters: 200)
+//        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: x0, maxiters: 500)
         let (x, _, _) = optimizer.optimize(verbose: true)
-        
-//        let optimizer = SCG(objective: rb, learning_rate: 0.01, init_x: Matrix<Float>([[-1.2, 1.0]]), maxiters: 100)
-//        let (x, _, _) = optimizer.optimize(verbose: true)
-        print(x)
+        print(optimizer.Xs)
     }
 
     func testSCG() {
@@ -96,11 +95,45 @@ class optimisationTests: XCTestCase {
     
     func testBFGS() {
         let rb = Rosenbrock()
-        let x0 = Matrix<Float>([[-1.2, 1.2]])
+        let x0 = Matrix<Float>([[-2.2, 1.2]])
         let initH: Matrix<Float> =   inv(rb.hessian(x0)) // Matrix([[1.0, 0.0],[0.0, 1.0]]) //
-        let optimizer = QuasiNewtonOptimizer(objective: rb, stepLength: 1.0, initX: x0, initH: nil, gTol: 1e-5, maxIters: 200, fTol: 1e-8, alphaMax: 2.0)
+        let optimizer = QuasiNewtonOptimizer(objective: rb, stepLength: 1.0, initX: x0, initH: nil, gTol: 1e-5, maxIters: 200, fTol: 1e-8, alphaMax: 1.0)
         let (x, _, _) = optimizer.optimize(verbose: true)
         print(optimizer.Xs)
+    }
+    
+    func testInterpolant() {
+        func cubicInterpolate(_ a: Float, _ b: Float, _ c: Float, _ fa: Float, _ fb: Float, _ fc: Float, _ dfa: Float) -> Float {
+
+            let db = b - a
+            let dc = c - a
+            let A = Matrix<Float>([[pow(dc, 2), -pow(db, 2)],[-pow(dc, 3), pow(db, 3)]])
+            let v = Matrix<Float>([[fb - fa - dfa * db, fc - fa - dfa * dc]])
+            
+            let C = 1.0 / (pow(dc, 2) * pow(db, 2) * (db - dc))
+            let ab = C * A * v.t
+            let (alpha, beta) = tuple(ab.grid)
+            
+            let R = beta * beta - 3 * alpha * dfa
+            if R < 0 || alpha == 0 {
+                return Float.nan
+            }
+            
+            let nom = -beta + sqrt(R)
+            return a + nom / (3.0 * alpha)
+        }
+        
+        func quadraticInterpolate(_ a: Float, _ b: Float, _ fa: Float, _ fb: Float, _ dfa: Float) -> Float {
+            let d = b - a
+            let denom = 2.0 * (fb - fa - dfa * d) / (d * d)
+            if denom <= 0 || a == b {
+                return Float.nan
+            }
+            return a - dfa / denom
+        }
+        
+        print(quadraticInterpolate(5.0, 10, 100.0,  200, -5.0))
+        print(cubicInterpolate(5.0, 10, 7, 100.0,  200, 120, -5.0))
     }
     
     func testPerformanceExample() {

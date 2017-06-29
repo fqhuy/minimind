@@ -17,6 +17,9 @@ public protocol Kernel {
     var parametersIds: [String:[IndexType]] {get set}
     var trainables: [String] {get set}
     var trainableIds: [IndexType] {get}
+    var X: MatrixT {get}
+    var nFeatures: Int {get}
+    var nDataPoints: Int {get}
     
     init()
     

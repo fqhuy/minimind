@@ -80,8 +80,8 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
 //        let opt = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
-        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 2.0, beta: 1.0)
-//        let opt = SteepestDescentOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
+//        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 1.0, beta: 1.0)
+        let opt = SteepestDescentOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
         
         let (x, _, _) = opt.optimize(verbose: verbose)
         
@@ -124,8 +124,11 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     
     public func compute(_ x: MatrixT) -> ScalarT {
         kernel.setParams(x)
-        
-        let C = kernel.K(Xtrain, Xtrain) + noise
+        if kernel.trainables.contains("X") {
+            Xtrain = kernel.X
+        }
+        let K = kernel.K(Xtrain, Xtrain)
+        let C = K + noise
         let N = Float(Xtrain.rows)
         
 //        let L = cholesky(C, "L")
@@ -143,6 +146,9 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     
     public func gradient(_ x: MatrixT) -> MatrixT {
         kernel.setParams(x)
+        if kernel.trainables.contains("X") {
+            Xtrain = kernel.X
+        }
         
         let C = kernel.K(Xtrain, Xtrain) + noise
         let N = Xtrain.rows

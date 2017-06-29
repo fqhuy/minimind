@@ -10,24 +10,31 @@ import XCTest
 @testable import minimind
 
 class decompositionTests: XCTestCase {
-    var Y: Matrix<Float> = zeros(100, 15)
+    let N: Int = 20
+    let D: Int = 10
+    let Q: Int = 2
+    
+    var Y: Matrix<Float> = Matrix()
+    var X: Matrix<Float> = Matrix()
 
     override func setUp() {
         super.setUp()
+        self.Y = zeros(N, D)
+        self.X = zeros(N, Q)
         
         let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
         let mean1 = Matrix<Float>([[-3, 0]])
         let mean2 = Matrix<Float>([[3, 0]])
         
-        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(50)
-        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(50)
+        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(N / 2)
+        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(N / 2)
         
         let xx = vstack([X1, X2])
-        var X = xx .- xx.mean(0)
+        X = xx .- xx.mean(0)
         X = X ./ X.std(0)
         
-        let A: Matrix<Float> = randMatrix(2, 15)
-        Y = X * A + 0.01 * randMatrix(100, 15)
+        let A: Matrix<Float> = randMatrix(2, D)
+        Y = X * A + 0.01 * randMatrix(N, D)
     }
     
     override func tearDown() {
@@ -40,6 +47,18 @@ class decompositionTests: XCTestCase {
         let X = pca.predict(Y)
         
         print(X)
+    }
+    
+    func testGPLVM() {
+        let pca = PCA(Q)
+        pca.fit(Y)
+        let initX = pca.predict(Y)
+        
+        let kern = RBF(variance: 200, lengthscale: 1000.0, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
+        gp.fit(X, Y, maxiters: 1000)
+        
+        print(gp.kernel.variance, gp.kernel.lengthscale)
     }
 
     func testPerformanceExample() {

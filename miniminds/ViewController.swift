@@ -84,6 +84,46 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         graph.autoScaleAll(true)
     }
     
+    func visualiseGPLVM() {
+        let N = 20
+        let D = 10
+        let Q = 2
+        
+        var Y: Matrix<Float> = zeros(N, D)
+        var X: Matrix<Float> = zeros(N, Q)
+        
+        let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
+        let mean1 = Matrix<Float>([[-3, 0]])
+        let mean2 = Matrix<Float>([[3, 0]])
+        
+        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(N / 2)
+        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(N / 2)
+        
+        let xx = vstack([X1, X2])
+        X = xx .- xx.mean(0)
+        X = X ./ X.std(0)
+        
+        let A: Matrix<Float> = randMatrix(2, D)
+        Y = X * A + 0.01 * randMatrix(N, D)
+        
+        let pca = PCA(Q)
+        pca.fit(Y)
+        let initX = pca.predict(Y)
+        
+        let kern = RBF(variance: 200, lengthscale: 1000.0, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
+        gp.fit(X, Y, maxiters: 1000)
+        
+        print(gp.kernel.variance, gp.kernel.lengthscale)
+        
+        let Xpred = gp.kernel.X
+        
+        _ = graph.scatter(x: Xpred[∶10, 0].grid.cgFloat, y: Xpred[∶10, 1].grid.cgFloat, c: UIColor.green, s: 10.0)
+        _ = graph.scatter(x: Xpred[10∶20, 0].grid.cgFloat, y: Xpred[10∶20, 1].grid.cgFloat, c: UIColor.red, s: 10.0)
+        
+        graph.autoScaleAll()
+    }
+    
     func visualiseGaussian() {
         let sigma = Matrix<Float>([[1.0, -0.1],[2.2, 5.0]])
         let mu = Matrix<Float>([[0.0, 0.0]])
@@ -173,8 +213,9 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
 //        testImage2D()
 //        visualiseMixtureOfGaussians()
 //        visualiseGaussian()
-        visualise1DRegression()
+//        visualise1DRegression()
 //        visualisePCA()
+        visualiseGPLVM()
     }
 
     override func didReceiveMemoryWarning() {

@@ -23,8 +23,6 @@ class gpTests: XCTestCase {
 
     
     func testGaussianProcessRegressor() {
-        let N = 8
-        let Nf = 20
         let X = Matrix<Float>([[-1.50983293], [-1.11726642], [-0.89303372], [ 0.07971517], [ 0.29116607], [ 0.7494249 ], [ 0.93321463], [ 1.46661229]])
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
@@ -37,8 +35,6 @@ class gpTests: XCTestCase {
         
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
-        
-        
     }
 
     func testPerformanceExample() {

@@ -18,7 +18,9 @@ public protocol LineSearchOptimizer: Optimizer {
     var stepLength: ScalarT {get set}
     var nStepLengthTrials: Int {get set}
     var fTol: ScalarT {get set}
-
+    
+//    func phi(alpha: ScalarT) -> ScalarT
+//    func dPhi(alpha: ScalarT) -> ScalarT
     
     func checkSufficientDecrease(alpha: ScalarT) -> Bool
     func checkCurvatureCondition(alpha: ScalarT) -> Bool
@@ -28,6 +30,7 @@ public protocol LineSearchOptimizer: Optimizer {
 //MARK: Extension and subclass needs the same constraint to work correctly!!
 
 public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
+
 
     /// objective w.r.t stepLength
     func phi(_ alpha: ScalarT) -> ScalarT {
@@ -63,18 +66,9 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         return re
     }
     
-    //TODO: need to throw an error here
+    //TODO: need to cache values here , _ fa: ScalarT, _ fb: ScalarT, _ fc: ScalarT, _ fpa: ScalarT
     func cubicInterpolate(_ a: ScalarT, _ b: ScalarT, _ c: ScalarT) -> ScalarT {
-//// Old impl. probably wrong
-//        let A = MatrixT([[pow(alphaHi, 2), -pow(alphaLo, 2)],[-pow(alphaHi, 3), pow(alphaLo, 3)]])
-//        let v = MatrixT([[phi(alphaLo) - phi(alpha0) - dPhi(alpha0) * alphaLo, phi(alphaHi) - phi(alpha0) - dPhi(alpha0) * alphaHi]])
-//        let c = 1.0 / (pow(alphaHi, 2) * pow(alphaLo, 2) * (alphaLo - alphaHi))
-//        let ab = c * A * v.t
-//        let (a, b) = tuple(ab.grid)
-//        
-//        let nom = -b * sqrt(b * b - 3 * a * dPhi(alpha0))
-//        return nom / (3.0 * a)
-        
+
         let db = b - a
         let dc = c - a
         let A = MatrixT([[pow(dc, 2), -pow(db, 2)],[-pow(dc, 3), pow(db, 3)]])
@@ -94,11 +88,6 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     }
     
     func quadraticInterpolate(_ a: ScalarT, _ b: ScalarT) -> ScalarT {
-        // old impl., probably wrong
-        //        let nom = (dPhi(a) * b * b)
-        //        let denom = 2.0 * (phi(b) - phi(a) - dPhi(a) * b )
-        //        return -nom / denom
-        
         let d = b - a
         let denom = 2.0 * (phi(b) - phi(a) - dPhi(a) * d ) / (d * d)
         if denom <= 0 || a == b {
@@ -158,11 +147,14 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
     }
     
     /// compute a reasonable stepLength based on current position & gradient
-    public func lineSearch(_ alphaMax: ScalarT = 1.0) -> ScalarT {
+    public func lineSearch(_ alphaMax: ScalarT = 1.0, _ oldPhi0: ScalarT? = nil) -> ScalarT {
 //        let alpha0: ScalarT = 0.0
         
         //TODO: could do better if we know phi from previous iteration
         var alpha: ScalarT = 1.0
+        if oldPhi0 != nil {
+            alpha = min(1.0, 1.01 * 2 * (phi(0) - oldPhi0!)/dPhi(0))
+        }
         var oldAlpha: ScalarT = 0.0
         var i: Int = 1
         while i < nStepLengthTrials {
@@ -200,37 +192,55 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
         var alphaH = alphaHi
         var alphaM: ScalarT = 0.0
         
-        var i = 0
+//        var falphaL: ScalarT = 0.0
+//        var falphaH: ScalarT = 0.0
+//        var falphaM: ScalarT = 0.0
+//        
+//        var dfalphaL: ScalarT = 0.0
+//        var dfalphaH: ScalarT = 0.0
+//        var dfalphaM: ScalarT = 0.0
+//        var falpha: ScalarT = 0.0
+//        var dfalpha: ScalarT = 0.0
+        
         var alpha = alphaH
+
         var dAlpha = alphaH - alphaL
         
         // constants from Scipy impl.
         let deltaQ: ScalarT = 0.1
         let deltaC: ScalarT = 0.2
+        
+        var i = 0
         while i < nStepLengthTrials {
             dAlpha = alphaH - alphaL
             let lBound = min(alphaL, alphaH)
             let uBound = max(alphaL, alphaH)
+            
+//            falphaL = phi(alphaL)
+//            falphaH = phi(alphaH)
+//            falphaM = phi(alphaM)
+//            
+//            falphaL = dPhi(alphaL)
+//            falphaH = dPhi(alphaH)
+//            falphaM = dPhi(alphaM)
+//            
+//            falpha = phi(alpha)
+//            dfalpha = dPhi(alpha)
+            
             // the order of trials is cubic -> quadratic -> bisection
             
             // make sure the interpolated alpha isn't too close to the alphaLo or alphaHi. N.O p62
-            // TODO: funny, in the old impl [08c604acd543d0e352e1b5ad81ece6b221aaf038].
+            // TODO: FUN FACT, in the old impl [08c604acd543d0e352e1b5ad81ece6b221aaf038].
             // if we break right after this, everything seems to work
             
-//            let cAlpha = cubicInterpolate(alphaL, alphaH, alphaM)
-//            alpha = lBound <= cAlpha && cAlpha <= uBound ? cAlpha : alphaL
-//            if abs(alpha - alphaL) < (deltaC * dAlpha)  || abs(alpha - alphaH) < (deltaC * dAlpha) {
-//                let qAlpha = quadraticInterpolate(alphaL, alphaH)
-//                alpha = lBound <= qAlpha && qAlpha <= uBound ? qAlpha : alphaL
-//                if abs(alpha - alphaL) < (deltaQ * dAlpha)  || abs(alpha - alphaH) < (deltaQ * dAlpha) {
-//                    alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
-//                }
-//            }
-            
-            let qAlpha = quadraticInterpolate(alphaL, alphaH)
-            alpha = lBound <= qAlpha && qAlpha <= uBound ? qAlpha : alphaL
-            if abs(alpha - alphaL) < (deltaQ * dAlpha)  || abs(alpha - alphaH) < (deltaQ * dAlpha) {
-                alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
+            let cAlpha = cubicInterpolate(alphaL, alphaH, alphaM)
+            alpha = lBound <= cAlpha && cAlpha <= uBound ? cAlpha : alphaL
+            if abs(alpha - alphaL) < (deltaC * dAlpha)  || abs(alpha - alphaH) < (deltaC * dAlpha) || i == 0 {
+                let qAlpha = quadraticInterpolate(alphaL, alphaH)
+                alpha = lBound <= qAlpha && qAlpha <= uBound ? qAlpha : alphaL
+                if abs(alpha - alphaL) < (deltaQ * dAlpha)  || abs(alpha - alphaH) < (deltaQ * dAlpha) {
+                    alpha = (alphaL + alphaH) / 2.0 // abs(alphaL - alphaH) * 0.5 + min(alphaL, alphaH)
+                }
             }
             
             let ø = phi(alpha)
@@ -241,6 +251,7 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
                 alphaH = alpha
             } else {
                 let π = dPhi(alpha)
+                
                 //Wolfe 2 condition
                 if abs(π) <= -c2 * dPhi(0) {
                     return alpha
@@ -263,12 +274,12 @@ public extension LineSearchOptimizer where ObjectiveFunctionT.ScalarT == Float {
 
 public class SteepestDescentOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> where F.ScalarT == Float {
 
-    public override func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
+    public override func optimize(verbose: Bool) -> (MatrixT, [ScalarT], Int) {
         currentPosition = initX
         var iter = 0
-        var currentF: Float = 0.0
-        var oldF: Float = 0.0
-        var Fs: [Float] = []
+        var currentF: ScalarT = 0.0
+        var oldF: ScalarT = 0.0
+        var Fs: [ScalarT] = []
         
         while iter < maxIters {
             Xs.append(currentPosition)
@@ -279,7 +290,11 @@ public class SteepestDescentOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> 
             let G = objective.gradient(currentPosition)
             
             currentSearchDirection = -G
-            stepLength = backTrackingSearch(initStepLength) // lineSearch(initStepLength) // 
+            if iter > 0 {
+                stepLength = lineSearch(initStepLength, oldF) //  backTrackingSearch(initStepLength) //
+            } else {
+                stepLength = lineSearch(initStepLength)
+            }
             
             currentPosition = currentPosition + stepLength * currentSearchDirection // * G  //
             iter += 1
@@ -307,12 +322,12 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
     public var currentPosition: MatrixT
     public var currentSearchDirection: MatrixT
     public var maxIters = 100
-    public var nStepLengthTrials = 100
+    public var nStepLengthTrials = 50
     public var initX: MatrixT
     public var objective: F
     public var Xs: [MatrixT] = []
     // 0 < c1 < c2 < 1
-    public var c1: ScalarT = 0.001
+    public var c1: ScalarT = 0.0001
     public var c2: ScalarT = 0.9
     public var alphaMax: ScalarT
     public var fTol: Float = 1e-5
@@ -352,11 +367,16 @@ public class NewtonOptimizer<F: ObjectiveFunction>: LineSearchOptimizer where F.
             
             currentSearchDirection = -cho_solve(L, G, "L") // -transpose(inv(H) * G.t)
 //            stepLength = backTrackingSearch(alphaMax)
-            stepLength = lineSearch(alphaMax)
+            if iter > 0 {
+                stepLength = lineSearch(alphaMax, oldF)
+            } else {
+                stepLength = lineSearch(alphaMax)
+            }
             
             if dPhi(0) >= 0 || phi(0) < phi(stepLength) {
                 if verbose {
                     print("iter: ", iter, ", f: ", currentF, ", alpha: ", stepLength, "Not a descent step!")
+                    break
                 }
             }
             
@@ -410,7 +430,7 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
     }
     
     public override func optimize(verbose: Bool) -> (MatrixT, [Float], Int) {
-        var k = 0
+        var iter = 0
         var g = objective.gradient(currentPosition)
         var oldG = g
         var oldPosition = currentPosition
@@ -424,12 +444,25 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             print(String(format: outputFmt, 0, currentF, stepLength))
         }
         Xs = [currentPosition]
-        while norm(g, "F") > gTol && k < maxIters {
-            currentSearchDirection = -transpose(H * g.t)
-            stepLength = lineSearch(alphaMax)
+        while norm(g, "F") > gTol && iter < maxIters {
+            oldF = currentF
+            currentF = objective.compute(currentPosition)
             
-            if stepLength <= 1e-9 || stepLength > 1e8 {
-                print(String(format: outputFmt, k, currentF, stepLength))
+            currentSearchDirection = -transpose(H * g.t)
+            
+            if iter > 0 {
+                stepLength = lineSearch(alphaMax, oldF)
+            } else {
+                stepLength = lineSearch(alphaMax)
+            }
+//            stepLength = backTrackingSearch(initStepLength)
+            
+            if stepLength < 1e-9 || stepLength > 1e8 {
+                if verbose {
+                    print("WEIRD STEP LENGTH!")
+                    print(String(format: outputFmt, iter, currentF, stepLength))
+//                    stepLength = 1e-5
+                }
                 break
             }
             
@@ -442,15 +475,12 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             currentPosition = currentPosition + stepLength * currentSearchDirection
             Xs.append(currentPosition)
             
-            oldF = currentF
-            currentF = objective.compute(currentPosition)
-            
             g = objective.gradient(currentPosition)
             let sk = currentPosition - oldPosition
             let yk = g - oldG
             
             // update H0 according N.O book p143 eq6.20
-            if k == 0 && !flagInitH {
+            if iter == 0 && !flagInitH {
                 let a = (yk * sk.t)[0, 0]
                 let b =  (yk * yk.t)[0, 0]
                 H = (a / b) * I
@@ -463,7 +493,7 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             H = v * H * v.t + rhok * sk.t * sk
             
             if verbose == true {
-                print(String(format: outputFmt, k, currentF, stepLength))
+                print(String(format: outputFmt, iter, currentF, stepLength))
             }
             
             if abs(oldF - currentF) < fTol {
@@ -477,10 +507,10 @@ public class QuasiNewtonOptimizer<F: ObjectiveFunction>: NewtonOptimizer<F> wher
             
             oldG = g
             oldPosition = currentPosition
-            k += 1
+            iter += 1
         }
         
-        return (currentPosition, [0.0], k)
+        return (currentPosition, [0.0], iter)
     }
 }
 

@@ -205,7 +205,7 @@ public func concatenate<T>(_ arrays: [[T]]) -> [T] {
     return re
 }
 
-public func zeros<T: HasZero>(n: Int) -> [T] {
+public func zeros<T: HasZero>(_ n: Int) -> [T] {
     return [T](repeating: T.zero, count: n)
 }
 
