@@ -79,9 +79,9 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         
         let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
-//        let opt = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
+        let opt = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
 //        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 1.0, beta: 1.0)
-        let opt = SteepestDescentOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
+//        let opt = SteepestDescentOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
         
         let (x, _, _) = opt.optimize(verbose: verbose)
         
@@ -130,18 +130,18 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
         let K = kernel.K(Xtrain, Xtrain)
         let C = K + noise
         let N = Float(Xtrain.rows)
+        let D = Float(Xtrain.columns)
         
-//        let L = cholesky(C, "L")
         let L = cho_factor(C, "L")
         let alpha = cho_solve(L, ytrain, "L")
         
         // same as 0.5 * tr(alpha.t * alpha)
-        let ytCy = 0.5 * reduce_sum(alpha ∘ ytrain)[0, 0] //in neill code, it is alpha \circ alpha
+        let ytCy = reduce_sum(alpha ∘ alpha)[0, 0]
 
-        let logdetC = reduce_sum(log(diag(L)))[0, 0] // 0.5 * D * logdet(C)
+        let logdetC = D * reduce_sum(log(diag(L)))[0, 0] // 0.5 * D * logdet(C)
 
         // Negative log likelihood
-        return ytCy + logdetC + N / 2.0 * log(2.0 * ScalarT.pi) + kernel.logPrior
+        return 0.5 * (ytCy + logdetC + N * log(2.0 * ScalarT.pi)) + kernel.logPrior
     }
     
     public func gradient(_ x: MatrixT) -> MatrixT {
@@ -151,27 +151,19 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
         }
         
         let C = kernel.K(Xtrain, Xtrain) + noise
+        let D = Float(Xtrain.columns)
         let N = Xtrain.rows
         
 //        DIRECT GRADIENT
-        let Cinv = inv(C)
-        let D = Float(Xtrain.columns)
-        let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
-        
-        // ANOTHER WAY
-//        let L = try! cholesky(C, "L")
-//        var B = cho_solve(L.t, ytrain, "U")
-//        B = cho_solve(L, B, "L")
-//        let D = ScalarT(Xtrain.columns)
-//        let iL = inv(L, "L")
-//        let t1 = -(B * transpose(B) )
-//        let t2 = D * (iL * transpose(iL) )
-//        let dLdK = t1 + t2 // -(B * B.t) + D * (iL * iL.t)
+//        let Cinv = inv(C)
+//        let dLdK = Cinv * ytrain * ytrain.t * Cinv + D * Cinv
 
-         // ANOTHER WAY
-//        let alpha = try! cholesky(C, "L")
-//        let tmp = alpha * alpha.t
-//        let dLdK = tmp - cho_solve(alpha, eye(N), "L")
+        // FASTEST
+        // Ref: ExactGaussianInference from GPy and GaussianProcessRegressor from scikit-learn
+        let L = cho_factor(C, "L")
+        let alpha = cho_solve(L, ytrain, "L") // this gives inv(K) * ytrain
+        let tmp =  alpha * alpha.t
+        let dLdK = -0.5 * (tmp - D * cho_solve(L, eye(N), "L"))
         
         return kernel.gradient(Xtrain, Xtrain, dLdK)
     }

@@ -54,8 +54,8 @@ class decompositionTests: XCTestCase {
         pca.fit(Y)
         let initX = pca.predict(Y)
         
-        let kern = RBF(variance: 200, lengthscale: 1000.0, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
-        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
+        let kern = RBF(variance: 1.0, lengthscale: 1.0, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.8)
         gp.fit(X, Y, maxiters: 1000)
         
         print(gp.kernel.variance, gp.kernel.lengthscale)

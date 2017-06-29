@@ -20,6 +20,7 @@ public class RBF: Kernel {
     public var parametersIds: [String:[IndexType]]
     public var nFeatures: Int
     public var nDataPoints: Int
+    public var XUpdateMask: [Bool] = []
     
     public var X: MatrixT {
         get {
@@ -32,18 +33,22 @@ public class RBF: Kernel {
     public var variance: ScalarT {
         get {
             return exp(logVariance)
+//            return log(1 + exp(logVariance))
         }
         set(val) {
             logVariance = exp(val)
+//            logVariance = log(exp(val) - 1)
         }
     }
     
     public var lengthscale: ScalarT {
         get {
             return exp(logLengthscale)
+//            return log(1 + exp(logLengthscale))
         }
         set(val) {
             logLengthscale = exp(val)
+//            logLengthscale = log(exp(val) - 1)
         }
     }
     
@@ -110,17 +115,12 @@ public class RBF: Kernel {
     }
     
     public func initParams() -> MatrixT {
-//        return MatrixT([[logVariance, logLengthscale] ∪ self.X.grid])
         var params: [Float] = []
         for t in trainableIds {
             params.append(parametersData[t])
         }
         return MatrixT([params])
     }
-    
-//    public func getParams() -> MatrixT {
-//        return MatrixT([[logVariance, logLengthscale]])
-//    }
     
     public func K(_ X: MatrixT,_ Y: MatrixT) -> MatrixT {
         let dist = scaledDist(X, Y)
@@ -138,7 +138,6 @@ public class RBF: Kernel {
     
     public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
         let (N, D) = X.shape
-        var d: MatrixT =  zeros(1, trainableIds.count) // zeros(1, 2 + D * N)
         var dGrid: [ScalarT] = []
         let r = scaledDist(X, Y)
         let Kr = K(r: r)
@@ -146,40 +145,27 @@ public class RBF: Kernel {
         
         // variance
         if trainables.contains("logVariance") {
-//            d[0, parametersIds["logVariance"]![0]] = (reduce_sum(Kr ∘ dLdK))[0, 0] / variance
-//            if lockedParams.contains("logVariance") {
-//                dGrid.append(0)
-//            } else {
-                dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance)
-//            }
+            dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance)
         }
         
         // lengthscale
         if trainables.contains("logLengthscale") {
-//            d[0, parametersIds["logLengthscale"]![0]] = -0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0]
-//            if lockedParams.contains("logLengthscale") {
-//                dGrid.append(0)
-//            } else {
-                dGrid.append(-0.5 * (reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0])
-//            }
+//            dGrid.append(-(reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0] / lengthscale) // 0.5 *
+            dGrid.append(-reduce_sum(dLdr ∘ r)[0,0] / lengthscale)
         }
         
         // gradient wrt X
         if trainables.contains("X") {
-//            if lockedParams.contains("X") {
-//                dGrid.append(contentsOf: zeros(N * D))
-//            } else {
-                var tmp = dLdr ∘ invDist(r)
-                tmp = tmp + tmp.t
-                var grad: MatrixT = zeros(N ,D)
-                for i in 0..<D {
-                    grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
-                }
+
+            var tmp = dLdr ∘ invDist(r)
+            tmp = tmp + tmp.t
+            var grad: MatrixT = zeros(N ,D)
+            for i in 0..<D {
+                grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
+            }
             
-    //            d[[0], parametersIds["X"]!] = grad.reshape([1, -1])
-                grad = grad / (lengthscale * lengthscale)
-                dGrid.append(contentsOf: grad.grid)
-//            }
+            grad = grad / (lengthscale * lengthscale)
+            dGrid.append(contentsOf: grad.grid)
         }
         return MatrixT([dGrid])
     }

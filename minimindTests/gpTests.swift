@@ -27,9 +27,9 @@ class gpTests: XCTestCase {
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 400, lengthscale: 1000, X: X, trainables: ["logVariance", "logLengthscale"])
-        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 1.0)
-        gp.fit(X, Y, maxiters: 200)
+        let kern = RBF(variance: 1.0, lengthscale: 10.0, X: X, trainables: ["logVariance", "logLengthscale"])
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.4)
+        gp.fit(X, Y, maxiters: 1000)
         
         print(gp.kernel.variance, gp.kernel.lengthscale)
         

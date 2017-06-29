@@ -17,9 +17,14 @@ public protocol Kernel {
     var parametersIds: [String:[IndexType]] {get set}
     var trainables: [String] {get set}
     var trainableIds: [IndexType] {get}
+    
     var X: MatrixT {get}
+    // to allow updating part of X (e.g when dealing with missing data)
+    var XUpdateMask: [Bool] {get set}
+    
     var nFeatures: Int {get}
     var nDataPoints: Int {get}
+    
     
     init()
     

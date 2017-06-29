@@ -25,6 +25,7 @@
 		3617FA051EDB226E0087C682 /* optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA041EDB226E0087C682 /* optimization.swift */; };
 		3617FA071EDC23860087C682 /* matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA061EDC23860087C682 /* matrix.swift */; };
 		3617FA0B1EDD973C0087C682 /* array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3617FA0A1EDD973C0087C682 /* array.swift */; };
+		361EF99B1F04FA44003EED49 /* gplvm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36161FB81F0452CB00F37A90 /* gplvm.swift */; };
 		363DDC9E1EE4AF02003607B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDC9D1EE4AF02003607B4 /* AppDelegate.swift */; };
 		363DDCA01EE4AF02003607B4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363DDC9F1EE4AF02003607B4 /* ViewController.swift */; };
 		363DDCA31EE4AF02003607B4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 363DDCA11EE4AF02003607B4 /* Main.storyboard */; };
@@ -866,6 +867,7 @@
 				3689624C1EEFDC0E009134A3 /* kernel.swift in Sources */,
 				3689624B1EEFDC04009134A3 /* array_int_extension.swift in Sources */,
 				36B2CB251EE323B0001751D3 /* random.swift in Sources */,
+				361EF99B1F04FA44003EED49 /* gplvm.swift in Sources */,
 				3689624A1EEFDC04009134A3 /* matrix_int_extension.swift in Sources */,
 				36161FB31F02982500F37A90 /* error_handling.swift in Sources */,
 				368962491EEFDC04009134A3 /* array_float_extension.swift in Sources */,
