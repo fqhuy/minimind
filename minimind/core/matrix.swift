@@ -80,7 +80,7 @@ public struct Matrix<T> {
     
     public init(_ data: [[Element]]) {
         precondition(data.count > 0)
-        precondition(all(data.map{ $0.count } == data[0].count) , "all dimensions in data must be equal")
+        precondition(minimind.all(data.map{ $0.count } == data[0].count) , "all dimensions in data must be equal")
         rows = data.count
         columns = data[0].count
         _grid = flatten(data)
@@ -208,6 +208,24 @@ public struct Matrix<T> {
             let rows = [row]
             let cols = fcol(self.columns)
             self[rows, cols] = val
+        }
+    }
+    
+    public subscript(_ frow: (Int) -> [Int], _ cols: [Int]) -> Matrix {
+        get {
+            return self[frow(rows), cols]
+        }
+        set(val) {
+            self[frow(rows), cols] = val
+        }
+    }
+    
+    public subscript(_ rows: [Int], _ fcol: (Int) -> [Int]) -> Matrix {
+        get {
+            return self[rows, fcol(columns)]
+        }
+        set(val) {
+            self[rows, fcol(columns)] = val
         }
     }
     
@@ -628,6 +646,17 @@ public func abs<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<T> {
     return newmat
 }
 
+public func square<T: ScalarType>(_ mat: inout Matrix<T>, inplace: Bool = false) -> Matrix<T> {
+    if inplace {
+        for r in 0..<mat.grid.count {
+            mat.grid[r] = mat.grid[r] * mat.grid[r]
+        }
+        return mat
+    } else {
+        return Matrix<T>(mat.rows, mat.columns, mat.grid.map{ $0 * $0 })
+    }
+}
+
 public func max<T: ScalarType>(_ mat: Matrix<T>) -> T {
     return minimind.max(mat.grid)
 }
@@ -638,6 +667,11 @@ public func min<T: ScalarType>(_ mat: Matrix<T>) -> T {
 
 public func max<T: ScalarType>(_ mat: Matrix<T>, axis: Int) -> Matrix<T> {
     return mat.apply(minimind.max, axis)
+}
+
+// element wise max
+public func fmax<T: ScalarType>(_ mat: Matrix<T>, _ a: T) -> Matrix<T> {
+    return Matrix<T>(mat.rows, mat.columns, mat.grid.map{ $0 > a ? $0 : a } )
 }
 
 public func min<T: ScalarType>(_ mat: Matrix<T>, axis: Int) -> Matrix<T> {
@@ -670,7 +704,7 @@ public func trace<T: ScalarType>(_ mat: Matrix<T>) ->T {
 
 //MARK: TRAVERSE
 
-public func reduce_sum<T: ScalarType>(_ mat: Matrix<T>,_ axis: Int = -1) -> Matrix<T> {
+public func reduce_sum<T: ScalarType>(_ mat: Matrix<T>, axis: Int = -1) -> Matrix<T> {
     return mat.apply(minimind.sum, axis)
 }
 
@@ -804,3 +838,7 @@ public func eye<T: ScalarType>(_ D: Int) -> Matrix<T> {
     return mat
 }
 
+public func linspace<T: FloatingPointScalarType>(_ from: T, _ to: T, _ n: Int) -> Matrix<T> {
+    let step = (to - from) / T(n)
+    return Matrix<T>(1, n, (0..<n).map{ T($0) * step + from })
+}

@@ -82,7 +82,7 @@ class optimisationTests: XCTestCase {
     }
 
     func testSCG() {
-        let scg = SCG(objective: Quad(2.0, -3.0, 5.0), learning_rate: 0.01, init_x: Matrix<Float>([[5.0]]), maxiters: 200)
+        let scg = SCG(objective: Quad(2.0, -3.0, 5.0), learningRate: 0.01, initX: Matrix<Float>([[5.0]]), maxIters: 200)
         let (x, _, _) = scg.optimize(verbose: true)
         print(x)
     }

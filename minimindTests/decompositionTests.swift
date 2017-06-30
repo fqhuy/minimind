@@ -54,11 +54,31 @@ class decompositionTests: XCTestCase {
         pca.fit(Y)
         let initX = pca.predict(Y)
         
-        let kern = RBF(variance: 1.0, lengthscale: 1.0, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
-        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.8)
-        gp.fit(X, Y, maxiters: 1000)
+        let kern = RBF(variance: 10.0, lengthscale: 10.0, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
+//        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.8)
+//        gp.fit(X, Y, maxiters: 1000)
+        
+        let gp = GPLVM(kernel: kern, alpha: 0.8)
+        gp.fit(initX, Y)
+        
+        let Xpred = gp.kernel.X
+        
+        let (maxX, maxY) = tuple(max(Xpred, axis: 0).grid)
+        let (minX, minY) = tuple(min(Xpred, axis: 0).grid)
+        
+        let Xs: Matrix<Float> = linspace(minX, maxX, 20)
+        let Ys: Matrix<Float> = linspace(minY, maxY, 20)
+        
+        let XStar = vstack([Xs, Ys]).t
+        let (means, covs) = gp.predict(XStar[0])
+        
+//        var ys = Y[0, forall] * 2.0
+//        ys[0, 1] = Float.nan
+//        let xs = gp.predictX(ys, true)
+//        print(xs)
         
         print(gp.kernel.variance, gp.kernel.lengthscale)
+
     }
 
     func testPerformanceExample() {

@@ -15,15 +15,15 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
 
     typealias T = ScalarT
     public var objective: F
-    var init_x: MatrixT
+    var initX: MatrixT
     public var Xs: [MatrixT] = []
-    var maxiters: Int
+    var maxIters: Int
     var verbose: Bool = false
     
-    public init(objective: F, learning_rate: Float, init_x: MatrixT, maxiters: Int = 200) {
+    public init(objective: F, learningRate: Float, initX: MatrixT, maxIters: Int = 200) {
         self.objective = objective
-        self.init_x = init_x
-        self.maxiters = maxiters
+        self.initX = initX
+        self.maxIters = maxIters
     }
     
     public func optimize(verbose: Bool = false) -> (MatrixT, [Float], Int) {
@@ -33,10 +33,10 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
         let max_f_eval = 10000
         
         let sigma0: T = 1.0e-7
-        var fold: T = self.objective.compute(self.init_x)
+        var fold: T = self.objective.compute(self.initX)
         var function_eval = 1
         var fnow = fold
-        var gradnew: MatrixT = self.objective.gradient(self.init_x)
+        var gradnew: MatrixT = self.objective.gradient(self.initX)
         function_eval += 1
         
         var current_grad = (gradnew * gradnew.t)[0, 0]
@@ -61,11 +61,11 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
         var beta: T = 1.0
         var Gamma: T = 0.0
         var mu: T = 0.0
-        var x = self.init_x
+        var x = self.initX
         var xnew: MatrixT
         var fnew: T = 0.0
         Xs.append(x)
-        while iteration < self.maxiters {
+        while iteration < self.maxIters {
             if success {
                 mu = (d * gradnew.t)[0, 0]
                 if mu >= 0 {
@@ -156,7 +156,7 @@ public class SCG<F: ObjectiveFunction>: Optimizer where F.ScalarT == Float {
                 d = Gamma * d - gradnew
             }
         }
-        if iteration == maxiters {
+        if iteration == maxIters {
             status = "maxiter exceeded"
         }
         if verbose {

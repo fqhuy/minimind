@@ -14,8 +14,12 @@ public typealias IndexType = Int
 
 //MARK: Can ScalaType be SignedNumber ?
 
-public typealias ScalarType = HasSign & HasZero & HasOne & HasArithmeticOps & HasComparisonOps
+public typealias ScalarType = HasSign & HasZero & HasOne & HasArithmeticOps & HasComparisonOps & HasNaN
 public typealias FloatingPointScalarType = ScalarType & BinaryFloatingPoint
+
+public protocol HasNaN {
+    var isNaN: Bool {get}
+}
 
 public protocol HasSign {
     prefix static func -(x: Self) -> Self
@@ -111,6 +115,11 @@ extension Double: ScalarType {
 }
 
 extension Int: ScalarType {
+    //TODO: very inappropriate for now
+    public var isNaN: Bool {
+        return self == Int.min
+    }
+
     public static func abs(_ x: Int) -> Int {
         return abs(x)
     }
@@ -128,6 +137,10 @@ extension Int: ScalarType {
 }
 
 extension Bool: ScalarType {
+    public var isNaN: Bool {
+        return false
+    }
+
     public static func abs(_ x: Bool) -> Bool {
         return x
     }

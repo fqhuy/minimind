@@ -36,6 +36,9 @@ public protocol Kernel {
     /// - Returns: gradient of the parameters
     func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT
     
+    /// compute the gradient of K w.r.t X
+    func gradientX(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT
+    
     /// each kernel should know how to set it parameters, all combined in a single 1xP vector
     mutating func setParams(_ params: MatrixT)
     
@@ -51,7 +54,7 @@ public protocol Kernel {
     /// parameters in log space
     //    var theta: MatrixT {get set}
     
-    /// log prior
+    /// log prior of all hyper parameters
     var logPrior: ScalarT {get}
 }
 

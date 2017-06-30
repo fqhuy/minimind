@@ -27,14 +27,16 @@ class gpTests: XCTestCase {
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 1.0, lengthscale: 10.0, X: X, trainables: ["logVariance", "logLengthscale"])
+        let kern = RBF(variance: 100.0, lengthscale: 100.0, X: X, trainables: ["logVariance", "logLengthscale"])
         let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.4)
         gp.fit(X, Y, maxiters: 1000)
         
         print(gp.kernel.variance, gp.kernel.lengthscale)
         
-        let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
+        let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.5))
         let (Mu, Sigma) = gp.predict(Xstar)
+        
+        print(Mu, Sigma)
     }
 
     func testPerformanceExample() {

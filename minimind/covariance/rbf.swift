@@ -136,8 +136,30 @@ public class RBF: Kernel {
         return -r ∘ K(r: r)
     }
     
-    public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
+    public func gradientX(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
+        let r = scaledDist(X, Y)
         let (N, D) = X.shape
+        let dLdr = dKdr(r: r) ∘ dLdK
+        var tmp = dLdr ∘ invDist(r)
+        
+        // TODO: detect X == Y here, should use Y: MatrixT? in the future
+        if X.rows == Y.rows {
+            if all(diag(r) == 0) {
+                tmp = tmp + tmp.t
+            }
+        }
+//        tmp = tmp + tmp.t
+        var grad: MatrixT = zeros(N ,D)
+        for i in 0..<D {
+            grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), axis: 1)
+        }
+        
+        grad = grad / (lengthscale * lengthscale)
+        return grad
+    }
+    
+    public func gradient(_ X: MatrixT, _ Y: MatrixT, _ dLdK: MatrixT) -> MatrixT {
+//        let (N, D) = X.shape
         var dGrid: [ScalarT] = []
         let r = scaledDist(X, Y)
         let Kr = K(r: r)
@@ -156,28 +178,32 @@ public class RBF: Kernel {
         
         // gradient wrt X
         if trainables.contains("X") {
-
-            var tmp = dLdr ∘ invDist(r)
-            tmp = tmp + tmp.t
-            var grad: MatrixT = zeros(N ,D)
-            for i in 0..<D {
-                grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
-            }
-            
-            grad = grad / (lengthscale * lengthscale)
-            dGrid.append(contentsOf: grad.grid)
+            let xGrad = gradientX(X, Y, dLdK)
+            dGrid.append(contentsOf: xGrad.grid)
+//            var tmp = dLdr ∘ invDist(r)
+//            tmp = tmp + tmp.t
+//            var grad: MatrixT = zeros(N ,D)
+//            for i in 0..<D {
+//                grad[forall, i] = reduce_sum(tmp ∘ cross_add(X[forall, i], -Y[forall, i]), 1)
+//            }
+//            
+//            grad = grad / (lengthscale * lengthscale)
+//            dGrid.append(contentsOf: grad.grid)
         }
         return MatrixT([dGrid])
     }
      
     public func dist(_ X: MatrixT, _ Y: MatrixT) -> MatrixT {
-        let xx = reduce_sum(X ∘ X, 1)
-        let yy = reduce_sum(Y ∘ Y, 1)
+        let xx = reduce_sum(X ∘ X, axis: 1)
+        let yy = reduce_sum(Y ∘ Y, axis: 1)
         var dist = cross_add(xx, yy) - 2.0 * (X * Y′)
         
         if X.rows == Y.rows {
-            for r in 0..<dist.rows {
-                dist[r, r] = 0.0
+            // detects X == Y, should use Y: MatrixT? instead
+            if diag(dist).sum()[0,0] < 1e-4 {
+                for r in 0..<dist.rows {
+                    dist[r, r] = 0.0
+                }
             }
         }
         dist = clip(dist, 0.0, 1e10)

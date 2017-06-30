@@ -10,6 +10,19 @@ import Foundation
 import Accelerate
 
 //MARK: COMPARISONS
+public extension Matrix where T == Bool {
+    public func any() -> Bool {
+        return minimind.any(self)
+    }
+    
+    public func all() -> Bool {
+        return minimind.all(self)
+    }
+}
+
+public func isnan<T: ScalarType>(_ mat: Matrix<T>) -> Matrix<Bool> {
+    return Matrix<Bool>(mat.rows, mat.columns, mat.grid.map{ $0.isNaN } )
+}
 
 public func all(_ mat: Matrix<Bool>) -> Bool {
     return all(mat.grid)

@@ -31,24 +31,17 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
     public var noise: MatrixT
     public var ytrain: MatrixT
     public var Kxx: MatrixT
-    
-    public var likelihood: GPLikelihood<KernelT> {
-        get {
-            return GPLikelihood(kernel, noise, Xtrain, ytrain)
-        }
-        
-        set(val) {
-            
-        }
-    }
+    public var likelihood: GPLikelihood<KernelT>
 
     public init( kernel: KernelT, alpha: ScalarT = 1.0) {
         self.kernel = kernel
+        self.alpha = alpha
+        
         Kxx = MatrixT()
         Xtrain = MatrixT()
         noise = MatrixT()
         ytrain = MatrixT()
-        self.alpha = alpha
+        likelihood = GPLikelihood(kernel, noise, Xtrain, ytrain)
     }
     
     public convenience init(X: MatrixT, Y: MatrixT, kernel: KernelT, alpha: ScalarT = 1.0) {
@@ -58,15 +51,14 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
     }
     
     public func predict(_ X: MatrixT) -> (MatrixT, MatrixT) {
+        // Last version: 7bd2556cf346844cedebe7590fce71ebc61cf189
         let Kxz = kernel.K(X, Xtrain)
         let Kzz = kernel.K(X, X)
-        Kxx = kernel.K(Xtrain, Xtrain)
         
-        let invK = inv(Kxx + noise)
-        let Sigma = Kzz - Kxz * invK * transpose(Kxz)
-        let Mu = Kxz * invK * ytrain
+        let Sigma = Kzz - Kxz * likelihood.woodburyInv * transpose(Kxz)
+        let Mu = Kxz * likelihood.woodburyVector
         
-        return (Mu.t, Sigma)
+        return (Mu.t, diag(Sigma))
     }
     
     public func fit(_ X: MatrixT, _ y: MatrixT, maxiters: Int = 200, verbose: Bool = true) {
@@ -77,15 +69,16 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         let e: Matrix<ScalarT> = eye(X.rows)
         noise = e * (alpha * alpha)
         
-        let llh = GPLikelihood(kernel, noise, Xtrain, ytrain)
+        likelihood = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
-        let opt = SCG(objective: llh, learning_rate: 0.01, init_x: kernel.initParams(), maxiters: maxiters)
-//        let opt = QuasiNewtonOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 1.0, beta: 1.0)
-//        let opt = SteepestDescentOptimizer(objective: llh, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
+        let opt = SCG(objective: likelihood, learningRate: 0.01, initX: kernel.initParams(), maxIters: maxiters)
+//        let opt = QuasiNewtonOptimizer(objective: likelihood, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 1.0, beta: 1.0)
+//        let opt = SteepestDescentOptimizer(objective: likelihood, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
         
         let (x, _, _) = opt.optimize(verbose: verbose)
         
         kernel.setParams(x)
+        likelihood.update()
     }
     
     public func fit(X: Matrix<GaussianProcessRegressor.ScalarT>, Y: Matrix<GaussianProcessRegressor.ScalarT>) {
@@ -114,12 +107,34 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
     public var Xtrain: MatrixT
     public var ytrain: MatrixT
     
+    // storing these for later prediction
+    // "alpha"
+    public var woodburyVector: MatrixT = MatrixT()
+    // inv(C)
+    public var woodburyInv: MatrixT = MatrixT()
+    // L
+    public var woodburyCho: MatrixT = MatrixT()
+    // C
+    public var C: MatrixT = MatrixT()
+    
     public init(_ kernel: KernelT, _ noise: MatrixT, _ X: MatrixT, _ y: MatrixT) {
         self.kernel = kernel
         self.noise = noise
         dims = kernel.nDims
         Xtrain = X
         ytrain = y
+    }
+    
+    public func update() {
+        let K = kernel.K(Xtrain, Xtrain)
+        
+        C = K + noise
+        let L = cho_factor(C, "L")
+        let alpha = cho_solve(L, ytrain, "L")
+        
+        woodburyCho = L
+        woodburyVector = alpha
+        woodburyInv = cho_solve(L, eye(Xtrain.rows), "L")
     }
     
     public func compute(_ x: MatrixT) -> ScalarT {
@@ -136,7 +151,7 @@ public class GPLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Float
         let alpha = cho_solve(L, ytrain, "L")
         
         // same as 0.5 * tr(alpha.t * alpha)
-        let ytCy = reduce_sum(alpha ∘ alpha)[0, 0]
+        let ytCy = reduce_sum(alpha ∘ ytrain)[0, 0]
 
         let logdetC = D * reduce_sum(log(diag(L)))[0, 0] // 0.5 * D * logdet(C)
 
