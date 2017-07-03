@@ -30,6 +30,69 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
 //    @IBOutlet weak var graph: GraphView!
     @IBOutlet var mainView: UIView!
     @IBOutlet weak var graph: GraphView!
+    
+    func simpleShapeInterpolation() {
+        let Q = 2
+        
+        if let asset = NSDataAsset(name: "ShapeData") {
+            let data = asset.data
+            let parser = XMLParser(data: data)
+            let svg = SVGParserDelegate()
+            parser.delegate = svg
+            
+            let success:Bool = parser.parse()
+            
+            if success {
+                print("parse success!")
+//                print(svg.paths)
+            } else {
+                print("parse failure!")
+            }
+            
+            var Y: Matrix<Float> = Matrix<Float>(svg.paths)
+            Y = Y .- Y.mean(axis: 0)
+//            Y = Y  / Y.std(axis: 0)
+            
+            let pca = PCA(nComponents: Q)
+            pca.fit(Y)
+            let initX = pca.predict(Y)
+            
+            let kern = RBF(variance: 1, lengthscale: 10, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
+            let gp = GPLVM<RBF>(kernel: kern, alpha: 10.0)
+            gp.fit(initX, Y, maxiters: 100)
+            
+            print(gp.kernel.variance, gp.kernel.lengthscale)
+            
+            let X = gp.kernel.X
+            
+            let Xstep = (X[9] - X[4]) / 10
+            let colors = [UIColor.black, UIColor.green, UIColor.red, UIColor.blue, UIColor.orange, UIColor.black, UIColor.green, UIColor.red, UIColor.blue, UIColor.orange]
+            for i in 1..<10 {
+                let Xm = X[7] + Xstep * Float(i)
+//                print(Xm)
+                var (Ym, _) = gp.predict(Xm)
+                Ym = Ym.reshape([11, 2])
+                
+//                print(Ym)
+                _ = graph.plot(x: Ym[column: 0].grid.cgFloat, y: Ym[column: 1].grid.cgFloat, c: colors[i], s: 2.0)
+            }
+            
+//            let Xpred = gp.kernel.X
+//            
+//            let (maxX, maxY) = tuple(max(Xpred, axis: 0).grid)
+//            let (minX, minY) = tuple(min(Xpred, axis: 0).grid)
+//            
+//            let Xs: [Float] = linspace(minX, maxX, 20)
+//            let Ys: [Float] = linspace(minY, maxY, 20)
+//            let (Xss, Yss) = meshgrid(Xs,Ys)
+//            let XX: Matrix<Float> = hstack([Xss.reshape([-1, 1]), Yss.reshape([-1, 1])])
+//            
+//            let (Mu, Sigma) = gp.predict(XX)
+//            _ = graph.imshow(Sigma.reshape([20, 20]), "bicubic", "luce")
+            
+            graph.autoScaleAll()
+        }
+    }
 
     
     func visualise1DRegression() {
@@ -40,8 +103,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         let Y = Matrix<Float>([[ 0.04964821,  0.0866106,  0.16055375,  0.58936555,  0.71558366,  1.00004714,  1.08412273,  1.42418915]]).t
         
-        let kern = RBF(variance: 100.0, lengthscale: 100.0, X: X, trainables: ["logVariance", "logLengthscale"])
-        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.5)
+        let kern = RBF(variance: 1.0, lengthscale: 1.0, X: X, trainables: ["logVariance", "logLengthscale"])
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.1)
         gp.fit(X, Y, maxiters: 100)
         
         print(gp.kernel.variance, gp.kernel.lengthscale)
@@ -49,8 +112,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let Xstar = Matrix<Float>(-1, 1, arange(-1.5, 1.5, 0.1))
         let (Mu, Sigma) = gp.predict(Xstar)
 
-        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu + diag(Sigma)).grid.cgFloat , c: UIColor.blue, s: 1.0)
-        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu - diag(Sigma)).grid.cgFloat, c: UIColor.blue, s: 1.0)
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu + Sigma).grid.cgFloat , c: UIColor.blue, s: 1.0)
+        _ = graph.plot(x: Xstar.grid.cgFloat, y: (Mu - Sigma).grid.cgFloat, c: UIColor.blue, s: 1.0)
         
         _ = graph.plot(x: Xstar.grid.cgFloat, y: Mu.grid.cgFloat, c: UIColor.red, s: 3.0)
         _ = graph.scatter(x: X.grid.cgFloat, y: Y.grid.cgFloat, c: UIColor.green, s: 10.0)
@@ -73,7 +136,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let A: Matrix<Float> = randMatrix(2, 15)
         let Y = X * A + 0.01 * randMatrix(150, 15)
         
-        let pca = PCA(2)
+        let pca = PCA(nComponents: 2)
         pca.fit(Y)
         let Xpred = pca.predict(Y)
         
@@ -100,18 +163,18 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(N / 2)
         
         let xx = vstack([X1, X2])
-        X = xx .- xx.mean(0)
-        X = X ./ X.std(0)
+        X = xx .- xx.mean(axis: 0)
+        X = X ./ X.std(axis: 0)
         
         let A: Matrix<Float> = randMatrix(2, D)
         Y = X * A + 0.01 * randMatrix(N, D)
         
-        let pca = PCA(Q)
+        let pca = PCA(nComponents: Q)
         pca.fit(Y)
         let initX = pca.predict(Y)
         
-        let kern = RBF(variance: 10, lengthscale: 10, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
-        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.8)
+        let kern = RBF(variance: 1, lengthscale: 1, X: initX, trainables: ["logVariance", "logLengthscale", "X"])
+        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.2)
         gp.fit(X, Y, maxiters: 1000)
         
         print(gp.kernel.variance, gp.kernel.lengthscale)
@@ -127,10 +190,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let XX: Matrix<Float> = hstack([Xss.reshape([-1, 1]), Yss.reshape([-1, 1])])
         
         let (Mu, Sigma) = gp.predict(XX)
-//        _ = graph.imshow(Sigma.reshape([20, 20]), "bicubic", "luce")
+        _ = graph.imshow(Sigma.reshape([20, 20]), "bicubic", "luce")
         
-        _ = graph.scatter(x: Xpred[∶10, 0].grid.cgFloat, y: Xpred[∶10, 1].grid.cgFloat, c: UIColor.green, s: 10.0)
-        _ = graph.scatter(x: Xpred[10∶20, 0].grid.cgFloat, y: Xpred[10∶20, 1].grid.cgFloat, c: UIColor.red, s: 10.0)
+//        _ = graph.scatter(x: Xpred[∶10, 0].grid.cgFloat, y: Xpred[∶10, 1].grid.cgFloat, c: UIColor.green, s: 10.0)
+//        _ = graph.scatter(x: Xpred[10∶20, 0].grid.cgFloat, y: Xpred[10∶20, 1].grid.cgFloat, c: UIColor.red, s: 10.0)
         
         graph.autoScaleAll()
     }
@@ -226,7 +289,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
 //        visualiseGaussian()
 //        visualise1DRegression()
 //        visualisePCA()
-        visualiseGPLVM()
+//        visualiseGPLVM()
+        simpleShapeInterpolation()
     }
 
     override func didReceiveMemoryWarning() {

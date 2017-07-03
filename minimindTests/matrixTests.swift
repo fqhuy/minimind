@@ -37,9 +37,9 @@ class matrixTests: XCTestCase {
     }
     
     func testArithmetic() {
-        XCTAssert(all(fx.mean(0) == Matrix<Float>([[0.5, 1.0]])), " matrix mean failed")
-        XCTAssert(all(fx.std(0) == Matrix<Float>([[0.5, 0.0]])), " matrix std failed")
-        XCTAssert(all(fx.sum(0) == Matrix<Float>([[1.0, 2.0]])), " matrix sum failed")
+        XCTAssert(all(fx.mean(axis: 0) == Matrix<Float>([[0.5, 1.0]])), " matrix mean failed")
+        XCTAssert(all(fx.std(axis: 0) == Matrix<Float>([[0.5, 0.0]])), " matrix std failed")
+        XCTAssert(all(fx.sum(axis: 0) == Matrix<Float>([[1.0, 2.0]])), " matrix sum failed")
     }
     
     func testTransformation() {

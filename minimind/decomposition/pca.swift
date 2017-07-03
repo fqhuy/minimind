@@ -17,7 +17,7 @@ public class PCA: BaseEstimator {
     public var components: MatrixT
     public var explained_variance: MatrixT
     
-    public init(_ nComponents: Int) {
+    public init(nComponents: Int) {
         self.nComponents = nComponents
         self.mean = MatrixT()
         self.components = MatrixT()
@@ -30,7 +30,7 @@ public class PCA: BaseEstimator {
     
     public func fit(_ X: MatrixT) {
         let (N, D) = X.shape
-        let Xmean = X.mean(0)
+        let Xmean = X.mean(axis: 0)
         let XX = (X .- Xmean)
         
 //        PRML, directly work on S
@@ -43,11 +43,12 @@ public class PCA: BaseEstimator {
         let (u, evals, vt) = svd(XX, "S", "S")
         
         // Sign corrections
-        let maxAbsVals = argmax(abs(u), 0)
-        let signs = sign(diag(u[maxAbsVals.grid, 0∶D]))
-//        let U = u .* signs
-        let V = vt |* signs′
-        
+        var V = vt
+        if N >= D {
+            let maxAbsVals = argmax(abs(u), 0)
+            let signs = sign(diag(u[maxAbsVals.grid, 0∶D]))
+            V = vt |* signs′
+        }
         self.components = V[0∶nComponents, 0∶D] // V[0∶D, 0∶nComponents].t
         self.explained_variance = (evals[0, 0∶] ∘ evals[0, 0∶]) / Float(N) // evals
         self.mean = Xmean

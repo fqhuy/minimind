@@ -417,8 +417,12 @@ public extension Matrix where T: ScalarType {
         return re
     }
     
-    public func sum(_ axis: Int = -1) -> Matrix {
+    public func sum(axis: Int = -1) -> Matrix {
         return apply(minimind.sum, axis)
+    }
+    
+    public func sum() -> Element {
+        return minimind.sum(grid)
     }
     
     public func zeros(_ rows: Int, _ columns: Int) -> Matrix {

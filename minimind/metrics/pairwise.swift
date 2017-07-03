@@ -13,14 +13,14 @@ public func euclideanDistances(X: Matrix<Float>, Y: Matrix<Float>, YNormSquared:
     
     var YY: Matrix<Float> = zeros(1, Y.rows)
     switch YNormSquared {
-        case nil: YY = (Y ∘ Y).sum(1).t
+    case nil: YY = (Y ∘ Y).sum(axis: 1).t
         default: YY = YNormSquared!
     }
     
     var XX: Matrix<Float> = zeros(X.rows, 1)
     switch XNormSquared {
         case nil:
-            XX = (X ∘ X).sum(1)
+            XX = (X ∘ X).sum(axis: 1)
         default:
             XX = XNormSquared!
     }

@@ -73,13 +73,15 @@ public class GPLVMLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Fl
             YTrain = YTrain[forall, validDims]
             let YNew_ = Y[forall, validDims]
             //WARNING: This is dangerous, consider the order of *
-            dist = (-2.0 * YNew_) * YTrain.t + pow(YNew_, 2).sum(1)[0,0] + pow(YTrain, 2).sum(1)[0,0]
+            let xy = -2.0 * YNew_ * YTrain.t
+            dist = (xy |+ pow(YNew_, 2).sum(axis: 1)) .+ pow(YTrain, 2).sum(axis: 1).t
         } else {
-            dist = (-2.0 * YNew) * YTrain.t + pow(YNew, 2).sum(1)[0,0] + pow(Y, 2).sum(1)[0,0]
+            let xy = -2.0 * YNew * YTrain.t
+            dist = (xy |+ pow(YNew, 2).sum(axis: 1)) .+ pow(YTrain, 2).sum(axis: 1).t
         }
         
-        let idx = argmin(dist, 1)[0, 0]
-        return model.Xtrain[idx]
+        let idx = argmin(dist, 1).t //[0, 0]
+        return model.Xtrain[idx.grid]
     }
     
     public func compute(_ x: Matrix<Float>) -> Float {
@@ -87,9 +89,9 @@ public class GPLVMLikelihood<K: Kernel>: ObjectiveFunction where K.ScalarT == Fl
         let psi1 = kernel.K(x, Z)
         let psi0 = diag(kernel.K(x, x))
         let psi2 = psi1.t * psi1
-        let v2 = (dPsi2 ∘ psi2).sum()[0, 0]
-        let v1 = (dPsi1 ∘ psi1).sum()[0, 0]
-        let v0 = (dPsi0 ∘ psi0).sum()[0, 0]
+        let v2 = (dPsi2 ∘ psi2).sum()
+        let v1 = (dPsi1 ∘ psi1).sum()
+        let v0 = (dPsi0 ∘ psi0).sum()
         return v0 + v1 + v2
     }
     

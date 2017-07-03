@@ -17,19 +17,19 @@ public extension Matrix where T == Double {
         }
     }
     
-    public func mean(_ axis: Int) -> Matrix {
+    public func mean(axis: Int) -> Matrix {
         return apply(minimind.mean, axis)
     }
     
-    public func std(_ axis: Int) -> Matrix {
+    public func std(axis: Int) -> Matrix {
         return apply(minimind.std, axis)
     }
     
-    public func sum(_ axis: Int = -1) -> Matrix {
+    public func sum(axis: Int = -1) -> Matrix {
         return apply(minimind.sum, axis)
     }
     
-    public func cumsum(_ axis: Int = -1) -> Matrix {
+    public func cumsum(axis: Int = -1) -> Matrix {
         return apply(minimind.cumsum, axis)
     }
 }

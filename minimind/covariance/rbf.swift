@@ -167,13 +167,13 @@ public class RBF: Kernel {
         
         // variance
         if trainables.contains("logVariance") {
-            dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance)
+            dGrid.append((reduce_sum(Kr ∘ dLdK))[0, 0] / variance + logVariance )
         }
         
         // lengthscale
         if trainables.contains("logLengthscale") {
 //            dGrid.append(-(reduce_sum((dLdK ∘ Kr) ∘ (r ∘ r) ))[0,0] / lengthscale) // 0.5 *
-            dGrid.append(-reduce_sum(dLdr ∘ r)[0,0] / lengthscale)
+            dGrid.append(-reduce_sum(dLdr ∘ r)[0,0] / lengthscale + logLengthscale )
         }
         
         // gradient wrt X
@@ -200,7 +200,7 @@ public class RBF: Kernel {
         
         if X.rows == Y.rows {
             // detects X == Y, should use Y: MatrixT? instead
-            if diag(dist).sum()[0,0] < 1e-4 {
+            if diag(dist).sum() < 1e-4 {
                 for r in 0..<dist.rows {
                     dist[r, r] = 0.0
                 }
@@ -224,7 +224,7 @@ public class RBF: Kernel {
         for r in 0..<dist.rows {
             for c in 0..<dist.columns {
                 if dist[r, c] == 0 {
-                    dist[r, c] = 1e10
+                    dist[r, c] = 0
                 }
                 else {
                     dist[r, c] = 1.0 / dist[r, c]

@@ -52,6 +52,7 @@
 		367E89201C963D2600C96392 /* minimindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367E891F1C963D2600C96392 /* minimindTests.swift */; };
 		367E89BD1C96BB4B00C96392 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 367E89BC1C96BB4B00C96392 /* Accelerate.framework */; };
 		36816BCA1EFD32500091DE53 /* trust_region.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36816BC91EFD32500091DE53 /* trust_region.swift */; };
+		36876D2A1F0782C0000B1B4E /* SVGParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36876D291F0782C0000B1B4E /* SVGParserDelegate.swift */; };
 		368962291EEBE247009134A3 /* pca.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368962281EEBE247009134A3 /* pca.swift */; };
 		3689622C1EEC41AD009134A3 /* kmeans.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622B1EEC41AD009134A3 /* kmeans.swift */; };
 		3689622E1EEE90C7009134A3 /* minimindTestArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3689622D1EEE90C7009134A3 /* minimindTestArray.swift */; };
@@ -191,6 +192,7 @@
 		367E89631C96AF3C00C96392 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		367E89BC1C96BB4B00C96392 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		36816BC91EFD32500091DE53 /* trust_region.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = trust_region.swift; path = optimisation/trust_region.swift; sourceTree = "<group>"; };
+		36876D291F0782C0000B1B4E /* SVGParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SVGParserDelegate.swift; sourceTree = "<group>"; };
 		368962281EEBE247009134A3 /* pca.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = pca.swift; path = decomposition/pca.swift; sourceTree = "<group>"; };
 		3689622B1EEC41AD009134A3 /* kmeans.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = kmeans.swift; path = cluster/kmeans.swift; sourceTree = "<group>"; };
 		3689622D1EEE90C7009134A3 /* minimindTestArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = minimindTestArray.swift; sourceTree = "<group>"; };
@@ -296,6 +298,7 @@
 				363DDCCB1EE58024003607B4 /* Artist.swift */,
 				3670FD9A1EEAA6B200AC07F2 /* Utils.swift */,
 				36ED05531EF9112000955522 /* ColorMap.swift */,
+				36876D291F0782C0000B1B4E /* SVGParserDelegate.swift */,
 			);
 			path = miniminds;
 			sourceTree = "<group>";
@@ -759,6 +762,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				363DDCCC1EE58024003607B4 /* Artist.swift in Sources */,
+				36876D2A1F0782C0000B1B4E /* SVGParserDelegate.swift in Sources */,
 				363DDCA61EE4AF02003607B4 /* miniminds.xcdatamodeld in Sources */,
 				363DDCC81EE56B54003607B4 /* GraphModel.swift in Sources */,
 				3670FD9B1EEAA6B200AC07F2 /* Utils.swift in Sources */,

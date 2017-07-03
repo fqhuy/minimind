@@ -22,19 +22,35 @@ class decompositionTests: XCTestCase {
         self.Y = zeros(N, D)
         self.X = zeros(N, Q)
         
-        let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
-        let mean1 = Matrix<Float>([[-3, 0]])
-        let mean2 = Matrix<Float>([[3, 0]])
+//        let cov = Matrix<Float>([[1.0, 0.1],[0.1, 1.0]])
+//        let mean1 = Matrix<Float>([[-3, 0]])
+//        let mean2 = Matrix<Float>([[3, 0]])
+//        
+//        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(N / 2)
+//        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(N / 2)
+//        let xx = vstack([X1, X2])
+//        X = xx .- xx.mean(axis: 0)
+//        X = X ./ X.std(axis: 0)
+//        
+//        let A: Matrix<Float> = randMatrix(Q, D)
+//        Y = X * A + 0.01 * randMatrix(N, D)
         
-        let X1 = MultivariateNormal(mean: mean1, cov: cov).rvs(N / 2)
-        let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(N / 2)
+        let u: [Float] = linspace(-3, 3, N)
+        let s1 = Matrix([sin(u)])
+        let s2 = Matrix([-cos(u) * cos(u)])
         
-        let xx = vstack([X1, X2])
-        X = xx .- xx.mean(0)
-        X = X ./ X.std(0)
+        let A: Matrix<Float> = randMatrix(1, Int(D / 2))
         
-        let A: Matrix<Float> = randMatrix(2, D)
-        Y = X * A + 0.01 * randMatrix(N, D)
+        let Y1 = s1.t * A + 0.01 * randMatrix(N, Int(D / 2))
+        let Y2 = s2.t * A + 0.01 * randMatrix(N, Int(D / 2))
+        
+        let yy = hstack([Y1, Y2])
+        Y = yy - yy.mean()
+        Y = Y / Y.std()
+        
+        let xx = vstack([s1, s2]).t
+        X = xx .- xx.mean(axis: 0)
+        X = X ./ X.std(axis: 0)
     }
     
     override func tearDown() {
@@ -42,7 +58,7 @@ class decompositionTests: XCTestCase {
     }
 
     func testPCA() {
-        let pca = PCA(2)
+        let pca = PCA(nComponents: 2)
         pca.fit(Y)
         let X = pca.predict(Y)
         
@@ -50,7 +66,7 @@ class decompositionTests: XCTestCase {
     }
     
     func testGPLVM() {
-        let pca = PCA(Q)
+        let pca = PCA(nComponents: Q)
         pca.fit(Y)
         let initX = pca.predict(Y)
         
@@ -58,7 +74,7 @@ class decompositionTests: XCTestCase {
 //        let gp = GaussianProcessRegressor<RBF>(kernel: kern, alpha: 0.8)
 //        gp.fit(X, Y, maxiters: 1000)
         
-        let gp = GPLVM(kernel: kern, alpha: 0.8)
+        let gp = GPLVM(kernel: kern, alpha: 8.2)
         gp.fit(initX, Y)
         
         let Xpred = gp.kernel.X
@@ -70,15 +86,20 @@ class decompositionTests: XCTestCase {
         let Ys: Matrix<Float> = linspace(minY, maxY, 20)
         
         let XStar = vstack([Xs, Ys]).t
-        let (means, covs) = gp.predict(XStar[0])
+//        let (means, covs) = gp.predict(XStar[0])
         
-//        var ys = Y[0, forall] * 2.0
-//        ys[0, 1] = Float.nan
+        var ys = Y[[0], forall]
+        ys[0, 1] = Float.nan
+        ys[0, 3] = Float.nan
+        
 //        let xs = gp.predictX(ys, true)
-//        print(xs)
+        let xs = gp.kernel.X[0]
+        let pys = gp.predict(xs)
         
+        print(pys, Y[0])
         print(gp.kernel.variance, gp.kernel.lengthscale)
-
+//        print(gp.kernel.X[column: 0])
+//        print(gp.kernel.X[column: 1])
     }
 
     func testPerformanceExample() {

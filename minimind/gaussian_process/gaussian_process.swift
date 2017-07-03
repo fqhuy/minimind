@@ -58,7 +58,7 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         let Sigma = Kzz - Kxz * likelihood.woodburyInv * transpose(Kxz)
         let Mu = Kxz * likelihood.woodburyVector
         
-        return (Mu.t, diag(Sigma))
+        return (Mu, diag(Sigma))
     }
     
     public func fit(_ X: MatrixT, _ y: MatrixT, maxiters: Int = 200, verbose: Bool = true) {
@@ -71,13 +71,13 @@ public class GaussianProcessRegressor<K: Kernel>: GaussianProcess, Regressor whe
         
         likelihood = GPLikelihood(kernel, noise, Xtrain, ytrain)
         
-        let opt = SCG(objective: likelihood, learningRate: 0.01, initX: kernel.initParams(), maxIters: maxiters)
-//        let opt = QuasiNewtonOptimizer(objective: likelihood, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 1.0, beta: 1.0)
+//        let opt = SCG(objective: likelihood, learningRate: 0.01, initX: kernel.initParams(), maxIters: maxiters)
+        let opt = QuasiNewtonOptimizer(objective: likelihood, stepLength: 1.0, initX: kernel.initParams(), initH: nil, gTol: 1e-8, maxIters: maxiters, alphaMax: 1.0, beta: 1.0)
 //        let opt = SteepestDescentOptimizer(objective: likelihood, stepLength: 1.0, initX: kernel.initParams(), maxIters: maxiters, alphaMax: 2.0)
-        
         let (x, _, _) = opt.optimize(verbose: verbose)
-        
         kernel.setParams(x)
+        Xtrain = kernel.X
+        
         likelihood.update()
     }
     

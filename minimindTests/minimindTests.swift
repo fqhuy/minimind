@@ -54,7 +54,7 @@ class minimindTests: XCTestCase {
         let gauss = MultivariateNormal(mean: v, cov: A)
         
         let X = gauss.rvs(1000)
-        print(X.mean(0))
+        print(X.mean(axis: 0))
         
         gauss.pdf(randMatrix(5, 3))
     }

@@ -23,8 +23,8 @@ class clusterTests: XCTestCase {
         let X2 = MultivariateNormal(mean: mean2, cov: cov).rvs(50)
         
         let xx = vstack([X1, X2]) 
-        X = xx .- xx.mean(0)
-        X = X ./ X.std(0)
+        X = xx .- xx.mean(axis: 0)
+        X = X ./ X.std(axis: 0)
     }
     
     override func tearDown() {
@@ -34,7 +34,7 @@ class clusterTests: XCTestCase {
     
     func testKMeansPlusPlus() {
         
-        let XSquaredNorm = (X ∘ X).sum(1)
+        let XSquaredNorm = (X ∘ X).sum(axis: 1)
         let clusters = KMeans.kMeansPlusPlus(X, XSquaredNorm, 2, 5)
         print(clusters)
 //        print(X)

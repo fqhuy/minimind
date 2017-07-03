@@ -30,7 +30,7 @@ class KMeans: BaseEstimator {
         let (N, D) = X.shape
         
         var iter = 0
-        let XSq = (X ∘ X).sum(1)
+        let XSq = (X ∘ X).sum(axis: 1)
         var centers: Matrix<ScalarT> = KMeans.kMeansPlusPlus(X, XSq, nClusters, nil)
         
         var score = ScalarT(1e10)
@@ -47,7 +47,7 @@ class KMeans: BaseEstimator {
             
             // compute new means from labels
             for c in 0..<nClusters {
-                centers[c] = X[nonzero(lbls.grid == c)].mean(0)
+                centers[c] = X[nonzero(lbls.grid == c)].mean(axis: 0)
             }
             
             if norm(centers - bestCenters, "F") < tol {
@@ -71,7 +71,7 @@ class KMeans: BaseEstimator {
     }
     
     public func predict(_ Xstar: MatrixT) -> Matrix<IndexType> {
-        let CSq = (clusterCenters ∘ clusterCenters).sum(1)
+        let CSq = (clusterCenters ∘ clusterCenters).sum(axis: 1)
         let dists = euclideanDistances(X: Xstar, Y: clusterCenters, YNormSquared: CSq, squared: true, XNormSquared: nil)
         let lbls = argmin(dists, 1)
         return lbls

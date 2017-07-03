@@ -17,19 +17,31 @@ public extension Matrix where T == Float {
         }
     }
 
-    public func mean(_ axis: Int) -> Matrix {
+    public func mean(axis: Int) -> Matrix {
         return apply(minimind.mean, axis)
     }
     
-    public func std(_ axis: Int) -> Matrix {
+    public func std(axis: Int) -> Matrix {
         return apply(minimind.std, axis)
     }
     
-    public func sum(_ axis: Int = -1) -> Matrix {
+    public func sum(axis: Int = -1) -> Matrix {
         return apply(minimind.sum, axis)
     }
     
-    public func cumsum(_ axis: Int = -1) -> Matrix {
+    public func mean() -> Element {
+        return minimind.mean(grid)
+    }
+    
+    public func std() -> Element {
+        return minimind.std(grid)
+    }
+    
+    public func sum() -> Element {
+        return minimind.sum(grid)
+    }
+    
+    public func cumsum(axis: Int = -1) -> Matrix {
         return apply(minimind.cumsum, axis)
     }
 }
