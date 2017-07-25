@@ -72,6 +72,32 @@ import minimind
         return line
     }
     
+    public func plotAnimation(x: [[CGFloat]], y: [[CGFloat]], c: UIColor, s: CGFloat) -> Line2D {
+        let line = Line2D(x: x[0], y: y[0], frame: self.bounds)
+        line.edgeColor = c
+        line.lineWidth = s
+        self.items.append(line)
+
+        var i = 0
+//        line.transform = CGAffineTransform(scaleX: 0, y: 0)
+//        UIView.animate(withDuration: 2.0, animations: {
+//            line.transform = CGAffineTransform(scaleX: 1, y: 1)
+//        }
+//        )
+        
+        UIView.animateKeyframes(withDuration: 5.0, delay: 0.5, animations: {
+//            line.edgeColor = UIColor.white
+            for i in [0, 1, 2] {
+                UIView.addKeyframe(withRelativeStartTime: Double(i) * 0.3, relativeDuration: 0.3, animations: {
+                    line.x = x[i]
+                    line.y = y[i]
+                }
+                )
+            }
+        }, completion: nil)
+        return line
+    }
+    
     public func scatter(x: [CGFloat], y: [CGFloat], c: UIColor, s: CGFloat ) -> PathCollection {
         let coll = PathCollection(x: x, y: y, frame:  self.bounds) //self.frame
         coll.edgeColor = c

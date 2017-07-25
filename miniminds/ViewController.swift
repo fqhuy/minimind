@@ -67,15 +67,23 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             
             let Xstep = (X[9] - X[4]) / 10
             let colors = [UIColor.black, UIColor.green, UIColor.red, UIColor.blue, UIColor.orange, UIColor.black, UIColor.green, UIColor.red, UIColor.blue, UIColor.orange]
+            
+            var XX: [[CGFloat]] = []
+            var YY: [[CGFloat]] = []
             for i in 1..<10 {
                 let Xm = X[7] + Xstep * Float(i)
-//                print(Xm)
                 var (Ym, _) = gp.predict(Xm)
                 Ym = Ym.reshape([11, 2])
                 
-//                print(Ym)
-                _ = graph.plot(x: Ym[column: 0].grid.cgFloat, y: Ym[column: 1].grid.cgFloat, c: colors[i], s: 2.0)
+                if isnan(Ym).any() {
+                    continue
+                }
+                XX.append(Ym[column: 0].grid.cgFloat)
+                YY.append(Ym[column: 1].grid.cgFloat)
+//                _ = graph.plot(x: Ym[column: 0].grid.cgFloat, y: Ym[column: 1].grid.cgFloat, c: colors[i], s: 2.0)
             }
+            
+            _ = graph.plotAnimation(x: XX, y: YY, c: UIColor.purple, s: 2.0)
             
 //            let Xpred = gp.kernel.X
 //            
